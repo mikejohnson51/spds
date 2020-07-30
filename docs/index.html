@@ -107,7 +107,7 @@ $(document).ready(function () {
 </style>
 <script>
 $(document).ready(function () {
-  window.initializeCodeFolding("show" === "show");
+  window.initializeCodeFolding("hide" === "show");
 });
 </script>
 
@@ -140,6 +140,15 @@ a:hover{
   color:#FEBC11;
 }
 
+h1.title {
+  text-align: center;
+}
+
+h3.subtitle {
+  text-align: center;
+}
+
+
 </style>
 <p><br><br></p>
 <blockquote>
@@ -156,12 +165,12 @@ a:hover{
 <p><br><br> <br><br></p>
 <center>
 <div class="section level1">
-<h1><i class="fa fa-file-o"></i> <a href="syllabus.html"><strong>Syllabus</strong></a> <i class="fas  fa-desktop "></i> <a href="labs-home.html"><strong>Lab Activites</strong></a></h1>
+<h1><i class="fa fa-file-o"></i> <a href="syllabus.html"><strong>Syllabus</strong></a> <i class="fas  fa-desktop "></i> <a href="labs.html"><strong>Lab Activites</strong></a></h1>
 </center>
 <p><br><br></p>
 <p><br></p>
 <div id="week-1-computational-environment" class="section level2">
-<h2>Week 1: Computational Environment</h2>
+<h2><strong>Week 1</strong>: Computational Environment</h2>
 <br>
 <div class="row">
 <div class="col-md-6">
@@ -169,13 +178,13 @@ a:hover{
 <h4><i class="fa fa-map-marker"></i> <strong>Lecture 01</strong>: <a href="lecture-01.html">Introduction</a></h4>
 </div>
 <div id="lecture-02-geoinformatics" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 02</strong>: <a href="lectures/01_DS.html">Geoinformatics</a></h4>
+<h4><i class="fa fa-map-marker"></i> <strong>Lecture 02</strong>: <a href="">Geoinformatics</a></h4>
 </div>
 <div id="lecture-02-projects-and-computers" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 02</strong>: <a href="lectures/02_reproducable.html">Projects and Computers</a></h4>
+<h4><i class="fa fa-map-marker"></i> <strong>Lecture 02</strong>: <a href="">Projects and Computers</a></h4>
 </div>
 <div id="lecture-03-data-types-structures" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 03</strong>: <a href="lectures/03_data-types-structure.html">Data Types &amp; Structures</a></h4>
+<h4><i class="fa fa-map-marker"></i> <strong>Lecture 03</strong>: <a href="">Data Types &amp; Structures</a></h4>
 </div>
 </div>
 <div class="col-md-6">
@@ -183,165 +192,13 @@ a:hover{
 <h4><strong>Exercise 01</strong>: <a href="../excersise/01_setup-R-Rstudio.html">Set up R &amp; RStudio</a> <i class="fab  fa-r-project "></i></h4>
 </div>
 <div class="section level4">
-<h4><strong>Exercise 02</strong>: <a href="resources/setup-github.html">Git &amp; Github</a> <i class="fab  fa-github "></i></h4>
+<h4><strong>Exercise 02</strong>: <a href="">Intro to Bash / Git Install</a> <i class="fas  fa-terminal "></i></h4>
 </div>
 <div class="section level4">
-<h4><strong>Exercise 03</strong>: <a href="resources/first-proj.html">Your first project!</a> <i class="fas  fa-rocket "></i> — <a href="readings/wilson2017.pdf">Wilson, 2017</a> <i class="fas  fa-book "></i></h4>
+<h4><strong>Exercise 03</strong>: <a href="">Getting “GitHub”</a> <i class="fab  fa-github "></i></h4>
 </div>
-<div id="exercise-04-starting-in-r" class="section level4">
-<h4><strong>Exercise 04</strong>: <a href="assignments/03_starwars.R">Starting in R</a></h4>
-</div>
-</div>
-</div>
-</div>
-<div id="week-2-tables-and-data-science" class="section level2">
-<h2>Week 2: Tables and “Data Science”</h2>
-<p><br></p>
-<div class="row">
-<div class="col-md-6">
-<div id="lecture-05-data-day-1-ingestmanipulation" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 05</strong>: <a href="resources/tidyverse.html">Data Day 1: Ingest/Manipulation</a></h4>
-</div>
-<div id="lecture-06-data-day-2-manipulationfactors" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 06</strong>: <a href="">Data Day 2: Manipulation/Factors</a></h4>
-</div>
-<div id="lecture-07-data-day-3-visulization" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 07</strong>: <a href="">Data Day 3: Visulization</a></h4>
-</div>
-<div id="lecture-08-data-day-4-formatmerging" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 08</strong>: <a href="">Data Day 4: Format/Merging</a></h4>
-</div>
-</div>
-<div class="col-md-6">
-<div id="exercise-05-importselectfilter" class="section level4">
-<h4><i class="fa fa-book"></i> <strong>Exercise 05</strong>: <a href="">Import/Select/Filter</a></h4>
-</div>
-<div id="exercise-06-group-bysummarize" class="section level4">
-<h4><i class="fa fa fa-book"></i> <strong>Exercise 06</strong>: <a href="">Group By/Summarize</a></h4>
-</div>
-<div id="exercise-07-your-first-plot" class="section level4">
-<h4><i class="fa fa-book"></i> <strong>Exercise 07</strong>: <a href="">Your first Plot!</a></h4>
-</div>
-<div id="exercise-08-data-joins" class="section level4">
-<h4><i class="fa fa fa-book"></i> <strong>Exercise 08</strong>: <a href="">Data Joins</a></h4>
-</div>
-</div>
-</div>
-</div>
-<div id="week-3-objects" class="section level2">
-<h2>Week 3: Objects</h2>
-<p><br></p>
-<div class="row">
-<div class="col-md-6">
-<div id="lecture-09-the-foss-gis-ecosystem" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 09</strong>: <a href="">The FOSS GIS Ecosystem</a></h4>
-</div>
-<div id="lecture-10-wktwkb-sf" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 10</strong>: <a href="https://r-spatial.github.io/sf/articles/sf1.html">WKT/WKB &amp; sf</a></h4>
-</div>
-<div id="lecture-11-projections-crs" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 11</strong>: <a href="https://mgimond.github.io/Spatial/coordinate-systems.html">Projections &amp; CRS</a></h4>
-</div>
-<div id="lecture-12-vector-uniaryoperations" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 12</strong>: <a href="https://mgimond.github.io/Spatial/coordinate-systems.html">Vector Uniary/Operations</a></h4>
-</div>
-</div>
-<div class="col-md-6">
-<div id="reading-kuhn-2012" class="section level4">
-<h4><i class="fa fa-book"></i> <strong>Reading</strong>: <a href="">Kuhn, 2012</a></h4>
-</div>
-<div id="reading" class="section level4">
-<h4><i class="fa fa fa-book"></i> <strong>Reading</strong>: <a href=""></a></h4>
-</div>
-</div>
-</div>
-</div>
-<div id="week-4-objects-feilds" class="section level2">
-<h2>Week 4: Objects &amp; Feilds</h2>
-<p><br></p>
-<div class="row">
-<div class="col-md-6">
-<div id="lecture-13-predicates-binary" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 13</strong>: <a href="https://mgimond.github.io/Spatial/coordinate-systems.html">Predicates &amp; Binary</a></h4>
-</div>
-<div id="lecture-14-join-filter-aw-interpolation" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 14</strong>: <a href="">Join, Filter, AW Interpolation</a></h4>
-</div>
-<div id="lecture-15-raster-data-structure-map-algebra" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 15</strong>: <a href="">Raster Data Structure &amp; Map Algebra</a></h4>
-</div>
-<div id="lecture-16-local-focal-zonal-global" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 16</strong>: <a href="">Local, Focal, Zonal, Global</a></h4>
-</div>
-</div>
-<div class="col-md-6">
-<div id="reading-1" class="section level4">
-<h4><i class="fa fa-book"></i> <strong>Reading</strong>: <a href=""></a></h4>
-</div>
-<div id="reading-2" class="section level4">
-<h4><i class="fa fa fa-book"></i> <strong>Reading</strong>: <a href=""></a></h4>
-</div>
-</div>
-</div>
-</div>
-<div id="week-5-feilds" class="section level2">
-<h2>Week 5: Feilds</h2>
-<br>
-<div class="row">
-<div class="col-md-6">
-<div id="lecture-17-categorical-rasters" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 17</strong>: <a href="">Categorical Rasters</a></h4>
-</div>
-<div id="lecture-18-raster-classification-1" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 18</strong>: <a href="">Raster Classification 1</a></h4>
-</div>
-<div id="lecture-19-raster-classification-2" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 19</strong>: <a href="">Raster Classification 2</a></h4>
-</div>
-<div id="lecture-20-terrain-analysis" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 20</strong>: <a href="https://matthewrvross.com/active.html">Terrain Analysis</a></h4>
-</div>
-</div>
-<div class="col-md-6">
-<div id="reading-resampling" class="section level4">
-<h4><i class="fa fa-book"></i> <strong>Reading</strong>: <a href="">Resampling</a></h4>
-</div>
-<div id="reading-3" class="section level4">
-<h4><i class="fa fa-book"></i> <strong>Reading</strong>: <a href=""></a></h4>
-</div>
-<div id="reading-4" class="section level4">
-<h4><i class="fa fa fa-book"></i> <strong>Reading</strong>: <a href=""></a></h4>
-</div>
-<div id="reading-innudation-library" class="section level4">
-<h4><i class="fa fa fa-book"></i> <strong>Reading</strong>: <a href="">Innudation Library</a></h4>
-</div>
-</div>
-</div>
-</div>
-<div id="week-6-time---the-3rd-diminsion" class="section level2">
-<h2>Week 6: Time - the 3<sup>rd</sup> diminsion</h2>
-<br>
-<div class="row">
-<div class="col-md-6">
-<div id="labor-day-no-class" class="section level4">
-<h4><i class="fa fa-paper-plane-o"></i> <strong>Labor Day (no class)</strong></h4>
-</div>
-<div id="lecture-21-time-series-streamflow" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 21</strong>: <a href="">Time Series: Streamflow</a></h4>
-</div>
-<div id="lecture-22-data-cubes" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 22</strong>: <a href="">Data Cubes</a></h4>
-</div>
-<div id="lecture-23-where-to-go-from-here" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 23</strong>: <a href="">Where to go from here?</a></h4>
-</div>
-</div>
-<div class="col-md-6">
-<div id="reading-5" class="section level4">
-<h4><i class="fa fa-book"></i> <strong>Reading</strong>: <a href=""></a></h4>
-</div>
-<div id="reading-6" class="section level4">
-<h4><i class="fa fa fa-book"></i> <strong>Reading</strong>: <a href=""></a></h4>
+<div class="section level4">
+<h4><strong>Exercise 04</strong>: <a href="">Structured Starwars</a> <i class="fas  fa-jedi "></i></h4>
 </div>
 </div>
 </div>
