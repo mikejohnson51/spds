@@ -29,15 +29,33 @@ class: center, middle, inverse, title-slide
 
 
 
+&lt;style type="text/css"&gt;
+span.code {
+      background:rgba(127,240,0, 0.2);
+      border-radius: 5px 5px 5px 5px;
+      padding-left:5px;
+      padding-top:2px;
+      padding-right:5px;
+      padding-bottom:2px;
+      color:#008000;
+     }
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+.remark-code{font-size: 100%}
+&lt;/style&gt;
+
 # Welcome to Geography 176A
 
-- In this course we will cover the foundations of **geoinformatics**, which is both a precursor to, and the outcome, of sound GIS principles. 
+- In this course we will cover the foundations of **geoinformatics**, 
+- which is both a precursor to, 
+- and the outcome, of sound GIS principles. 
 
 ---
 
 ## 176 @ UCSB
 
-- 3-course series taught to cover the scope of GIS:
+- 3-course series covering the scope of GIS:
 
 --
 
@@ -45,7 +63,7 @@ class: center, middle, inverse, title-slide
 
 --
 
-  &gt; Comprehensive overview of Geographic Information Systems and Science. Topics span the nature of geographic information and the procedures for operating GIS. Labs provide hands-on experience with GIS and related software.
+  &gt; Comprehensive overview of Geographic Information Systems and Science. Topics span the nature of &lt;span class = "code"&gt;geographic information and the procedures for operating GIS&lt;/span&gt;. Labs provide hands-on experience with GIS and related software.
 
 --
 
@@ -53,13 +71,13 @@ class: center, middle, inverse, title-slide
 
 --
 
-  &gt; Study of the technical issues underlying geographic information systems, including coordinate systems and analytic geometry, database models and structures, algorithms and analytical procedures. Laboratory analysis of digital geographic information from physical and social sources.
+  &gt; Study of the technical issues underlying geographic information systems, including coordinate systems and analytic geometry, &lt;span class = "code"&gt;database models and structures, algorithms and analytical procedures&lt;/span&gt;. Laboratory analysis of digital geographic information from physical and social sources.
 
 - GEOG 176C: GIS Design and Applications
 
 --
 
-  &gt; Applying GIS theory and techniques to solve problems in land and resource management, utilities, and municipal government. Covers all stages of a GIS project: planning, design, analysis, and presentation. Students collaborate to design, develop, and present a GIS pilot study.
+  &gt; Applying GIS theory and techniques to solve problems in land and resource management, utilities, and municipal government. Covers all stages of a GIS project: planning, design, analysis, and presentation. Students collaborate to &lt;span class = "code"&gt;design, develop, and present a GIS pilot study&lt;/span&gt;.
 
 ---
 
@@ -69,7 +87,11 @@ class: center, middle, inverse, title-slide
 
 --
 
-- It was designed this summer to provide you with the best possible introduction to a data-driven GIS mindset while building a strong GIS skillset and data understanding
+- It was written over the summer to support students looking for jobs in the GIS profession
+
+--
+
+- It was designed to provide you with the best possible introduction to a &lt;span class = "code"&gt;data-driven GIS mindset&lt;/span&gt; while building a strong GIS skill set and data understanding
 
 --
 
@@ -77,21 +99,21 @@ class: center, middle, inverse, title-slide
  
 --
  
- - The more feedback you give me, the more fluid/tailored the course can be
+ - The &lt;span class = "code"&gt;more feedback you give me, the more fluid/tailored the course can be&lt;/span&gt;
  
 ---
 
 # Philoshophy
 
-- Intentionally **Data Science** focused, we will code, not use software
+- Intentionally **Data Science** focused, &lt;span class = "code"&gt;we will code, not learn software&lt;/span&gt;
 
 --
 
-- The pace will be fast, coding is tough, things "click" for people at different time. We expect this!
+- The pace will be fast
 
 --
 
-- We will expose you to a wide range of techniques, resources, and technologies to prepare you to grow on your own after this course. We want to be broadly aware of the GIS field rather then master a specific skill
+- Coding is hard, &lt;span class = "code"&gt;things "click" for people at different time&lt;/span&gt;. **We expect this!**
 
 --
 
@@ -99,11 +121,11 @@ class: center, middle, inverse, title-slide
 
 --
 
-- We (me, TAs and you) are all in this together. 
+- We will expose you to a wide range of techniques, resources, and technologies to &lt;span class = "code"&gt;prepare you to grow on your own after this course&lt;/span&gt;.
 
 --
 
-- Seek to address foundational computer/data literacy issues that all classes seem to assume another class has covered.
+- We (me, TAs and you) are &lt;span class = "code"&gt;all in this together&lt;/span&gt;. 
 
 ---
 
@@ -111,13 +133,25 @@ class: center, middle, inverse, title-slide
 
 &gt; "The purpose of programming is to **find a sequence of instructions** that will automate the performance of a task on a **computer**, to solve a given problem." 
 
+--
+
 **Tasks** in a geospatial context involve: 
-(1) _phenomena_ (area of arable land, % college educated, number of dogs)
-(2) _space_ (realizing and representing continuous space)
-(3) _time_ (when does something happen and how does it change)
 
+--
 
-This class is about using the power of *computers* to do things with geographic *data* in _reproducible_, _transparent_, and _creative_ ways.
+(1) &lt;span class = "code"&gt;_phenomena_&lt;/span&gt; (area of arable land, % college educated, number of dogs)
+
+--
+
+(2) &lt;span class = "code"&gt;_space_&lt;/span&gt; (realizing and representing continuous space as discrete units)
+
+--
+
+(3) &lt;span class = "code"&gt;_time_&lt;/span&gt;(when does something happen and how does it change)
+
+--
+
+This class is about using the power of span class = "code"&gt;*computers*&lt;/span&gt; to do things with span class = "code"&gt;geographic&lt;/span&gt; *data* in _reproducible_, _transparent_, and _creative_ ways.
 
 
 ---
@@ -210,29 +244,50 @@ class: center, middle
 
 # Learning Curve
 
-&lt;img src="img/learning-curve.jpg"&gt;
+&lt;img src="lec-img/01-learning-curve.png", width=65%&gt;
+
+--
+
+- If you stick with us, we will get you to the &lt;span class = "code"&gt;upswing of awesome&lt;/span&gt;
+
+--
+
+- But you must make it through hand holding, confusion, and despair 
 
 ---
 
 class: inverse, middle, center
 
-&gt; "It’s easy when you start out programming to get really frustrated and think, “Oh it’s me, I’m really stupid,” or, “I’m not made out to program.” But, that is absolutely not the case. Everyone gets frustrated. I still get frustrated occasionally when writing R code. It’s just a natural part of programming. So, it happens to everyone and gets less and less over time. Don’t blame yourself. Just take a break, do something fun, and then come back and try again later." - Hadley Wickham
+## "It’s easy when you start out programming to get really frustrated and think, “Oh it’s me, I’m really stupid,” or, “I’m not made out to program.” But, that is absolutely not the case. Everyone gets frustrated. I still get frustrated occasionally when writing R code. It’s just a natural part of programming. So, it happens to everyone and gets less and less over time. Don’t blame yourself. Just take a break, do something fun, and then come back and try again later." - Hadley Wickham
 
 ---
 # Why R
 
 So we know we are going to program... but why R?
 
-[R](https://www.r-project.org/) is an object-oriented, functional programming language specifically designed to interface to other software. 
+--
 
-This is ideal for using libraries written in lower level languages like C, FORTRAN or Java. 
+- [R](https://www.r-project.org/) is an object-oriented, functional programming language &lt;span class = "code"&gt;specifically designed to interface to other software&lt;/spa&gt;. 
 
-Such libraries **will** help you avoid ‘ceiling’ imposed by GUI-based or proprietary geographic information systems. 
+--
 
-Furthermore, R facilitates access to other languages: the packages Rcpp and reticulate enable access to C++ and Python code, for example. This means R can be used as a ‘bridge’ to a wide range of existing geospatial **programs** (see Section 1.3).
+- This is ideal for using libraries written in lower level languages like C, FORTRAN or Java. 
 
+--
 
-Learning how to use the wealth of geospatial tools available from the R command line can be exciting, but creating new ones can be truly liberating and are the key to become a geospatial scientist rather then a "software user". 
+- Such libraries **will** help you avoid ‘ceiling’ imposed by GUI-based or proprietary geographic information systems. 
+
+--
+
+- Furthermore, R facilitates access to other languages: the packages Rcpp and reticulate enable access to C++ and Python code, for example. This means R can be used as a ‘bridge’ to a wide range of existing geospatial **programs**.
+&lt;center&gt;
+&lt;img src="lec-img/osgeo-logo.png", width=35%&gt;
+&lt;/center&gt;
+--
+
+- Learning how to use the wealth of geospatial tools available from the R command line can be exciting, but creating new ones is the key to become a &lt;span class = "code"&gt;geospatial scientist rather then a "software user"&lt;/span&gt;. 
+
+--
 
 - That is, when programming, you are only limited by you, and not the tools you use.
 
@@ -241,34 +296,30 @@ Learning how to use the wealth of geospatial tools available from the R command 
 # Why r-spatial?
 
 - Strong, dedicated, central, open development community
-- `r-spatial` is grounded in its interfaces to "geolibraries" like GDAL, GEOS, and PostGIS
-- R spatial is improving every day and is built on the premise of leverging libraries like GDAL, GEOS, and PROJ.
-- All of this will becomre more clear in lecture through out this course
+- `r-spatial` is improving every day and is built on the premise of leveraging libraries like GDAL, GEOS, and PROJ.
+- All of this will become more clear in lecture through out this course
 ---
 
 # Are we "learning" R?
 
-- *Yes.* You will learn R and its applications for spatial data science.
+- &lt;span class = "code"&gt;*Yes.*&lt;/span&gt; You will learn R and its applications for spatial data science.
 
-- *No.* We are not "teaching" R. Rather, R is one tool for dealing with spatial data. The concepts learned in this course will make you a more effient analyst in python, ArcMap, ect.
+--
 
-- Put another way, learning software is easy. 176B might use ArcMap and you might feel behind on day 1. But the concepts here ranging from project structure to analysis will serve you well.
+- &lt;span class = "code"&gt;*No.*&lt;/span&gt; We are not "teaching" R. Rather, R is one tool for dealing with spatial data. The concepts learned in this course will make you a more efficient analyst in python, ArcMap, Google Earth Engine, ect.
 
----
+--
 
-# What is RStudio?
-
-I am not cruel. You will use R in an IDE called RStudio. This is not a crutch - I (am everyone I know) use an IDE for code development
-
-- RStudio makes R more user-friendly and provide a panel dedicated to interactive visualization.
+- Put another way, learning software is easy. &lt;span class = "code"&gt;176B might use ArcMap and you might feel behind on day 1&lt;/span&gt;. But the concepts here ranging from project structure to analysis will serve you well.
 
 ---
 
-# Mikes Opinions:
+# Mike's Opinions:
 
 To be fair, you should know these things about me:
 
-- I think R is currently the best tool for spatial data science. Other certainly disagree
+- I think R is currently the best tool for spatial data science. Other **certainly** disagree
+    (This statement can be the equivalent to a holy war)
 
 --
 
@@ -276,12 +327,11 @@ To be fair, you should know these things about me:
 
 --
 
-- GIS is a combination of understanding data science, geometry, and matrices. This is math!
-  - But fun math 😄
+- GIS is a combination of understanding our computers, data science, and geometry
   
 --
 
-- Everyone can code, I have taught this material (or coding) in many classes/scenarios and those who ride it out "get it" by the end
+- Everyone can code.
 
 --
 
@@ -289,7 +339,34 @@ To be fair, you should know these things about me:
 
 --
 
-- The world is messy, computers are black/white. This is the hardesst part of GIS
+- The world is messy, computers are black/white. This is the hardest part of GIS 
+
+---
+# What will we do?
+
+- Build an online presence with a compelling website
+
+--
+
+- Analyze Real-time NY-Times COVID data
+
+--
+
+- Analyze the impacts of real-world policies like the 100-mile DHS border
+
+--
+
+- Analyze the National Dam network and its relationship to water demand
+
+--
+
+- Analyze landocover from Satellite Imagery and implement a rudimentary Machine Learning Classification
+
+
+--
+
+
+- &lt;span class = "code"&gt;You will work at a scale that is meaningful, with real-world messy data, to ask questions that are topical&lt;/span&gt;
 
 ---
 
@@ -300,16 +377,16 @@ So, who are we?
 - ### Mike Johnson
   - Instructing this course
   - PhD candidate in Geography @ UCSB
-  - Lead Data Scientist for the Urban Flooding Open Knowledge Network
-  - Lead data scientist for Lynker Technology on detail @ NOAA National Water Center
-  - Part time researcher for the USGS
+  - Lead Data Scientist for the Urban Flooding Open Knowledge Network (part-time)
+  - Lead data scientist for Lynker Technology on detail @ NOAA National Water Center (part-time)
+  - Part time researcher for the USGS (part-time)
 
 --
-
-- ### Jiwon Balk
+&lt;br&gt;
+- ### Jiwon Baik
 
 --
-
+&lt;br&gt;
 - ### Matthew Feliciano
 
 ---
@@ -317,7 +394,7 @@ So, who are we?
 # Our first example:
 
 - Lets practice! Here you are going to see some code.  
-- Don't be intimidated by it, but think how it relates to how you understand the world and data you've seen before
+- &lt;span class = "code"&gt;Don't be intimidated by it&lt;/span&gt;, but think how it relates to how you understand the world and data you've seen before
 - The idea is not to "understand" the code, but to expose the ideas we'll see soon
 
 --
@@ -466,6 +543,8 @@ points = instructors %&gt;%
   st_as_sf(coords = c('lng', 'lat'), crs = 4269)
 ```
 
+--
+
 &lt;table&gt;
  &lt;thead&gt;
   &lt;tr&gt;
@@ -493,27 +572,35 @@ points = instructors %&gt;%
 &lt;/tbody&gt;
 &lt;/table&gt;
 
+--
+
 
 ```r
 # Lets get some external data provided by a useful R package
 world = st_as_sf(rnaturalearth::countries110)
 ```
 
+--
+
 
 ```
-Simple feature collection with 3 features and 5 fields
+Simple feature collection with 177 features and 2 fields
 geometry type:  MULTIPOLYGON
 dimension:      XY
-bbox:           xmin: 11.6401 ymin: -17.93064 xmax: 75.15803 ymax: 42.68825
+bbox:           xmin: -180 ymin: -90 xmax: 180 ymax: 83.64513
 CRS:            +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0
-  scalerank      featurecla labelrank  sovereignt sov_a3
-0         1 Admin-0 country         3 Afghanistan    AFG
-1         1 Admin-0 country         3      Angola    AGO
-2         1 Admin-0 country         6     Albania    ALB
-                        geometry
-0 MULTIPOLYGON (((61.21082 35...
-1 MULTIPOLYGON (((16.32653 -5...
-2 MULTIPOLYGON (((20.59025 41...
+First 10 features:
+            sovereignt sov_a3                       geometry
+0          Afghanistan    AFG MULTIPOLYGON (((61.21082 35...
+1               Angola    AGO MULTIPOLYGON (((16.32653 -5...
+2              Albania    ALB MULTIPOLYGON (((20.59025 41...
+3 United Arab Emirates    ARE MULTIPOLYGON (((51.57952 24...
+4            Argentina    ARG MULTIPOLYGON (((-65.5 -55.2...
+5              Armenia    ARM MULTIPOLYGON (((43.58275 41...
+6           Antarctica    ATA MULTIPOLYGON (((-59.57209 -...
+7               France    FR1 MULTIPOLYGON (((68.935 -48....
+8            Australia    AU1 MULTIPOLYGON (((145.398 -40...
+9              Austria    AUT MULTIPOLYGON (((16.97967 48...
 ```
 
 ---
@@ -641,8 +728,8 @@ count: false
 ]
  
 .right-panel-interactive-auto[
-<div id="htmlwidget-146f8fa4b1ea40508644" style="width:432px;height:504px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-146f8fa4b1ea40508644">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-a6afc93b2688ebc10559" style="width:432px;height:504px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a6afc93b2688ebc10559">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}}},"evals":[],"jsHooks":[]}</script>
 ]
 
 ---
@@ -658,8 +745,8 @@ leaflet(instructors) %&gt;%
 ]
  
 .right-panel-interactive-auto[
-<div id="htmlwidget-50b258650a67dce3c8c9" style="width:432px;height:504px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-50b258650a67dce3c8c9">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}]},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-1328ff0656ced371edb6" style="width:432px;height:504px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1328ff0656ced371edb6">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}]},"evals":[],"jsHooks":[]}</script>
 ]
 
 ---
@@ -678,8 +765,8 @@ leaflet(instructors) %&gt;%
 ]
  
 .right-panel-interactive-auto[
-<div id="htmlwidget-1b6d299aff133710e58e" style="width:432px;height:504px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1b6d299aff133710e58e">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[[38.8,40.1,35.9],[-104.8,-74.4,127.7],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},["Mike","Matt","Jiwon"],null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[35.9,40.1],"lng":[-104.8,127.7]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-7d310f3125686e671840" style="width:432px;height:504px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7d310f3125686e671840">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[[38.8,40.1,35.9],[-104.8,-74.4,127.7],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},["Mike","Matt","Jiwon"],null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[35.9,40.1],"lng":[-104.8,127.7]}},"evals":[],"jsHooks":[]}</script>
 ]
 
 &lt;style&gt;
@@ -713,13 +800,12 @@ leaflet(instructors) %&gt;%
 
 class: center, middle
 
-# Assignment: [Set up R and Rstudio](../excersise/01_setup-R-Rstudio.html)
+# Assignment: [Set up R and Rstudio](01-setup-R-Rstudio.html)
 
 ---
+class: center, middle
+# END
 
-&lt;style type="text/css"&gt;
-.remark-code{font-size: 100%}
-&lt;/style&gt;
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
