@@ -1,0 +1,4989 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 176A</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/font-awesome-5.3.1/css/fontawesome-all.min.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+    <script src="libs/jquery-1.12.4/jquery.min.js"></script>
+    <link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="libs/datatables-binding-0.14/datatables.js"></script>
+    <link href="libs/dt-core-1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="libs/dt-core-1.10.20/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="libs/dt-core-1.10.20/js/jquery.dataTables.min.js"></script>
+    <link href="libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+    <script src="libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 176A
+## Lecture 02: Class Roadmap
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{font-size: 100%}
+&lt;/style&gt;
+
+
+
+
+&lt;center&gt;
+&lt;img src="lec-img/road-map.jpg" width="50%"&gt;
+&lt;/center&gt;
+
+--
+
+- Today is a broad overview of the content we will cover in class
+
+--
+
+- The goal is to show you now how all the pieces we will learn fit together
+
+--
+
+- Again, the code is meant for us just to get comfortable seeing code and listening to it be talked about. 
+
+---
+
+# Key points today are: 
+--
+
+ - tables 
+
+--
+
+ - geometries
+
+--
+
+ - binary/booelean conditions (TRUE/FALSE)
+
+--
+
+- data diminsions (1D, 2D, 3D, 4D)
+
+---
+
+## Whats in a name?
+
+&lt;center&gt;
+&lt;img src="lec-img/gis-layers.jpg"&gt;
+&lt;/center&gt;
+
+---
+
+class: center, middle
+&lt;center&gt;
+&lt;img src="lec-img/gis-eras.jpg"&gt;
+&lt;/center&gt;
+
+--
+
+### largely this is how 176 has been taught at UCSB... technology --&gt; concepts --&gt; applications
+
+---
+
+.pull-left[
+
+### Information _Systems_:
+
+- **Information Systems**: complementary networks of hardware and software used to &lt;span class="code"&gt;collect, filter, process, create and  distribute data&lt;/span&gt;.
+
+- **Geographic Information Systems**: a framework that provides the ability to capture and &lt;span class="code"&gt;analyze spatial and geographic data&lt;/span&gt;.
+]
+
+.pull-right[
+&lt;center&gt;
+&lt;img src="lec-img/02-information-systems.png" width = "75%"&gt;
+&lt;/center&gt;
+]
+
+---
+
+## ...
+
+.pull-left[
+
+### Information _Science_:
+
+- **Information Science**: the study of _storing_ and _retrieving_ information.
+
+- **Geographic Information Science**: studies the techniques to capture, represent, process, and analyze geographic information. 
+
+]
+
+.pull-right[
+&lt;center&gt;
+&lt;img src="lec-img/02-info-science.png" width = "75%"&gt;
+&lt;/center&gt;
+]
+
+---
+
+## ...
+
+
+### Data Science
+
+- **Data Science**: the discovery and communication of knowledge, patterns, or actionable information in &lt;span class="code"&gt;structured&lt;/span&gt; and unstructured data.
+
+- **Data Models**: abstract (general) model that organizes elements of data and standardizes how they relate to one another and to the properties of real-world entities. A data model can sometimes be referred to as a &lt;span class="code"&gt;data structure&lt;/span&gt;, especially in the context of programming languages. 
+
+
+&lt;center&gt;
+&lt;img src="lec-img/02-data-science.png" width = "75%"&gt;
+&lt;/center&gt;
+
+---
+
+# So...
+
+- Data Models tell us _what_ should be stored in an element of data and how it is organized &lt;br&gt;&lt;br&gt;
+<i class="fas  fa-file fa-2x "></i> &lt;br&gt;
+
+- Information Science tells us _how_ to store and retrieve many elements &lt;br&gt;&lt;br&gt;
+<i class="fas  fa-file fa-2x " style="color:red;"></i> <i class="fas  fa-file fa-2x "></i> <i class="fas  fa-file fa-2x " style="color:red;"></i> <i class="fas  fa-file fa-2x "></i> <i class="fas  fa-file fa-2x "></i> <i class="fas  fa-file fa-2x "></i> <i class="fas  fa-file fa-2x " style="color:red;"></i> <i class="fas  fa-file fa-2x "></i> <i class="fas  fa-file fa-2x "></i> &lt;br&gt;
+
+- Data Science informs how we _anaylsize_ and _evaluate_ collections of elements &lt;br&gt;&lt;br&gt; 
+sum( <i class="fas  fa-file fa-2x " style="color:red;"></i> <i class="fas  fa-file fa-2x " style="color:red;"></i> <i class="fas  fa-file fa-2x " style="color:red;"></i> ) = 3
+
+- Systems have been built to support these missions
+---
+
+class: center, middle
+
+*Geoinformatics* is the science and the technology which develops and uses **information science** infrastructure to address the problems of geography, cartography, geosciences.
+
+--
+
+_How do we combine the knowledge of &lt;u&gt;computer science&lt;/u&gt;, &lt;u&gt;mathmatics&lt;/u&gt;, &lt;u&gt;information science&lt;/u&gt;, and &lt;u&gt;data science&lt;/u&gt; to answer geographic questions?_
+
+
+--
+
+To answer this I suggest that we need to address **3**
+
+1. understand our computer and systems for working with digital data in a reproducible, flexable way.
+2. Have a strong foundation in standard data manipulation and data visualization
+3. Understand what makes "spatial" special including familiarity with dealing with vector objects, raster fields, and time.
+
+---
+
+## Introduction to Geoinformatics
+
+ 1. You will build habits that will allow your work to be reproducible and shared (**week 1**)
+    - R, Github, Markdown (our computer)
+ 
+ 2. You will learn to analyze, clean, and communicate structured data in a open-source coding environment (**week 2**)
+    - Data wrangling
+    - Data Visualization
+ 
+ 3. You will learn the underlying data models of spatial data (**week 3-5**)
+    - Raster and Vector Data Models and Operations
+ 
+ 4. ... and how to work time and existing databases (**week 6**)
+    - Finding Data, data formats, and cartography
+ 
+---
+
+## Structured Data
+
+- Generally pre-defined data models
+- Usually resides in relational databases ([RDBMS](https://techterms.com/definition/rdbms#:~:text=Terms%20%3A%20RDBMS%20Definition-,RDBMS,format%2C%20using%20rows%20and%20columns.)). 
+- Fields store data of a same type (character, boolean, double, factor). 
+- Data may be human - or machine - generated as long as the data is created within an a known structure. 
+
+--
+
+## Unstructured Data
+
+- **Unstructured** data either does not have a defined data model or is not organized in a pre-defined manner. 
+- typically text-heavy (think Social Media, Webpages, emails), but may contain data such as dates, numbers, and facts. 
+- results in ambiguities that require advanced techniques such as semantic tagging or natural language processing (NLP)
+
+---
+
+&lt;img src="lec-img/02-structuredVsUnstructured.png" width="711" /&gt;
+---
+
+## Data science: the table view
+
+- structured - rows, columns, 
+- ["tidy" data](https://vita.had.co.nz/papers/tidy-data.pdf) is ideal (rows = observations; columns = variables/attributes)
+---
+
+# A typical approach ...
+
+
+```r
+url &lt;- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-11-06/us_wind.csv"
+
+us_wind &lt;- readr::read_csv(url) 
+
+head(us_wind)
+```
+
+```
+# A tibble: 6 x 24
+  case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+    &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+# … with 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;, t_manu &lt;chr&gt;,
+#   t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;, t_rsa &lt;dbl&gt;,
+#   t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;, t_img_date &lt;chr&gt;,
+#   t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+
+```r
+names(us_wind)
+```
+
+```
+ [1] "case_id"    "faa_ors"    "faa_asn"    "usgs_pr_id" "t_state"   
+ [6] "t_county"   "t_fips"     "p_name"     "p_year"     "p_tnum"    
+[11] "p_cap"      "t_manu"     "t_model"    "t_cap"      "t_hh"      
+[16] "t_rd"       "t_rsa"      "t_ttlh"     "t_conf_atr" "t_conf_loc"
+[21] "t_img_date" "t_img_srce" "xlong"      "ylat"      
+```
+
+---
+  
+count: false
+ 
+#Data Exploration
+.left-panel-wind1-auto[
+
+```r
+*us_wind
+```
+]
+ 
+.right-panel-wind1-auto[
+
+```
+# A tibble: 58,185 x 24
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 58,175 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Data Exploration
+.left-panel-wind1-auto[
+
+```r
+us_wind %&gt;%  
+* filter(t_state == 'CA')
+```
+]
+ 
+.right-panel-wind1-auto[
+
+```
+# A tibble: 9,037 x 24
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 9,027 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Data Exploration
+.left-panel-wind1-auto[
+
+```r
+us_wind %&gt;%  
+  filter(t_state == 'CA') %&gt;%  
+* tally()
+```
+]
+ 
+.right-panel-wind1-auto[
+
+```
+# A tibble: 1 x 1
+      n
+  &lt;int&gt;
+1  9037
+```
+]
+
+---
+count: false
+ 
+#Data Exploration
+.left-panel-wind1-auto[
+
+```r
+us_wind %&gt;%  
+  filter(t_state == 'CA') %&gt;%  
+  tally()  
+
+*us_wind
+```
+]
+ 
+.right-panel-wind1-auto[
+
+```
+# A tibble: 1 x 1
+      n
+  &lt;int&gt;
+1  9037
+```
+
+```
+# A tibble: 58,185 x 24
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 58,175 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Data Exploration
+.left-panel-wind1-auto[
+
+```r
+us_wind %&gt;%  
+  filter(t_state == 'CA') %&gt;%  
+  tally()  
+
+us_wind %&gt;%  
+* group_by(t_state)
+```
+]
+ 
+.right-panel-wind1-auto[
+
+```
+# A tibble: 1 x 1
+      n
+  &lt;int&gt;
+1  9037
+```
+
+```
+# A tibble: 58,185 x 24
+# Groups:   t_state [45]
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 58,175 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Data Exploration
+.left-panel-wind1-auto[
+
+```r
+us_wind %&gt;%  
+  filter(t_state == 'CA') %&gt;%  
+  tally()  
+
+us_wind %&gt;%  
+  group_by(t_state) %&gt;%  
+* summarize(n = n())
+```
+]
+ 
+.right-panel-wind1-auto[
+
+```
+# A tibble: 1 x 1
+      n
+  &lt;int&gt;
+1  9037
+```
+
+```
+# A tibble: 45 x 2
+   t_state     n
+   &lt;chr&gt;   &lt;int&gt;
+ 1 AK        141
+ 2 AR          1
+ 3 AZ        144
+ 4 CA       9037
+ 5 CO       2278
+ 6 CT          3
+ 7 DE          1
+ 8 FL          1
+ 9 GU          1
+10 HI        124
+# … with 35 more rows
+```
+]
+
+---
+count: false
+ 
+#Data Exploration
+.left-panel-wind1-auto[
+
+```r
+us_wind %&gt;%  
+  filter(t_state == 'CA') %&gt;%  
+  tally()  
+
+us_wind %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarize(n = n()) %&gt;%  
+* arrange(-n)
+```
+]
+ 
+.right-panel-wind1-auto[
+
+```
+# A tibble: 1 x 1
+      n
+  &lt;int&gt;
+1  9037
+```
+
+```
+# A tibble: 45 x 2
+   t_state     n
+   &lt;chr&gt;   &lt;int&gt;
+ 1 TX      13232
+ 2 CA       9037
+ 3 IA       4280
+ 4 OK       3821
+ 5 KS       2898
+ 6 IL       2602
+ 7 MN       2547
+ 8 CO       2278
+ 9 OR       1868
+10 WA       1744
+# … with 35 more rows
+```
+]
+
+---
+count: false
+ 
+#Data Exploration
+.left-panel-wind1-auto[
+
+```r
+us_wind %&gt;%  
+  filter(t_state == 'CA') %&gt;%  
+  tally()  
+
+us_wind %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarize(n = n()) %&gt;%  
+  arrange(-n) %&gt;%  
+* slice(1:5)
+```
+]
+ 
+.right-panel-wind1-auto[
+
+```
+# A tibble: 1 x 1
+      n
+  &lt;int&gt;
+1  9037
+```
+
+```
+# A tibble: 5 x 2
+  t_state     n
+  &lt;chr&gt;   &lt;int&gt;
+1 TX      13232
+2 CA       9037
+3 IA       4280
+4 OK       3821
+5 KS       2898
+```
+]
+
+&lt;style&gt;
+.left-panel-wind1-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-wind1-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-wind1-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+  
+  
+
+
+---
+
+# Table of California ...
+
+&lt;br&gt;&lt;br&gt;
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; state &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; aland &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; San Francisco &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 121455687 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Nevada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2480606160 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Merced &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5012175306 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Alpine &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1912292633 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Contra Costa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1871930816 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Tulare &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12495016292 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Lake &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3254288286 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Mono &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7896839510 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Imperial &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10817291640 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Alameda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1914242789 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## Tables can have ... coordinates as numeric fields
+
+.pull-left[
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; state &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; aland &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; X &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Y &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; San Francisco &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 121455687 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -122.4386 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 37.75215 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Nevada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2480606160 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -120.7632 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.30394 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Merced &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5012175306 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -120.7209 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 37.18922 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Alpine &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1912292633 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -119.8224 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 38.59679 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Contra Costa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1871930816 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -121.9294 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 37.91943 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Tulare &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12495016292 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -118.8018 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36.22045 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Lake &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3254288286 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -122.7536 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.10122 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Mono &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7896839510 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -118.8872 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 37.93899 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Imperial &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10817291640 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -115.3643 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.03960 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Alameda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1914242789 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -121.8926 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 37.64651 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+.pull-right[
+&lt;img src="lecture-02_files/figure-html/unnamed-chunk-6-1.png" width="432" /&gt;
+]
+---
+
+## Tables can have ... POINT geometries
+
+.pull-left[
+- &lt;span class = "code"&gt;WKT: Well-Known-Text (human readable)&lt;/span&gt;
+
+- &lt;span class = "code"&gt;WKB: Well-Known-Binary (machine and database readable) &lt;/span&gt;
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; state &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; aland &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; geometry &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; San Francisco &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 121455687 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; POINT (-122.4386 37.75215) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Nevada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2480606160 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; POINT (-120.7632 39.30394) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Merced &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5012175306 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; POINT (-120.7209 37.18922) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Alpine &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1912292633 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; POINT (-119.8224 38.59679) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Contra Costa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1871930816 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; POINT (-121.9294 37.91943) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Tulare &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12495016292 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; POINT (-118.8018 36.22045) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Lake &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3254288286 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; POINT (-122.7536 39.10122) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Mono &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7896839510 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; POINT (-118.8872 37.93899) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Imperial &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10817291640 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; POINT (-115.3643 33.0396) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Alameda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1914242789 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; POINT (-121.8926 37.64651) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+]
+
+.pull-right[
+
+&lt;img src="lecture-02_files/figure-html/unnamed-chunk-8-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Distance Operators...
+.left-panel-dist-auto[
+
+```r
+*dist_m = st_distance(points)
+```
+]
+ 
+.right-panel-dist-auto[
+
+]
+
+---
+count: false
+ 
+#Distance Operators...
+.left-panel-dist-auto[
+
+```r
+dist_m = st_distance(points) %&gt;%  
+* units::drop_units()
+```
+]
+ 
+.right-panel-dist-auto[
+
+]
+
+---
+count: false
+ 
+#Distance Operators...
+.left-panel-dist-auto[
+
+```r
+dist_m = st_distance(points) %&gt;%  
+  units::drop_units()  
+
+*dist_mi = 1/dist_m  # qgraph requires a similarity matrix
+```
+]
+ 
+.right-panel-dist-auto[
+
+]
+
+---
+count: false
+ 
+#Distance Operators...
+.left-panel-dist-auto[
+
+```r
+dist_m = st_distance(points) %&gt;%  
+  units::drop_units()  
+
+dist_mi = 1/dist_m  # qgraph requires a similarity matrix
+
+*qgraph(dist_mi, layout='spring', vsize=4, labels = points$name)
+```
+]
+ 
+.right-panel-dist-auto[
+&lt;img src="lecture-02_files/figure-html/dist_auto_4_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-dist-auto {
+  color: #777;
+  width: 49.0196078431373%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-dist-auto {
+  width: 49.0196078431373%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-dist-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+count: false
+ 
+#Geometric Operators...
+.left-panel-bbox-auto[
+
+```r
+*st_bbox(points)
+```
+]
+ 
+.right-panel-bbox-auto[
+
+```
+      xmin       ymin       xmax       ymax 
+-123.89741   33.03456 -115.36434   41.74228 
+```
+]
+
+---
+count: false
+ 
+#Geometric Operators...
+.left-panel-bbox-auto[
+
+```r
+st_bbox(points) %&gt;%  
+* st_as_sfc()
+```
+]
+ 
+.right-panel-bbox-auto[
+
+```
+Geometry set for 1 feature 
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: -123.8974 ymin: 33.03456 xmax: -115.3643 ymax: 41.74228
+CRS:            4269
+```
+]
+
+---
+count: false
+ 
+#Geometric Operators...
+.left-panel-bbox-auto[
+
+```r
+st_bbox(points) %&gt;%  
+  st_as_sfc() %&gt;%  
+* ggplot()
+```
+]
+ 
+.right-panel-bbox-auto[
+&lt;img src="lecture-02_files/figure-html/bbox_auto_3_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Geometric Operators...
+.left-panel-bbox-auto[
+
+```r
+st_bbox(points) %&gt;%  
+  st_as_sfc() %&gt;%  
+  ggplot() +  
+* geom_sf()
+```
+]
+ 
+.right-panel-bbox-auto[
+&lt;img src="lecture-02_files/figure-html/bbox_auto_4_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Geometric Operators...
+.left-panel-bbox-auto[
+
+```r
+st_bbox(points) %&gt;%  
+  st_as_sfc() %&gt;%  
+  ggplot() +  
+  geom_sf() +  
+* geom_sf(data = points, col = "darkred")
+```
+]
+ 
+.right-panel-bbox-auto[
+&lt;img src="lecture-02_files/figure-html/bbox_auto_5_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-bbox-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-bbox-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-bbox-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+## Tables can have ... POLYGON geometries
+
+.pull-left[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; state &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; aland &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; geometry &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; San Francisco &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 121455687 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MULTIPOLYGON (((-122.512 37... &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Nevada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2480606160 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MULTIPOLYGON (((-121.2661 3... &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Merced &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5012175306 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MULTIPOLYGON (((-121.2268 3... &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Alpine &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1912292633 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MULTIPOLYGON (((-120.0725 3... &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Contra Costa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1871930816 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MULTIPOLYGON (((-122.4253 3... &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+.pull-right[
+&lt;img src="lecture-02_files/figure-html/unnamed-chunk-10-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Polygon Operators...
+.left-panel-area-auto[
+
+```r
+*poly
+```
+]
+ 
+.right-panel-area-auto[
+
+```
+Simple feature collection with 58 features and 3 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+CRS:            4269
+# A tibble: 58 x 4
+   state name          aland                                            geometry
+   &lt;chr&gt; &lt;chr&gt;         &lt;dbl&gt;                                  &lt;MULTIPOLYGON [°]&gt;
+ 1 CA    San Fran…   1.21e 8 (((-122.512 37.77113, -122.4654 37.80088, -122.398…
+ 2 CA    Nevada      2.48e 9 (((-121.2661 39.27272, -121.1275 39.38024, -121.02…
+ 3 CA    Merced      5.01e 9 (((-121.2268 37.13477, -120.9638 37.34614, -120.98…
+ 4 CA    Alpine      1.91e 9 (((-120.0725 38.50987, -120.0724 38.70277, -119.96…
+ 5 CA    Contra C…   1.87e 9 (((-122.4253 37.95567, -122.3676 37.97817, -122.36…
+ 6 CA    Tulare      1.25e10 (((-119.5461 36.50896, -119.4663 36.57524, -119.30…
+ 7 CA    Lake        3.25e 9 (((-123.0778 39.17379, -122.9948 39.23592, -123.07…
+ 8 CA    Mono        7.90e 9 (((-119.6392 38.32688, -119.5424 38.48166, -119.61…
+ 9 CA    Imperial    1.08e10 (((-116.1056 32.72157, -116.0811 33.07483, -116.08…
+10 CA    Alameda     1.91e 9 (((-122.3337 37.8098, -122.3039 37.83009, -122.328…
+# … with 48 more rows
+```
+]
+
+---
+count: false
+ 
+#Polygon Operators...
+.left-panel-area-auto[
+
+```r
+poly %&gt;%  
+* mutate(area = as.numeric(st_area(.) /1e6))
+```
+]
+ 
+.right-panel-area-auto[
+
+```
+Simple feature collection with 58 features and 4 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+CRS:            4269
+# A tibble: 58 x 5
+   state name         aland                                      geometry   area
+ * &lt;chr&gt; &lt;chr&gt;        &lt;dbl&gt;                            &lt;MULTIPOLYGON [°]&gt;  &lt;dbl&gt;
+ 1 CA    San Fran…  1.21e 8 (((-122.512 37.77113, -122.4654 37.80088, -1…   114.
+ 2 CA    Nevada     2.48e 9 (((-121.2661 39.27272, -121.1275 39.38024, -…  2483.
+ 3 CA    Merced     5.01e 9 (((-121.2268 37.13477, -120.9638 37.34614, -…  5140.
+ 4 CA    Alpine     1.91e 9 (((-120.0725 38.50987, -120.0724 38.70277, -…  1932.
+ 5 CA    Contra C…  1.87e 9 (((-122.4253 37.95567, -122.3676 37.97817, -…  1957.
+ 6 CA    Tulare     1.25e10 (((-119.5461 36.50896, -119.4663 36.57524, -… 12513.
+ 7 CA    Lake       3.25e 9 (((-123.0778 39.17379, -122.9948 39.23592, -…  3432.
+ 8 CA    Mono       7.90e 9 (((-119.6392 38.32688, -119.5424 38.48166, -…  8110.
+ 9 CA    Imperial   1.08e10 (((-116.1056 32.72157, -116.0811 33.07483, -… 11549.
+10 CA    Alameda    1.91e 9 (((-122.3337 37.8098, -122.3039 37.83009, -1…  1967.
+# … with 48 more rows
+```
+]
+
+---
+count: false
+ 
+#Polygon Operators...
+.left-panel-area-auto[
+
+```r
+poly %&gt;%  
+  mutate(area = as.numeric(st_area(.) /1e6)) %&gt;%  
+* ggplot()
+```
+]
+ 
+.right-panel-area-auto[
+&lt;img src="lecture-02_files/figure-html/area_auto_3_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Polygon Operators...
+.left-panel-area-auto[
+
+```r
+poly %&gt;%  
+  mutate(area = as.numeric(st_area(.) /1e6)) %&gt;%  
+  ggplot() +  
+* geom_col(aes(x = reorder(name, -area), y = area))
+```
+]
+ 
+.right-panel-area-auto[
+&lt;img src="lecture-02_files/figure-html/area_auto_4_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Polygon Operators...
+.left-panel-area-auto[
+
+```r
+poly %&gt;%  
+  mutate(area = as.numeric(st_area(.) /1e6)) %&gt;%  
+  ggplot() +  
+  geom_col(aes(x = reorder(name, -area), y = area)) +  
+* labs(title = "Area per state",
+*      y = "Area Km^2",
+*      x = "State")
+```
+]
+ 
+.right-panel-area-auto[
+&lt;img src="lecture-02_files/figure-html/area_auto_5_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Polygon Operators...
+.left-panel-area-auto[
+
+```r
+poly %&gt;%  
+  mutate(area = as.numeric(st_area(.) /1e6)) %&gt;%  
+  ggplot() +  
+  geom_col(aes(x = reorder(name, -area), y = area)) +  
+  labs(title = "Area per state",  
+       y = "Area Km^2",  
+       x = "State") +  
+* theme_light()
+```
+]
+ 
+.right-panel-area-auto[
+&lt;img src="lecture-02_files/figure-html/area_auto_6_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Polygon Operators...
+.left-panel-area-auto[
+
+```r
+poly %&gt;%  
+  mutate(area = as.numeric(st_area(.) /1e6)) %&gt;%  
+  ggplot() +  
+  geom_col(aes(x = reorder(name, -area), y = area)) +  
+  labs(title = "Area per state",  
+       y = "Area Km^2",  
+       x = "State") +  
+  theme_light() +  
+* theme(axis.text.x = element_text(angle = 90))
+```
+]
+ 
+.right-panel-area-auto[
+&lt;img src="lecture-02_files/figure-html/area_auto_7_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-area-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-area-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-area-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+count: false
+ 
+#Geometric Operators...
+.left-panel-dissolve-auto[
+
+```r
+*ca
+```
+]
+ 
+.right-panel-dissolve-auto[
+
+```
+Simple feature collection with 58 features and 12 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+CRS:            4269
+# A tibble: 58 x 13
+   statefp contyfp contyns affgeod geoid name  lsad    aland awater stat_nm
+   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;  
+ 1 06      075     002773… 050000… 06075 San … 06    1.21e 8 4.79e8 Califo…
+ 2 06      057     016829… 050000… 06057 Neva… 06    2.48e 9 4.15e7 Califo…
+ 3 06      047     002772… 050000… 06047 Merc… 06    5.01e 9 1.13e8 Califo…
+ 4 06      003     016758… 050000… 06003 Alpi… 06    1.91e 9 1.26e7 Califo…
+ 5 06      013     016759… 050000… 06013 Cont… 06    1.87e 9 2.10e8 Califo…
+ 6 06      107     002773… 050000… 06107 Tula… 06    1.25e10 3.71e7 Califo…
+ 7 06      033     002772… 050000… 06033 Lake  06    3.25e 9 1.89e8 Califo…
+ 8 06      051     002772… 050000… 06051 Mono  06    7.90e 9 2.15e8 Califo…
+ 9 06      025     002772… 050000… 06025 Impe… 06    1.08e10 7.90e8 Califo…
+10 06      001     016758… 050000… 06001 Alam… 06    1.91e 9 2.13e8 Califo…
+# … with 48 more rows, and 3 more variables: stt_bbr &lt;chr&gt;, jrsdct_ &lt;chr&gt;,
+#   geometry &lt;MULTIPOLYGON [°]&gt;
+```
+]
+
+---
+count: false
+ 
+#Geometric Operators...
+.left-panel-dissolve-auto[
+
+```r
+ca %&gt;%  
+*st_union()
+```
+]
+ 
+.right-panel-dissolve-auto[
+
+```
+Geometry set for 1 feature 
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+CRS:            4269
+```
+]
+
+---
+count: false
+ 
+#Geometric Operators...
+.left-panel-dissolve-auto[
+
+```r
+ca %&gt;%  
+st_union() %&gt;%  
+* ggplot()
+```
+]
+ 
+.right-panel-dissolve-auto[
+&lt;img src="lecture-02_files/figure-html/dissolve_auto_3_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Geometric Operators...
+.left-panel-dissolve-auto[
+
+```r
+ca %&gt;%  
+st_union() %&gt;%  
+  ggplot() +  
+* geom_sf()
+```
+]
+ 
+.right-panel-dissolve-auto[
+&lt;img src="lecture-02_files/figure-html/dissolve_auto_4_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Geometric Operators...
+.left-panel-dissolve-auto[
+
+```r
+ca %&gt;%  
+st_union() %&gt;%  
+  ggplot() +  
+  geom_sf() +  
+* theme_bw()
+```
+]
+ 
+.right-panel-dissolve-auto[
+&lt;img src="lecture-02_files/figure-html/dissolve_auto_5_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-dissolve-auto {
+  color: #777;
+  width: 29.4117647058824%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-dissolve-auto {
+  width: 68.6274509803922%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-dissolve-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+## Coordinate Reference Systems
+
+A data structure cannot be considered spatial unless it is accompanied by coordinate reference system (CRS) 
+ - They describe the reference _origin_ and the reference _units_ so that coordinates become spatially meaningful!
+
+&lt;img src="lecture-02_files/figure-html/unnamed-chunk-11-1.png" width="432" /&gt;&lt;img src="lecture-02_files/figure-html/unnamed-chunk-11-2.png" width="432" /&gt;
+
+---
+
+.pull-left[
+
+```r
+st_crs(poly)
+```
+
+```
+Coordinate Reference System:
+  User input: 4269 
+  wkt:
+GEOGCS["NAD83",
+    DATUM["North_American_Datum_1983",
+        SPHEROID["GRS 1980",6378137,298.257222101,
+            AUTHORITY["EPSG","7019"]],
+        TOWGS84[0,0,0,0,0,0,0],
+        AUTHORITY["EPSG","6269"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.0174532925199433,
+        AUTHORITY["EPSG","9122"]],
+    AUTHORITY["EPSG","4269"]]
+```
+]
+
+.pull-right[
+
+```r
+st_crs(st_transform(poly, 5070))
+```
+
+```
+Coordinate Reference System:
+  User input: EPSG:5070 
+  wkt:
+PROJCS["NAD83 / Conus Albers",
+    GEOGCS["NAD83",
+        DATUM["North_American_Datum_1983",
+            SPHEROID["GRS 1980",6378137,298.257222101,
+                AUTHORITY["EPSG","7019"]],
+            TOWGS84[0,0,0,0,0,0,0],
+            AUTHORITY["EPSG","6269"]],
+        PRIMEM["Greenwich",0,
+            AUTHORITY["EPSG","8901"]],
+        UNIT["degree",0.0174532925199433,
+            AUTHORITY["EPSG","9122"]],
+        AUTHORITY["EPSG","4269"]],
+    PROJECTION["Albers_Conic_Equal_Area"],
+    PARAMETER["standard_parallel_1",29.5],
+    PARAMETER["standard_parallel_2",45.5],
+    PARAMETER["latitude_of_center",23],
+    PARAMETER["longitude_of_center",-96],
+    PARAMETER["false_easting",0],
+    PARAMETER["false_northing",0],
+    UNIT["metre",1,
+        AUTHORITY["EPSG","9001"]],
+    AXIS["X",EAST],
+    AXIS["Y",NORTH],
+    AUTHORITY["EPSG","5070"]]
+```
+]
+
+---
+
+count: false
+ 
+#Extending the Wind Table
+.left-panel-wind2-auto[
+
+```r
+*us_wind
+```
+]
+ 
+.right-panel-wind2-auto[
+
+```
+# A tibble: 58,185 x 24
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 58,175 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Extending the Wind Table
+.left-panel-wind2-auto[
+
+```r
+us_wind %&gt;%  
+* filter(!t_state %in% c("AK", "PR", "HI", "GU"))
+```
+]
+ 
+.right-panel-wind2-auto[
+
+```
+# A tibble: 57,856 x 24
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 57,846 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Extending the Wind Table
+.left-panel-wind2-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+* ggplot()
+```
+]
+ 
+.right-panel-wind2-auto[
+&lt;img src="lecture-02_files/figure-html/wind2_auto_3_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table
+.left-panel-wind2-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  ggplot() +  
+* aes(x = xlong, y = ylat)
+```
+]
+ 
+.right-panel-wind2-auto[
+&lt;img src="lecture-02_files/figure-html/wind2_auto_4_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table
+.left-panel-wind2-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  ggplot() +  
+  aes(x = xlong, y = ylat) +  
+* borders("state")
+```
+]
+ 
+.right-panel-wind2-auto[
+&lt;img src="lecture-02_files/figure-html/wind2_auto_5_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table
+.left-panel-wind2-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  ggplot() +  
+  aes(x = xlong, y = ylat) +  
+  borders("state") +  
+* geom_point(col = "darkred", alpha = .5)
+```
+]
+ 
+.right-panel-wind2-auto[
+&lt;img src="lecture-02_files/figure-html/wind2_auto_6_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table
+.left-panel-wind2-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  ggplot() +  
+  aes(x = xlong, y = ylat) +  
+  borders("state") +  
+  geom_point(col = "darkred", alpha = .5) +  
+* geom_density_2d(col = "steelblue")
+```
+]
+ 
+.right-panel-wind2-auto[
+&lt;img src="lecture-02_files/figure-html/wind2_auto_7_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table
+.left-panel-wind2-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  ggplot() +  
+  aes(x = xlong, y = ylat) +  
+  borders("state") +  
+  geom_point(col = "darkred", alpha = .5) +  
+  geom_density_2d(col = "steelblue") +  
+* coord_map(projection = "mercator")
+```
+]
+ 
+.right-panel-wind2-auto[
+&lt;img src="lecture-02_files/figure-html/wind2_auto_8_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table
+.left-panel-wind2-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  ggplot() +  
+  aes(x = xlong, y = ylat) +  
+  borders("state") +  
+  geom_point(col = "darkred", alpha = .5) +  
+  geom_density_2d(col = "steelblue") +  
+  coord_map(projection = "mercator") +  
+* labs(title = "Wind turbines in the CONUS")
+```
+]
+ 
+.right-panel-wind2-auto[
+&lt;img src="lecture-02_files/figure-html/wind2_auto_9_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table
+.left-panel-wind2-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  ggplot() +  
+  aes(x = xlong, y = ylat) +  
+  borders("state") +  
+  geom_point(col = "darkred", alpha = .5) +  
+  geom_density_2d(col = "steelblue") +  
+  coord_map(projection = "mercator") +  
+  labs(title = "Wind turbines in the CONUS") +  
+* theme_void()
+```
+]
+ 
+.right-panel-wind2-auto[
+&lt;img src="lecture-02_files/figure-html/wind2_auto_10_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-wind2-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-wind2-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-wind2-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+count: false
+ 
+#Extending the Wind Table...
+.left-panel-wind3-auto[
+
+```r
+*us_wind
+```
+]
+ 
+.right-panel-wind3-auto[
+
+```
+# A tibble: 58,185 x 24
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 58,175 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Extending the Wind Table...
+.left-panel-wind3-auto[
+
+```r
+us_wind %&gt;%  
+* filter(!t_state %in% c("AK", "PR", "HI", "GU"))
+```
+]
+ 
+.right-panel-wind3-auto[
+
+```
+# A tibble: 57,856 x 24
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 57,846 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Extending the Wind Table...
+.left-panel-wind3-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+* group_by(t_state)
+```
+]
+ 
+.right-panel-wind3-auto[
+
+```
+# A tibble: 57,856 x 24
+# Groups:   t_state [41]
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 57,846 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Extending the Wind Table...
+.left-panel-wind3-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  group_by(t_state) %&gt;%  
+* summarise(n = n())
+```
+]
+ 
+.right-panel-wind3-auto[
+
+```
+# A tibble: 41 x 2
+   t_state     n
+   &lt;chr&gt;   &lt;int&gt;
+ 1 AR          1
+ 2 AZ        144
+ 3 CA       9037
+ 4 CO       2278
+ 5 CT          3
+ 6 DE          1
+ 7 FL          1
+ 8 IA       4280
+ 9 ID        541
+10 IL       2602
+# … with 31 more rows
+```
+]
+
+---
+count: false
+ 
+#Extending the Wind Table...
+.left-panel-wind3-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+* ggplot()
+```
+]
+ 
+.right-panel-wind3-auto[
+&lt;img src="lecture-02_files/figure-html/wind3_auto_5_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table...
+.left-panel-wind3-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  ggplot() +  
+* aes(x = reorder(t_state, -n), y = n)
+```
+]
+ 
+.right-panel-wind3-auto[
+&lt;img src="lecture-02_files/figure-html/wind3_auto_6_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table...
+.left-panel-wind3-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  ggplot() +  
+  aes(x = reorder(t_state, -n), y = n) +  
+* geom_col()
+```
+]
+ 
+.right-panel-wind3-auto[
+&lt;img src="lecture-02_files/figure-html/wind3_auto_7_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table...
+.left-panel-wind3-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  ggplot() +  
+  aes(x = reorder(t_state, -n), y = n) +  
+  geom_col() +  
+* labs(title = "Wind turbines By State",
+*      x = "State",
+*      y = "Total Turbines")
+```
+]
+ 
+.right-panel-wind3-auto[
+&lt;img src="lecture-02_files/figure-html/wind3_auto_8_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table...
+.left-panel-wind3-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  ggplot() +  
+  aes(x = reorder(t_state, -n), y = n) +  
+  geom_col() +  
+  labs(title = "Wind turbines By State",  
+       x = "State",  
+       y = "Total Turbines") +  
+* theme_bw()
+```
+]
+ 
+.right-panel-wind3-auto[
+&lt;img src="lecture-02_files/figure-html/wind3_auto_9_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Extending the Wind Table...
+.left-panel-wind3-auto[
+
+```r
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  ggplot() +  
+  aes(x = reorder(t_state, -n), y = n) +  
+  geom_col() +  
+  labs(title = "Wind turbines By State",  
+       x = "State",  
+       y = "Total Turbines") +  
+  theme_bw() +  
+* theme(axis.text.x = element_text(angle = 90))
+```
+]
+ 
+.right-panel-wind3-auto[
+&lt;img src="lecture-02_files/figure-html/wind3_auto_10_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-wind3-auto {
+  color: #777;
+  width: 49.0196078431373%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-wind3-auto {
+  width: 49.0196078431373%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-wind3-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+*USAboundaries::us_states(resolution = "low")
+```
+]
+ 
+.right-panel-wind4-auto[
+
+```
+Simple feature collection with 52 features and 12 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -179.1743 ymin: 17.91377 xmax: 179.7739 ymax: 71.35256
+CRS:            EPSG:4326
+First 10 features:
+   statefp  statens    affgeoid geoid stusps                 name lsad
+1       23 01779787 0400000US23    23     ME                Maine   00
+2       15 01779782 0400000US15    15     HI               Hawaii   00
+3       04 01779777 0400000US04    04     AZ              Arizona   00
+4       05 00068085 0400000US05    05     AR             Arkansas   00
+5       10 01779781 0400000US10    10     DE             Delaware   00
+6       13 01705317 0400000US13    13     GA              Georgia   00
+7       27 00662849 0400000US27    27     MN            Minnesota   00
+8       02 01785533 0400000US02    02     AK               Alaska   00
+9       06 01779778 0400000US06    06     CA           California   00
+10      11 01702382 0400000US11    11     DC District of Columbia   00
+           aland       awater           state_name state_abbr jurisdiction_type
+1    79885221885  11748755195                Maine         ME             state
+2    16634100855  11777698394               Hawaii         HI             state
+3   294198560125   1027346486              Arizona         AZ             state
+4   134771517596   2960191698             Arkansas         AR             state
+5     5047194742   1398720828             Delaware         DE             state
+6   149169848456   4741100880              Georgia         GA             state
+7   206232257655  18929176411            Minnesota         MN             state
+8  1477946266785 245390495931               Alaska         AK             state
+9   403501101370  20466718403           California         CA             state
+10     158364992     18633403 District of Columbia         DC          district
+                         geometry
+1  MULTIPOLYGON (((-68.92401 4...
+2  MULTIPOLYGON (((-156.0497 1...
+3  MULTIPOLYGON (((-114.7997 3...
+4  MULTIPOLYGON (((-94.61792 3...
+5  MULTIPOLYGON (((-75.77379 3...
+6  MULTIPOLYGON (((-85.60516 3...
+7  MULTIPOLYGON (((-97.22904 4...
+8  MULTIPOLYGON (((179.4813 51...
+9  MULTIPOLYGON (((-118.594 33...
+10 MULTIPOLYGON (((-77.11976 3...
+```
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+* select(state_abbr)
+```
+]
+ 
+.right-panel-wind4-auto[
+
+```
+Simple feature collection with 52 features and 1 field
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -179.1743 ymin: 17.91377 xmax: 179.7739 ymax: 71.35256
+CRS:            EPSG:4326
+First 10 features:
+   state_abbr                       geometry
+1          ME MULTIPOLYGON (((-68.92401 4...
+2          HI MULTIPOLYGON (((-156.0497 1...
+3          AZ MULTIPOLYGON (((-114.7997 3...
+4          AR MULTIPOLYGON (((-94.61792 3...
+5          DE MULTIPOLYGON (((-75.77379 3...
+6          GA MULTIPOLYGON (((-85.60516 3...
+7          MN MULTIPOLYGON (((-97.22904 4...
+8          AK MULTIPOLYGON (((179.4813 51...
+9          CA MULTIPOLYGON (((-118.594 33...
+10         DC MULTIPOLYGON (((-77.11976 3...
+```
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+* states
+```
+]
+ 
+.right-panel-wind4-auto[
+
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+*us_wind
+```
+]
+ 
+.right-panel-wind4-auto[
+
+```
+# A tibble: 58,185 x 24
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 58,175 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+* filter(!t_state %in% c("AK", "PR", "HI", "GU"))
+```
+]
+ 
+.right-panel-wind4-auto[
+
+```
+# A tibble: 57,856 x 24
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 57,846 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+* select(t_state)
+```
+]
+ 
+.right-panel-wind4-auto[
+
+```
+# A tibble: 57,856 x 1
+   t_state
+   &lt;chr&gt;  
+ 1 CA     
+ 2 CA     
+ 3 CA     
+ 4 CA     
+ 5 CA     
+ 6 CA     
+ 7 CA     
+ 8 CA     
+ 9 CA     
+10 CA     
+# … with 57,846 more rows
+```
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  select(t_state) %&gt;%  
+* group_by(t_state)
+```
+]
+ 
+.right-panel-wind4-auto[
+
+```
+# A tibble: 57,856 x 1
+# Groups:   t_state [41]
+   t_state
+   &lt;chr&gt;  
+ 1 CA     
+ 2 CA     
+ 3 CA     
+ 4 CA     
+ 5 CA     
+ 6 CA     
+ 7 CA     
+ 8 CA     
+ 9 CA     
+10 CA     
+# … with 57,846 more rows
+```
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  select(t_state) %&gt;%  
+  group_by(t_state) %&gt;%  
+* summarise(n = n())
+```
+]
+ 
+.right-panel-wind4-auto[
+
+```
+# A tibble: 41 x 2
+   t_state     n
+   &lt;chr&gt;   &lt;int&gt;
+ 1 AR          1
+ 2 AZ        144
+ 3 CA       9037
+ 4 CO       2278
+ 5 CT          3
+ 6 DE          1
+ 7 FL          1
+ 8 IA       4280
+ 9 ID        541
+10 IL       2602
+# … with 31 more rows
+```
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  select(t_state) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+* inner_join(states, by = c("t_state" = "state_abbr" ))
+```
+]
+ 
+.right-panel-wind4-auto[
+
+```
+# A tibble: 41 x 3
+   t_state     n                                                        geometry
+   &lt;chr&gt;   &lt;int&gt;                                              &lt;MULTIPOLYGON [°]&gt;
+ 1 AR          1 (((-94.61792 36.49941, -94.3612 36.4996, -94.07709 36.49898, -…
+ 2 AZ        144 (((-114.7997 32.59362, -114.8094 32.61712, -114.7649 32.64939,…
+ 3 CA       9037 (((-118.594 33.4672, -118.4848 33.48748, -118.3703 33.40928, -…
+ 4 CO       2278 (((-109.06 38.49999, -109.06 38.49999, -109.0515 39.12609, -10…
+ 5 CT          3 (((-73.69594 41.11526, -73.48271 41.21276, -73.55096 41.29542,…
+ 6 DE          1 (((-75.77379 39.7222, -75.75323 39.75799, -75.71706 39.79232, …
+ 7 FL          1 (((-81.81169 24.56874, -81.75127 24.65352, -81.67234 24.69951,…
+ 8 IA       4280 (((-96.62187 42.77925, -96.57794 42.82764, -96.53785 42.87847,…
+ 9 ID        541 (((-117.243 44.39097, -117.2151 44.42716, -117.2259 44.47939, …
+10 IL       2602 (((-91.50617 40.20064, -91.49696 40.2487, -91.49289 40.26992, …
+# … with 31 more rows
+```
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  select(t_state) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%  
+* st_as_sf()
+```
+]
+ 
+.right-panel-wind4-auto[
+
+```
+Simple feature collection with 41 features and 2 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+CRS:            EPSG:4326
+# A tibble: 41 x 3
+   t_state     n                                                        geometry
+   &lt;chr&gt;   &lt;int&gt;                                              &lt;MULTIPOLYGON [°]&gt;
+ 1 AR          1 (((-94.61792 36.49941, -94.3612 36.4996, -94.07709 36.49898, -…
+ 2 AZ        144 (((-114.7997 32.59362, -114.8094 32.61712, -114.7649 32.64939,…
+ 3 CA       9037 (((-118.594 33.4672, -118.4848 33.48748, -118.3703 33.40928, -…
+ 4 CO       2278 (((-109.06 38.49999, -109.06 38.49999, -109.0515 39.12609, -10…
+ 5 CT          3 (((-73.69594 41.11526, -73.48271 41.21276, -73.55096 41.29542,…
+ 6 DE          1 (((-75.77379 39.7222, -75.75323 39.75799, -75.71706 39.79232, …
+ 7 FL          1 (((-81.81169 24.56874, -81.75127 24.65352, -81.67234 24.69951,…
+ 8 IA       4280 (((-96.62187 42.77925, -96.57794 42.82764, -96.53785 42.87847,…
+ 9 ID        541 (((-117.243 44.39097, -117.2151 44.42716, -117.2259 44.47939, …
+10 IL       2602 (((-91.50617 40.20064, -91.49696 40.2487, -91.49289 40.26992, …
+# … with 31 more rows
+```
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  select(t_state) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%  
+  st_as_sf() %&gt;%  
+* mutate(area = as.numeric(st_area(.) / 1e6),
+*        perArea = n / area)
+```
+]
+ 
+.right-panel-wind4-auto[
+
+```
+Simple feature collection with 41 features and 4 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+CRS:            EPSG:4326
+# A tibble: 41 x 5
+   t_state     n                                        geometry   area  perArea
+ * &lt;chr&gt;   &lt;int&gt;                              &lt;MULTIPOLYGON [°]&gt;  &lt;dbl&gt;    &lt;dbl&gt;
+ 1 AR          1 (((-94.61792 36.49941, -94.3612 36.4996, -94.0… 1.38e5  7.26e-6
+ 2 AZ        144 (((-114.7997 32.59362, -114.8094 32.61712, -11… 2.95e5  4.88e-4
+ 3 CA       9037 (((-118.594 33.4672, -118.4848 33.48748, -118.… 4.11e5  2.20e-2
+ 4 CO       2278 (((-109.06 38.49999, -109.06 38.49999, -109.05… 2.70e5  8.45e-3
+ 5 CT          3 (((-73.69594 41.11526, -73.48271 41.21276, -73… 1.30e4  2.31e-4
+ 6 DE          1 (((-75.77379 39.7222, -75.75323 39.75799, -75.… 5.32e3  1.88e-4
+ 7 FL          1 (((-81.81169 24.56874, -81.75127 24.65352, -81… 1.54e5  6.49e-6
+ 8 IA       4280 (((-96.62187 42.77925, -96.57794 42.82764, -96… 1.46e5  2.94e-2
+ 9 ID        541 (((-117.243 44.39097, -117.2151 44.42716, -117… 2.17e5  2.50e-3
+10 IL       2602 (((-91.50617 40.20064, -91.49696 40.2487, -91.… 1.46e5  1.78e-2
+# … with 31 more rows
+```
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  select(t_state) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%  
+  st_as_sf() %&gt;%  
+  mutate(area = as.numeric(st_area(.) / 1e6),  
+         perArea = n / area) %&gt;%  
+* ggplot()
+```
+]
+ 
+.right-panel-wind4-auto[
+&lt;img src="lecture-02_files/figure-html/wind4_auto_12_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  select(t_state) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%  
+  st_as_sf() %&gt;%  
+  mutate(area = as.numeric(st_area(.) / 1e6),  
+         perArea = n / area) %&gt;%  
+  ggplot() +  
+* aes(x = reorder(t_state, -perArea), y = perArea)
+```
+]
+ 
+.right-panel-wind4-auto[
+&lt;img src="lecture-02_files/figure-html/wind4_auto_13_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  select(t_state) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%  
+  st_as_sf() %&gt;%  
+  mutate(area = as.numeric(st_area(.) / 1e6),  
+         perArea = n / area) %&gt;%  
+  ggplot() +  
+  aes(x = reorder(t_state, -perArea), y = perArea) +  
+* geom_col()
+```
+]
+ 
+.right-panel-wind4-auto[
+&lt;img src="lecture-02_files/figure-html/wind4_auto_14_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  select(t_state) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%  
+  st_as_sf() %&gt;%  
+  mutate(area = as.numeric(st_area(.) / 1e6),  
+         perArea = n / area) %&gt;%  
+  ggplot() +  
+  aes(x = reorder(t_state, -perArea), y = perArea) +  
+  geom_col() +  
+* labs(title = "Wind turbines per km2 by state",
+*      x = "State",
+*      y = "Turbines per km2")
+```
+]
+ 
+.right-panel-wind4-auto[
+&lt;img src="lecture-02_files/figure-html/wind4_auto_15_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  select(t_state) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%  
+  st_as_sf() %&gt;%  
+  mutate(area = as.numeric(st_area(.) / 1e6),  
+         perArea = n / area) %&gt;%  
+  ggplot() +  
+  aes(x = reorder(t_state, -perArea), y = perArea) +  
+  geom_col() +  
+  labs(title = "Wind turbines per km2 by state",  
+       x = "State",  
+       y = "Turbines per km2") +  
+* theme_bw()
+```
+]
+ 
+.right-panel-wind4-auto[
+&lt;img src="lecture-02_files/figure-html/wind4_auto_16_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Geometry + Table...
+.left-panel-wind4-auto[
+
+```r
+USAboundaries::us_states(resolution = "low") %&gt;%  
+  select(state_abbr) -&gt;  
+  states  
+
+us_wind %&gt;%  
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%  
+  select(t_state) %&gt;%  
+  group_by(t_state) %&gt;%  
+  summarise(n = n()) %&gt;%  
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%  
+  st_as_sf() %&gt;%  
+  mutate(area = as.numeric(st_area(.) / 1e6),  
+         perArea = n / area) %&gt;%  
+  ggplot() +  
+  aes(x = reorder(t_state, -perArea), y = perArea) +  
+  geom_col() +  
+  labs(title = "Wind turbines per km2 by state",  
+       x = "State",  
+       y = "Turbines per km2") +  
+  theme_bw() +  
+* theme(axis.text.x = element_text(angle = 90))
+```
+]
+ 
+.right-panel-wind4-auto[
+&lt;img src="lecture-02_files/figure-html/wind4_auto_17_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-wind4-auto {
+  color: #777;
+  width: 49.0196078431373%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-wind4-auto {
+  width: 49.0196078431373%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-wind4-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# Predicates and Operations
+
+- So far we have operated on a table with boolean conditions (filter, select)
+
+--
+
+- We have derived geometry based attributes (distance and area)
+
+--
+
+- Spatial predicates are topologically-invariant *binary* spatial relations based on the DE-9IM. For ease of use "named spatial predicates" have been defined for some common relations.
+
+--
+
+- Predicates defined with masks of domain {T,F,*}
+
+&lt;center&gt;
+&lt;img src="lec-img/02-jts-predicates.png" width=40%&gt;
+&lt;/center&gt;
+---
+
+
+```r
+ca = st_transform(ca, 5070)
+
+(county = filter(ca, name == "Kern"))
+```
+
+```
+Simple feature collection with 1 feature and 12 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -2149069 ymin: 1529323 xmax: -1921152 ymax: 1689554
+CRS:            EPSG:5070
+# A tibble: 1 x 13
+  statefp contyfp contyns affgeod geoid name  lsad    aland awater stat_nm
+* &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;  
+1 06      029     020541… 050000… 06029 Kern  06    2.11e10 7.96e7 Califo…
+# … with 3 more variables: stt_bbr &lt;chr&gt;, jrsdct_ &lt;chr&gt;, geometry &lt;MULTIPOLYGON
+#   [m]&gt;
+```
+
+---
+
+count: false
+ 
+#Predicates...
+.left-panel-kern-wind-auto[
+
+```r
+*us_wind
+```
+]
+ 
+.right-panel-kern-wind-auto[
+
+```
+# A tibble: 58,185 x 24
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 58,175 more rows, and 15 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, xlong &lt;dbl&gt;, ylat &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-kern-wind-auto[
+
+```r
+us_wind %&gt;%  
+* st_as_sf(coords = c("xlong", "ylat"),
+*          crs = 4269)
+```
+]
+ 
+.right-panel-kern-wind-auto[
+
+```
+Simple feature collection with 58185 features and 22 fields
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -171.7131 ymin: 13.38938 xmax: 144.7227 ymax: 66.8399
+CRS:            EPSG:4269
+# A tibble: 58,185 x 23
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 58,175 more rows, and 14 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, geometry &lt;POINT [°]&gt;
+```
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-kern-wind-auto[
+
+```r
+us_wind %&gt;%  
+  st_as_sf(coords = c("xlong", "ylat"),  
+           crs = 4269) %&gt;%  
+* st_transform(5070)
+```
+]
+ 
+.right-panel-kern-wind-auto[
+
+```
+Simple feature collection with 58185 features and 22 fields
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -10410840 ymin: -37031.97 xmax: 3282616 ymax: 6528692
+CRS:            EPSG:5070
+# A tibble: 58,185 x 23
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 58,175 more rows, and 14 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, geometry &lt;POINT [m]&gt;
+```
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-kern-wind-auto[
+
+```r
+us_wind %&gt;%  
+  st_as_sf(coords = c("xlong", "ylat"),  
+           crs = 4269) %&gt;%  
+  st_transform(5070) %&gt;%  
+* st_filter(county, .predicate = st_intersects)
+```
+]
+ 
+.right-panel-kern-wind-auto[
+
+```
+Simple feature collection with 4564 features and 22 fields
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -2018084 ymin: 1551019 xmax: -1977847 ymax: 1641567
+CRS:            EPSG:5070
+# A tibble: 4,564 x 23
+   case_id faa_ors faa_asn usgs_pr_id t_state t_county t_fips p_name p_year
+ *   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;
+ 1 3073429 missing missing       4960 CA      Kern Co… 06029  251 W…   1987
+ 2 3071522 missing missing       4997 CA      Kern Co… 06029  251 W…   1987
+ 3 3073425 missing missing       4957 CA      Kern Co… 06029  251 W…   1987
+ 4 3071569 missing missing       5023 CA      Kern Co… 06029  251 W…   1987
+ 5 3005252 missing missing       5768 CA      Kern Co… 06029  251 W…   1987
+ 6 3003862 missing missing       5836 CA      Kern Co… 06029  251 W…   1987
+ 7 3073370 missing missing       4948 CA      Kern Co… 06029  251 W…   1987
+ 8 3010101 missing missing       5828 CA      Kern Co… 06029  251 W…   1987
+ 9 3073324 missing missing       4965 CA      Kern Co… 06029  251 W…   1987
+10 3072659 missing missing       5044 CA      Kern Co… 06029  251 W…   1987
+# … with 4,554 more rows, and 14 more variables: p_tnum &lt;dbl&gt;, p_cap &lt;dbl&gt;,
+#   t_manu &lt;chr&gt;, t_model &lt;chr&gt;, t_cap &lt;dbl&gt;, t_hh &lt;dbl&gt;, t_rd &lt;dbl&gt;,
+#   t_rsa &lt;dbl&gt;, t_ttlh &lt;dbl&gt;, t_conf_atr &lt;dbl&gt;, t_conf_loc &lt;dbl&gt;,
+#   t_img_date &lt;chr&gt;, t_img_srce &lt;chr&gt;, geometry &lt;POINT [m]&gt;
+```
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-kern-wind-auto[
+
+```r
+us_wind %&gt;%  
+  st_as_sf(coords = c("xlong", "ylat"),  
+           crs = 4269) %&gt;%  
+  st_transform(5070) %&gt;%  
+  st_filter(county, .predicate = st_intersects) %&gt;%  
+* ggplot()
+```
+]
+ 
+.right-panel-kern-wind-auto[
+&lt;img src="lecture-02_files/figure-html/kern-wind_auto_5_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-kern-wind-auto[
+
+```r
+us_wind %&gt;%  
+  st_as_sf(coords = c("xlong", "ylat"),  
+           crs = 4269) %&gt;%  
+  st_transform(5070) %&gt;%  
+  st_filter(county, .predicate = st_intersects) %&gt;%  
+  ggplot() +  
+* geom_sf(size = .5)
+```
+]
+ 
+.right-panel-kern-wind-auto[
+&lt;img src="lecture-02_files/figure-html/kern-wind_auto_6_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-kern-wind-auto[
+
+```r
+us_wind %&gt;%  
+  st_as_sf(coords = c("xlong", "ylat"),  
+           crs = 4269) %&gt;%  
+  st_transform(5070) %&gt;%  
+  st_filter(county, .predicate = st_intersects) %&gt;%  
+  ggplot() +  
+  geom_sf(size = .5) +  
+* geom_sf(data = county, fill = NA)
+```
+]
+ 
+.right-panel-kern-wind-auto[
+&lt;img src="lecture-02_files/figure-html/kern-wind_auto_7_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-kern-wind-auto[
+
+```r
+us_wind %&gt;%  
+  st_as_sf(coords = c("xlong", "ylat"),  
+           crs = 4269) %&gt;%  
+  st_transform(5070) %&gt;%  
+  st_filter(county, .predicate = st_intersects) %&gt;%  
+  ggplot() +  
+  geom_sf(size = .5) +  
+  geom_sf(data = county, fill = NA) +  
+* coord_sf(datum  = st_crs(county))
+```
+]
+ 
+.right-panel-kern-wind-auto[
+&lt;img src="lecture-02_files/figure-html/kern-wind_auto_8_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-kern-wind-auto[
+
+```r
+us_wind %&gt;%  
+  st_as_sf(coords = c("xlong", "ylat"),  
+           crs = 4269) %&gt;%  
+  st_transform(5070) %&gt;%  
+  st_filter(county, .predicate = st_intersects) %&gt;%  
+  ggplot() +  
+  geom_sf(size = .5) +  
+  geom_sf(data = county, fill = NA) +  
+  coord_sf(datum  = st_crs(county)) +  
+* theme_minimal()
+```
+]
+ 
+.right-panel-kern-wind-auto[
+&lt;img src="lecture-02_files/figure-html/kern-wind_auto_9_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-kern-wind-auto {
+  color: #777;
+  width: 49.0196078431373%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-kern-wind-auto {
+  width: 49.0196078431373%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-kern-wind-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-touch-auto[
+
+```r
+*ggplot()
+```
+]
+ 
+.right-panel-touch-auto[
+&lt;img src="lecture-02_files/figure-html/touch_auto_1_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-touch-auto[
+
+```r
+ggplot() +  
+* geom_sf(datum = st_crs(ca))
+```
+]
+ 
+.right-panel-touch-auto[
+&lt;img src="lecture-02_files/figure-html/touch_auto_2_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-touch-auto[
+
+```r
+ggplot() +  
+  geom_sf(datum = st_crs(ca)) +  
+* geom_sf(data = county, fill = "red")
+```
+]
+ 
+.right-panel-touch-auto[
+&lt;img src="lecture-02_files/figure-html/touch_auto_3_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-touch-auto[
+
+```r
+ggplot() +  
+  geom_sf(datum = st_crs(ca)) +  
+  geom_sf(data = county, fill = "red") +  
+* geom_sf(data = st_filter(ca, county,
+*                     .predicate = st_touches),
+*         fill = "blue")
+```
+]
+ 
+.right-panel-touch-auto[
+&lt;img src="lecture-02_files/figure-html/touch_auto_4_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-touch-auto[
+
+```r
+ggplot() +  
+  geom_sf(datum = st_crs(ca)) +  
+  geom_sf(data = county, fill = "red") +  
+  geom_sf(data = st_filter(ca, county,  
+                      .predicate = st_touches),  
+          fill = "blue") +  
+* theme_bw()
+```
+]
+ 
+.right-panel-touch-auto[
+&lt;img src="lecture-02_files/figure-html/touch_auto_5_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-touch-auto {
+  color: #777;
+  width: 58.8235294117647%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-touch-auto {
+  width: 39.2156862745098%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-touch-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+count: false
+ 
+#Predicates...
+.left-panel-within-auto[
+
+```r
+*ggplot()
+```
+]
+ 
+.right-panel-within-auto[
+&lt;img src="lecture-02_files/figure-html/within_auto_1_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-within-auto[
+
+```r
+ggplot() +  
+* geom_sf(datum = st_crs(ca))
+```
+]
+ 
+.right-panel-within-auto[
+&lt;img src="lecture-02_files/figure-html/within_auto_2_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-within-auto[
+
+```r
+ggplot() +  
+  geom_sf(datum = st_crs(ca)) +  
+* geom_sf(data = county, fill = "red")
+```
+]
+ 
+.right-panel-within-auto[
+&lt;img src="lecture-02_files/figure-html/within_auto_3_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-within-auto[
+
+```r
+ggplot() +  
+  geom_sf(datum = st_crs(ca)) +  
+  geom_sf(data = county, fill = "red") +  
+* geom_sf(data = st_filter(ca, county, .predicate =
+*                st_is_within_distance, dist =6e5),
+*         fill = "orange")
+```
+]
+ 
+.right-panel-within-auto[
+&lt;img src="lecture-02_files/figure-html/within_auto_4_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-within-auto[
+
+```r
+ggplot() +  
+  geom_sf(datum = st_crs(ca)) +  
+  geom_sf(data = county, fill = "red") +  
+  geom_sf(data = st_filter(ca, county, .predicate =  
+                 st_is_within_distance, dist =6e5),  
+          fill = "orange") +  
+* geom_sf(data = st_filter(ca, county, .predicate =
+*                st_is_within_distance, dist =6e4),
+*         fill = "green")
+```
+]
+ 
+.right-panel-within-auto[
+&lt;img src="lecture-02_files/figure-html/within_auto_5_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-within-auto[
+
+```r
+ggplot() +  
+  geom_sf(datum = st_crs(ca)) +  
+  geom_sf(data = county, fill = "red") +  
+  geom_sf(data = st_filter(ca, county, .predicate =  
+                 st_is_within_distance, dist =6e5),  
+          fill = "orange") +  
+  geom_sf(data = st_filter(ca, county, .predicate =  
+                 st_is_within_distance, dist =6e4),  
+          fill = "green") +  
+*   geom_sf(data = st_filter(ca, county,.predicate =
+*                st_is_within_distance, dist =6e3),
+*           fill = "blue")
+```
+]
+ 
+.right-panel-within-auto[
+&lt;img src="lecture-02_files/figure-html/within_auto_6_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-within-auto[
+
+```r
+ggplot() +  
+  geom_sf(datum = st_crs(ca)) +  
+  geom_sf(data = county, fill = "red") +  
+  geom_sf(data = st_filter(ca, county, .predicate =  
+                 st_is_within_distance, dist =6e5),  
+          fill = "orange") +  
+  geom_sf(data = st_filter(ca, county, .predicate =  
+                 st_is_within_distance, dist =6e4),  
+          fill = "green") +  
+    geom_sf(data = st_filter(ca, county,.predicate =  
+                 st_is_within_distance, dist =6e3),  
+            fill = "blue") +  
+* geom_sf(data = county,
+*         fill = "red")
+```
+]
+ 
+.right-panel-within-auto[
+&lt;img src="lecture-02_files/figure-html/within_auto_7_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Predicates...
+.left-panel-within-auto[
+
+```r
+ggplot() +  
+  geom_sf(datum = st_crs(ca)) +  
+  geom_sf(data = county, fill = "red") +  
+  geom_sf(data = st_filter(ca, county, .predicate =  
+                 st_is_within_distance, dist =6e5),  
+          fill = "orange") +  
+  geom_sf(data = st_filter(ca, county, .predicate =  
+                 st_is_within_distance, dist =6e4),  
+          fill = "green") +  
+    geom_sf(data = st_filter(ca, county,.predicate =  
+                 st_is_within_distance, dist =6e3),  
+            fill = "blue") +  
+  geom_sf(data = county,  
+          fill = "red") +  
+* theme_bw()
+```
+]
+ 
+.right-panel-within-auto[
+&lt;img src="lecture-02_files/figure-html/within_auto_8_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-within-auto {
+  color: #777;
+  width: 58.8235294117647%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-within-auto {
+  width: 39.2156862745098%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-within-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+
+```r
+sf::st_drivers() %&gt;% 
+ DT::datatable()
+```
+
+<div id="htmlwidget-e1e9c5dea0c6a457dafe" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e1e9c5dea0c6a457dafe">{"x":{"filter":"none","data":[["PCIDSK","PDF","MBTiles","EEDA","ESRI Shapefile","MapInfo File","UK .NTF","OGR_SDTS","S57","DGN","OGR_VRT","REC","Memory","BNA","CSV","GML","GPX","KML","GeoJSON","GeoJSONSeq","ESRIJSON","TopoJSON","OGR_GMT","GPKG","SQLite","WAsP","OpenFileGDB","XPlane","DXF","CAD","Geoconcept","GeoRSS","GPSTrackMaker","VFK","PGDUMP","OSM","GPSBabel","SUA","OpenAir","OGR_PDS","WFS","WFS3","HTF","AeronavFAA","EDIGEO","GFT","SVG","CouchDB","Cloudant","Idrisi","ARCGEN","SEGUKOOA","SEGY","ODS","XLSX","ElasticSearch","Carto","AmigoCloud","SXF","Selafin","JML","PLSCENES","CSW","VDV","MVT","TIGER","AVCBin","AVCE00","NGW","HTTP"],["PCIDSK","PDF","MBTiles","EEDA","ESRI Shapefile","MapInfo File","UK .NTF","OGR_SDTS","S57","DGN","OGR_VRT","REC","Memory","BNA","CSV","GML","GPX","KML","GeoJSON","GeoJSONSeq","ESRIJSON","TopoJSON","OGR_GMT","GPKG","SQLite","WAsP","OpenFileGDB","XPlane","DXF","CAD","Geoconcept","GeoRSS","GPSTrackMaker","VFK","PGDUMP","OSM","GPSBabel","SUA","OpenAir","OGR_PDS","WFS","WFS3","HTF","AeronavFAA","EDIGEO","GFT","SVG","CouchDB","Cloudant","Idrisi","ARCGEN","SEGUKOOA","SEGY","ODS","XLSX","ElasticSearch","Carto","AmigoCloud","SXF","Selafin","JML","PLSCENES","CSW","VDV","MVT","TIGER","AVCBin","AVCE00","NGW","HTTP"],["PCIDSK Database File","Geospatial PDF","MBTiles","Earth Engine Data API","ESRI Shapefile","MapInfo File","UK .NTF","SDTS","IHO S-57 (ENC)","Microstation DGN","VRT - Virtual Datasource","EPIInfo .REC ","Memory","Atlas BNA","Comma Separated Value (.csv)","Geography Markup Language (GML)","GPX","Keyhole Markup Language (KML)","GeoJSON","GeoJSON Sequence","ESRIJSON","TopoJSON","GMT ASCII Vectors (.gmt)","GeoPackage","SQLite / Spatialite","WAsP .map format","ESRI FileGDB","X-Plane/Flightgear aeronautical data","AutoCAD DXF","AutoCAD Driver","Geoconcept","GeoRSS","GPSTrackMaker","Czech Cadastral Exchange Data Format","PostgreSQL SQL dump","OpenStreetMap XML and PBF","GPSBabel","Tim Newport-Peace's Special Use Airspace Format","OpenAir","Planetary Data Systems TABLE","OGC WFS (Web Feature Service)","OGC WFS 3 client (Web Feature Service)","Hydrographic Transfer Vector","Aeronav FAA","French EDIGEO exchange format","Google Fusion Tables","Scalable Vector Graphics","CouchDB / GeoCouch","Cloudant / CouchDB","Idrisi Vector (.vct)","Arc/Info Generate","SEG-P1 / UKOOA P1/90","SEG-Y","Open Document/ LibreOffice / OpenOffice Spreadsheet ","MS Office Open XML spreadsheet","Elastic Search","Carto","AmigoCloud","Storage and eXchange Format","Selafin","OpenJUMP JML","Planet Labs Scenes API","OGC CSW (Catalog  Service for the Web)","VDV-451/VDV-452/INTREST Data Format","Mapbox Vector Tiles","U.S. Census TIGER/Line","Arc/Info Binary Coverage","Arc/Info E00 (ASCII) Coverage","NextGIS Web","HTTP Fetching Wrapper"],[true,true,true,false,true,true,false,false,true,true,false,false,true,true,true,true,true,true,true,true,false,false,true,true,true,true,false,false,true,false,true,true,true,false,true,false,true,false,false,false,false,false,false,false,false,true,false,true,true,false,false,false,false,true,true,true,true,true,false,true,true,false,false,true,false,true,false,false,true,false],[false,true,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[true,true,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,true,false,false,false,false,false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,true,false,false,false,false,false,false,true,true],[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],[true,false,true,false,true,true,true,true,true,true,true,false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,true,true,false,true,true,true,true,false,true,true,true,false,true,false,false,true,true,true,true,true,true,false,false,false,true,true,true,false,false,true,true,true,true,true,false,false]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>name<\/th>\n      <th>long_name<\/th>\n      <th>write<\/th>\n      <th>copy<\/th>\n      <th>is_raster<\/th>\n      <th>is_vector<\/th>\n      <th>vsi<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}]}},"evals":[],"jsHooks":[]}</script>
+---
+
+# Wait! What about Raster (Feild) Data??
+
+- Raster are another type of data structure (array)
+
+
+```r
+library(stars)
+x = system.file("tif/L7_ETMs.tif", package = "stars") %&gt;% read_stars() 
+plot(x)
+```
+
+&lt;img src="lecture-02_files/figure-html/unnamed-chunk-16-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+par(mfrow = c(1,3), mar = c(0,0,0,0))
+image(x, rgb = c(4,3,2)) 
+title(main = "Color Infared", line = -10)
+image(x, rgb = c(3,2,1)) 
+title(main = "Natural Color", line = -10)
+image(x, rgb = c(5,4,3)) 
+title(main = "Psuedo color", line = -10)
+```
+
+&lt;img src="lecture-02_files/figure-html/unnamed-chunk-17-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+circle = st_point(c(293749.5, 9115745)) %&gt;% 
+         st_buffer(400) %&gt;% 
+         st_sfc(crs = st_crs(x)) 
+        
+{plot(x[circle][, , , 3], reset = FALSE)
+plot(circle, col = NA, border = 'red', add = TRUE, lwd = 2)}
+```
+
+&lt;img src="lecture-02_files/figure-html/unnamed-chunk-18-1.png" width="432" style="display: block; margin: auto;" /&gt;
+---
+
+## Data science is script driven
+
+  - You use an IDE / Command Line
+  - Data is left raw and manipulated with scripts
+  - Scripts are shareable, reproducible,  and self-contained
+  - Scripts are process documenting
+  
+&lt;img src="lec-img/02-r-studio-ide.png" width="50%"&gt;
+
+---
+class: center, middle, inverse
+
+# What is the Alternative??
+
+---
+
+## GISystems: the shapefile view
+
+A geographic information system (GIS) is a framework for gathering, managing, and analyzing data. 
+ - It is limited to spatial data (table manipulation is minimal)
+ - Operates on its own information system (shp is a data single)
+ - Is driven through user interaction with clicks and text entries
+---
+### ...
+
+shapefiles have at minimum 4 components
+.pull-left[
+
+- Geometry (.shp)
+- Data (.dbf)
+- Relations (.shx) 
+- Projection (.prj) (will discuss soon...)
+ 
+all stored separately...
+
+- a shapefile is data model of a data model (sf geometry)
+
+]
+
+.pull-right[
+
+&lt;img src="lec-img/02-shp-model.png" width="378" /&gt;
+]
+
+---
+
+## ... point-and-click UI
+
+- Geometries (shp) are rendered and symbolized by a data field (dbf) in graphical interfaces
+
+- there is no way to record what clicks you make, or what order they are made in...
+
+&lt;center&gt;
+&lt;img src="lec-img/02-qgis.png" width="50%"&gt;
+&lt;/center&gt;
+---
+
+### Both the data science and  GISystem approach make use of tables and geometries:
+
+ - Data Science approach treats geometry as a **column** of the table
+    - Allows single file storage, and operations directly on the data AND on the geometry
+    
+ - GISystem (shapefile) approach requires a multi-file approach
+ - associates a table **dbf** file with a geometry **shp** file using an **shx** file
+ 
+### In both cases coordinates - composite geometries - must have a &lt;span class="code"&gt;reference system&lt;/span&gt;
+
+---
+
+## Why the Data Science vs GISystem approach?
+
+- Lets take a quick example to end the day... our task is to isolate Modoc County California and calcuated its areas in m^2^
+
+In ArcMap (or QGIS) we would
+
+ 1. Open a new map document and load the California shp
+ 2. Open the Attribute table and select the correct feature by name
+ 4. Export to new layer
+ 5. Open the ArcToolbox Projection wizard
+ 6. Select the new layer
+ 7. Specify a location and name for the new projected data. 
+ 8. Specify the output coordinate system to project the data. 
+ 9. Complete the projection.
+ 10. Go to back to the attribute table
+ 11. Create a new field column
+ 12. Populate it with the "Field Calculator"
+ 
+---
+
+count: false
+ 
+#In R...
+.left-panel-modoc-auto[
+
+```r
+*aim = "Modoc"
+```
+]
+ 
+.right-panel-modoc-auto[
+
+]
+
+---
+count: false
+ 
+#In R...
+.left-panel-modoc-auto[
+
+```r
+aim = "Modoc"  
+
+*mod = read_sf("data/ca.shp")
+```
+]
+ 
+.right-panel-modoc-auto[
+
+]
+
+---
+count: false
+ 
+#In R...
+.left-panel-modoc-auto[
+
+```r
+aim = "Modoc"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+* filter(name == aim)
+```
+]
+ 
+.right-panel-modoc-auto[
+
+]
+
+---
+count: false
+ 
+#In R...
+.left-panel-modoc-auto[
+
+```r
+aim = "Modoc"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+* st_transform(5070)
+```
+]
+ 
+.right-panel-modoc-auto[
+
+]
+
+---
+count: false
+ 
+#In R...
+.left-panel-modoc-auto[
+
+```r
+aim = "Modoc"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+  st_transform(5070)  
+
+*st_area(mod)
+```
+]
+ 
+.right-panel-modoc-auto[
+
+```
+10883528376 [m^2]
+```
+]
+
+---
+count: false
+ 
+#In R...
+.left-panel-modoc-auto[
+
+```r
+aim = "Modoc"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+  st_transform(5070)  
+
+st_area(mod)  
+
+*ggplot()
+```
+]
+ 
+.right-panel-modoc-auto[
+
+```
+10883528376 [m^2]
+```
+
+&lt;img src="lecture-02_files/figure-html/modoc_auto_6_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#In R...
+.left-panel-modoc-auto[
+
+```r
+aim = "Modoc"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+  st_transform(5070)  
+
+st_area(mod)  
+
+ggplot() +  
+* geom_sf(data = mod, fill = "blue")
+```
+]
+ 
+.right-panel-modoc-auto[
+
+```
+10883528376 [m^2]
+```
+
+&lt;img src="lecture-02_files/figure-html/modoc_auto_7_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#In R...
+.left-panel-modoc-auto[
+
+```r
+aim = "Modoc"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+  st_transform(5070)  
+
+st_area(mod)  
+
+ggplot() +  
+  geom_sf(data = mod, fill = "blue") +  
+* coord_sf(datum = st_crs(mod))
+```
+]
+ 
+.right-panel-modoc-auto[
+
+```
+10883528376 [m^2]
+```
+
+&lt;img src="lecture-02_files/figure-html/modoc_auto_8_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#In R...
+.left-panel-modoc-auto[
+
+```r
+aim = "Modoc"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+  st_transform(5070)  
+
+st_area(mod)  
+
+ggplot() +  
+  geom_sf(data = mod, fill = "blue") +  
+  coord_sf(datum = st_crs(mod)) +  
+* labs(title  = paste(mod$name, "County, California"))
+```
+]
+ 
+.right-panel-modoc-auto[
+
+```
+10883528376 [m^2]
+```
+
+&lt;img src="lecture-02_files/figure-html/modoc_auto_9_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-modoc-auto {
+  color: #777;
+  width: 58.8235294117647%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-modoc-auto {
+  width: 39.2156862745098%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-modoc-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+Six weeks from now when you realize "shoot, I really wanted Santa Barbara County 😠":
+
+--
+
+In ArcMap (or QGIS) we would need to:
+
+--
+
+ 1. Open a new map document and load the California shp
+ 2. Open the Attribute table and select the correct feature by name
+ 4. Export to new layer
+ 5. Open the ArcToolbox Projection wizard
+ 6. Select the new layer
+ 7. Specify a location and name for the new projected data. 
+ 8. Specify the output coordinate system to project the data. 
+ 9. Complete the projection.
+ 10. Go to back to the attribute table
+ 11. Create a new field column
+ 12. Populate it with the "Field Calculator"
+ 
+---
+
+count: false
+ 
+#or in R...
+.left-panel-in_a_pipeline2-auto[
+
+```r
+*aim = "Santa Barbara"
+```
+]
+ 
+.right-panel-in_a_pipeline2-auto[
+
+]
+
+---
+count: false
+ 
+#or in R...
+.left-panel-in_a_pipeline2-auto[
+
+```r
+aim = "Santa Barbara"  
+
+*mod = read_sf("data/ca.shp")
+```
+]
+ 
+.right-panel-in_a_pipeline2-auto[
+
+]
+
+---
+count: false
+ 
+#or in R...
+.left-panel-in_a_pipeline2-auto[
+
+```r
+aim = "Santa Barbara"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+* filter(name == aim)
+```
+]
+ 
+.right-panel-in_a_pipeline2-auto[
+
+]
+
+---
+count: false
+ 
+#or in R...
+.left-panel-in_a_pipeline2-auto[
+
+```r
+aim = "Santa Barbara"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+* st_transform(5070)
+```
+]
+ 
+.right-panel-in_a_pipeline2-auto[
+
+]
+
+---
+count: false
+ 
+#or in R...
+.left-panel-in_a_pipeline2-auto[
+
+```r
+aim = "Santa Barbara"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+  st_transform(5070)  
+
+*st_area(mod)
+```
+]
+ 
+.right-panel-in_a_pipeline2-auto[
+
+```
+7376916735 [m^2]
+```
+]
+
+---
+count: false
+ 
+#or in R...
+.left-panel-in_a_pipeline2-auto[
+
+```r
+aim = "Santa Barbara"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+  st_transform(5070)  
+
+st_area(mod)  
+
+*ggplot()
+```
+]
+ 
+.right-panel-in_a_pipeline2-auto[
+
+```
+7376916735 [m^2]
+```
+
+&lt;img src="lecture-02_files/figure-html/in_a_pipeline2_auto_6_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#or in R...
+.left-panel-in_a_pipeline2-auto[
+
+```r
+aim = "Santa Barbara"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+  st_transform(5070)  
+
+st_area(mod)  
+
+ggplot() +  
+* geom_sf(data = mod, fill = "blue")
+```
+]
+ 
+.right-panel-in_a_pipeline2-auto[
+
+```
+7376916735 [m^2]
+```
+
+&lt;img src="lecture-02_files/figure-html/in_a_pipeline2_auto_7_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#or in R...
+.left-panel-in_a_pipeline2-auto[
+
+```r
+aim = "Santa Barbara"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+  st_transform(5070)  
+
+st_area(mod)  
+
+ggplot() +  
+  geom_sf(data = mod, fill = "blue") +  
+* coord_sf(datum = st_crs(mod))
+```
+]
+ 
+.right-panel-in_a_pipeline2-auto[
+
+```
+7376916735 [m^2]
+```
+
+&lt;img src="lecture-02_files/figure-html/in_a_pipeline2_auto_8_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#or in R...
+.left-panel-in_a_pipeline2-auto[
+
+```r
+aim = "Santa Barbara"  
+
+mod = read_sf("data/ca.shp") %&gt;%  
+  filter(name == aim) %&gt;%  
+  st_transform(5070)  
+
+st_area(mod)  
+
+ggplot() +  
+  geom_sf(data = mod, fill = "blue") +  
+  coord_sf(datum = st_crs(mod)) +  
+* labs(title  = paste(mod$name, "County, California"))
+```
+]
+ 
+.right-panel-in_a_pipeline2-auto[
+
+```
+7376916735 [m^2]
+```
+
+&lt;img src="lecture-02_files/figure-html/in_a_pipeline2_auto_9_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-in_a_pipeline2-auto {
+  color: #777;
+  width: 58.8235294117647%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-in_a_pipeline2-auto {
+  width: 39.2156862745098%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-in_a_pipeline2-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+#Hurricane Rainfall..
+.left-panel-hurricane-auto[
+
+```r
+*(ppt = system.file("nc/test_stageiv_xyt.nc", package = "stars") %&gt;%
+* read_ncdf(curvilinear = c("lon", "lat"), ignore_bounds = TRUE))
+```
+]
+ 
+.right-panel-hurricane-auto[
+
+```
+stars object with 3 dimensions and 1 attribute
+attribute(s):
+ Total_precipitation_surface_1_Hour_Accumulation [kg/m^2]
+ Min.   :  0.000                                         
+ 1st Qu.:  0.000                                         
+ Median :  0.750                                         
+ Mean   :  4.143                                         
+ 3rd Qu.:  4.630                                         
+ Max.   :163.750                                         
+dimension(s):
+     from  to                  offset   delta    refsys point
+x       1  87                      NA      NA EPSG:4326    NA
+y       1 118                      NA      NA EPSG:4326    NA
+time    1  23 2018-09-13 18:30:00 UTC 1 hours   POSIXct    NA
+                             values    
+x    [87x118] -80.6113,...,-74.8822 [x]
+y      [87x118] 32.4413,...,37.6193 [y]
+time                           NULL    
+curvilinear grid
+```
+]
+
+---
+count: false
+ 
+#Hurricane Rainfall..
+.left-panel-hurricane-auto[
+
+```r
+(ppt = system.file("nc/test_stageiv_xyt.nc", package = "stars") %&gt;%  
+  read_ncdf(curvilinear = c("lon", "lat"), ignore_bounds = TRUE))  
+
+*dim(ppt)
+```
+]
+ 
+.right-panel-hurricane-auto[
+
+```
+stars object with 3 dimensions and 1 attribute
+attribute(s):
+ Total_precipitation_surface_1_Hour_Accumulation [kg/m^2]
+ Min.   :  0.000                                         
+ 1st Qu.:  0.000                                         
+ Median :  0.750                                         
+ Mean   :  4.143                                         
+ 3rd Qu.:  4.630                                         
+ Max.   :163.750                                         
+dimension(s):
+     from  to                  offset   delta    refsys point
+x       1  87                      NA      NA EPSG:4326    NA
+y       1 118                      NA      NA EPSG:4326    NA
+time    1  23 2018-09-13 18:30:00 UTC 1 hours   POSIXct    NA
+                             values    
+x    [87x118] -80.6113,...,-74.8822 [x]
+y      [87x118] 32.4413,...,37.6193 [y]
+time                           NULL    
+curvilinear grid
+```
+
+```
+   x    y time 
+  87  118   23 
+```
+]
+
+---
+count: false
+ 
+#Hurricane Rainfall..
+.left-panel-hurricane-auto[
+
+```r
+(ppt = system.file("nc/test_stageiv_xyt.nc", package = "stars") %&gt;%  
+  read_ncdf(curvilinear = c("lon", "lat"), ignore_bounds = TRUE))  
+
+dim(ppt)  
+```
+]
+ 
+.right-panel-hurricane-auto[
+
+```
+stars object with 3 dimensions and 1 attribute
+attribute(s):
+ Total_precipitation_surface_1_Hour_Accumulation [kg/m^2]
+ Min.   :  0.000                                         
+ 1st Qu.:  0.000                                         
+ Median :  0.750                                         
+ Mean   :  4.143                                         
+ 3rd Qu.:  4.630                                         
+ Max.   :163.750                                         
+dimension(s):
+     from  to                  offset   delta    refsys point
+x       1  87                      NA      NA EPSG:4326    NA
+y       1 118                      NA      NA EPSG:4326    NA
+time    1  23 2018-09-13 18:30:00 UTC 1 hours   POSIXct    NA
+                             values    
+x    [87x118] -80.6113,...,-74.8822 [x]
+y      [87x118] 32.4413,...,37.6193 [y]
+time                           NULL    
+curvilinear grid
+```
+
+```
+   x    y time 
+  87  118   23 
+```
+]
+
+&lt;style&gt;
+.left-panel-hurricane-auto {
+  color: #777;
+  width: 58.8235294117647%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-hurricane-auto {
+  width: 39.2156862745098%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-hurricane-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+# Time Slices ...
+
+
+```r
+plot(ppt[,,,5:7], nrow = 1)
+```
+
+&lt;img src="lecture-02_files/figure-html/unnamed-chunk-20-1.png" width="432" /&gt;
+
+---
+# Across time ...
+&lt;img src="lec-img/hurricane.gif" height="95%"&gt;
+
+---
+count: false
+ 
+#North Carolina...
+.left-panel-nc-auto[
+
+```r
+*system.file("gpkg/nc.gpkg", package = "sf")
+```
+]
+ 
+.right-panel-nc-auto[
+
+```
+[1] "/Library/Frameworks/R.framework/Versions/4.0/Resources/library/sf/gpkg/nc.gpkg"
+```
+]
+
+---
+count: false
+ 
+#North Carolina...
+.left-panel-nc-auto[
+
+```r
+system.file("gpkg/nc.gpkg", package = "sf") %&gt;%  
+* read_sf("nc.gpkg")
+```
+]
+ 
+.right-panel-nc-auto[
+
+```
+Simple feature collection with 100 features and 14 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -84.32385 ymin: 33.88199 xmax: -75.45698 ymax: 36.58965
+CRS:            4267
+# A tibble: 100 x 15
+    AREA PERIMETER CNTY_ CNTY_ID NAME  FIPS  FIPSNO CRESS_ID BIR74 SID74 NWBIR74
+   &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt;    &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+ 1 0.114      1.44  1825    1825 Ashe  37009  37009        5  1091     1      10
+ 2 0.061      1.23  1827    1827 Alle… 37005  37005        3   487     0      10
+ 3 0.143      1.63  1828    1828 Surry 37171  37171       86  3188     5     208
+ 4 0.07       2.97  1831    1831 Curr… 37053  37053       27   508     1     123
+ 5 0.153      2.21  1832    1832 Nort… 37131  37131       66  1421     9    1066
+ 6 0.097      1.67  1833    1833 Hert… 37091  37091       46  1452     7     954
+ 7 0.062      1.55  1834    1834 Camd… 37029  37029       15   286     0     115
+ 8 0.091      1.28  1835    1835 Gates 37073  37073       37   420     0     254
+ 9 0.118      1.42  1836    1836 Warr… 37185  37185       93   968     4     748
+10 0.124      1.43  1837    1837 Stok… 37169  37169       85  1612     1     160
+# … with 90 more rows, and 4 more variables: BIR79 &lt;dbl&gt;, SID79 &lt;dbl&gt;,
+#   NWBIR79 &lt;dbl&gt;, geom &lt;MULTIPOLYGON [°]&gt;
+```
+]
+
+---
+count: false
+ 
+#North Carolina...
+.left-panel-nc-auto[
+
+```r
+system.file("gpkg/nc.gpkg", package = "sf") %&gt;%  
+  read_sf("nc.gpkg") %&gt;%  
+* st_transform(st_crs(ppt))
+```
+]
+ 
+.right-panel-nc-auto[
+
+```
+Simple feature collection with 100 features and 14 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -84.32385 ymin: 33.88199 xmax: -75.45698 ymax: 36.58965
+CRS:            EPSG:4326
+# A tibble: 100 x 15
+    AREA PERIMETER CNTY_ CNTY_ID NAME  FIPS  FIPSNO CRESS_ID BIR74 SID74 NWBIR74
+   &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt;    &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+ 1 0.114      1.44  1825    1825 Ashe  37009  37009        5  1091     1      10
+ 2 0.061      1.23  1827    1827 Alle… 37005  37005        3   487     0      10
+ 3 0.143      1.63  1828    1828 Surry 37171  37171       86  3188     5     208
+ 4 0.07       2.97  1831    1831 Curr… 37053  37053       27   508     1     123
+ 5 0.153      2.21  1832    1832 Nort… 37131  37131       66  1421     9    1066
+ 6 0.097      1.67  1833    1833 Hert… 37091  37091       46  1452     7     954
+ 7 0.062      1.55  1834    1834 Camd… 37029  37029       15   286     0     115
+ 8 0.091      1.28  1835    1835 Gates 37073  37073       37   420     0     254
+ 9 0.118      1.42  1836    1836 Warr… 37185  37185       93   968     4     748
+10 0.124      1.43  1837    1837 Stok… 37169  37169       85  1612     1     160
+# … with 90 more rows, and 4 more variables: BIR79 &lt;dbl&gt;, SID79 &lt;dbl&gt;,
+#   NWBIR79 &lt;dbl&gt;, geom &lt;MULTIPOLYGON [°]&gt;
+```
+]
+
+---
+count: false
+ 
+#North Carolina...
+.left-panel-nc-auto[
+
+```r
+system.file("gpkg/nc.gpkg", package = "sf") %&gt;%  
+  read_sf("nc.gpkg") %&gt;%  
+  st_transform(st_crs(ppt)) -&gt;  
+* nc
+```
+]
+ 
+.right-panel-nc-auto[
+
+]
+
+---
+count: false
+ 
+#North Carolina...
+.left-panel-nc-auto[
+
+```r
+system.file("gpkg/nc.gpkg", package = "sf") %&gt;%  
+  read_sf("nc.gpkg") %&gt;%  
+  st_transform(st_crs(ppt)) -&gt;  
+  nc  
+
+*(nc_outline = st_union(nc))
+```
+]
+ 
+.right-panel-nc-auto[
+
+```
+Geometry set for 1 feature 
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -84.32385 ymin: 33.88199 xmax: -75.45698 ymax: 36.58965
+CRS:            EPSG:4326
+```
+]
+
+&lt;style&gt;
+.left-panel-nc-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-nc-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-nc-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+count: false
+ 
+#Through time...
+.left-panel-ds-auto[
+
+```r
+*plot_hook = function() {
+* plot(nc_outline, border = 'red', add = TRUE)
+*} 
+```
+]
+ 
+.right-panel-ds-auto[
+
+]
+
+---
+count: false
+ 
+#Through time...
+.left-panel-ds-auto[
+
+```r
+plot_hook = function() {  
+  plot(nc_outline, border = 'red', add = TRUE)  
+}  
+
+*ppt
+```
+]
+ 
+.right-panel-ds-auto[
+
+```
+stars object with 3 dimensions and 1 attribute
+attribute(s):
+ Total_precipitation_surface_1_Hour_Accumulation [kg/m^2]
+ Min.   :  0.000                                         
+ 1st Qu.:  0.000                                         
+ Median :  0.750                                         
+ Mean   :  4.143                                         
+ 3rd Qu.:  4.630                                         
+ Max.   :163.750                                         
+dimension(s):
+     from  to                  offset   delta    refsys point
+x       1  87                      NA      NA EPSG:4326    NA
+y       1 118                      NA      NA EPSG:4326    NA
+time    1  23 2018-09-13 18:30:00 UTC 1 hours   POSIXct    NA
+                             values    
+x    [87x118] -80.6113,...,-74.8822 [x]
+y      [87x118] 32.4413,...,37.6193 [y]
+time                           NULL    
+curvilinear grid
+```
+]
+
+---
+count: false
+ 
+#Through time...
+.left-panel-ds-auto[
+
+```r
+plot_hook = function() {  
+  plot(nc_outline, border = 'red', add = TRUE)  
+}  
+
+ppt %&gt;%  
+* slice(1:12, along = "time")
+```
+]
+ 
+.right-panel-ds-auto[
+
+```
+stars object with 3 dimensions and 1 attribute
+attribute(s):
+ Total_precipitation_surface_1_Hour_Accumulation [kg/m^2]
+ Min.   :  0.000                                         
+ 1st Qu.:  0.000                                         
+ Median :  0.380                                         
+ Mean   :  3.708                                         
+ 3rd Qu.:  3.880                                         
+ Max.   :163.750                                         
+dimension(s):
+     from  to                  offset   delta    refsys point
+x       1  87                      NA      NA EPSG:4326    NA
+y       1 118                      NA      NA EPSG:4326    NA
+time    1  12 2018-09-13 18:30:00 UTC 1 hours   POSIXct    NA
+                             values    
+x    [87x118] -80.6113,...,-74.8822 [x]
+y      [87x118] 32.4413,...,37.6193 [y]
+time                           NULL    
+curvilinear grid
+```
+]
+
+---
+count: false
+ 
+#Through time...
+.left-panel-ds-auto[
+
+```r
+plot_hook = function() {  
+  plot(nc_outline, border = 'red', add = TRUE)  
+}  
+
+ppt %&gt;%  
+  slice(1:12, along = "time") %&gt;%  
+* plot(downsample = c(5, 5, 1), hook = plot_hook)
+```
+]
+ 
+.right-panel-ds-auto[
+&lt;img src="lecture-02_files/figure-html/ds_auto_4_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-ds-auto {
+  color: #777;
+  width: 49.0196078431373%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-ds-auto {
+  width: 49.0196078431373%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-ds-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+#Object/Field Interaction...
+.left-panel-hurricane2-auto[
+
+```r
+*ppt
+```
+]
+ 
+.right-panel-hurricane2-auto[
+
+```
+stars object with 3 dimensions and 1 attribute
+attribute(s):
+ Total_precipitation_surface_1_Hour_Accumulation [kg/m^2]
+ Min.   :  0.000                                         
+ 1st Qu.:  0.000                                         
+ Median :  0.750                                         
+ Mean   :  4.143                                         
+ 3rd Qu.:  4.630                                         
+ Max.   :163.750                                         
+dimension(s):
+     from  to                  offset   delta    refsys point
+x       1  87                      NA      NA EPSG:4326    NA
+y       1 118                      NA      NA EPSG:4326    NA
+time    1  23 2018-09-13 18:30:00 UTC 1 hours   POSIXct    NA
+                             values    
+x    [87x118] -80.6113,...,-74.8822 [x]
+y      [87x118] 32.4413,...,37.6193 [y]
+time                           NULL    
+curvilinear grid
+```
+]
+
+---
+count: false
+ 
+#Object/Field Interaction...
+.left-panel-hurricane2-auto[
+
+```r
+ppt %&gt;%  
+* aggregate(by = nc, FUN = max)
+```
+]
+ 
+.right-panel-hurricane2-auto[
+
+```
+stars object with 2 dimensions and 1 attribute
+attribute(s):
+ Total_precipitation_surface_1_Hour_Accumulation 
+ Min.   :  0.000                                 
+ 1st Qu.:  0.380                                 
+ Median :  2.880                                 
+ Mean   :  9.902                                 
+ 3rd Qu.: 13.750                                 
+ Max.   :136.630                                 
+ NA's   :966                                     
+dimension(s):
+     from  to                  offset   delta    refsys point
+geom    1 100                      NA      NA EPSG:4326 FALSE
+time    1  23 2018-09-13 18:30:00 UTC 1 hours   POSIXct    NA
+                                                                values
+geom MULTIPOLYGON (((-81.47276 3...,...,MULTIPOLYGON (((-78.65572 3...
+time                                                              NULL
+```
+]
+
+---
+count: false
+ 
+#Object/Field Interaction...
+.left-panel-hurricane2-auto[
+
+```r
+ppt %&gt;%  
+  aggregate(by = nc, FUN = max) %&gt;%  
+* plot(max.plot = 23, border = 'grey', lwd = .5)
+```
+]
+ 
+.right-panel-hurricane2-auto[
+&lt;img src="lecture-02_files/figure-html/hurricane2_auto_3_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-hurricane2-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-hurricane2-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-hurricane2-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+count: false
+ 
+#Total Rainfall...
+.left-panel-hurricane3-auto[
+
+```r
+*ppt
+```
+]
+ 
+.right-panel-hurricane3-auto[
+
+```
+stars object with 3 dimensions and 1 attribute
+attribute(s):
+ Total_precipitation_surface_1_Hour_Accumulation [kg/m^2]
+ Min.   :  0.000                                         
+ 1st Qu.:  0.000                                         
+ Median :  0.750                                         
+ Mean   :  4.143                                         
+ 3rd Qu.:  4.630                                         
+ Max.   :163.750                                         
+dimension(s):
+     from  to                  offset   delta    refsys point
+x       1  87                      NA      NA EPSG:4326    NA
+y       1 118                      NA      NA EPSG:4326    NA
+time    1  23 2018-09-13 18:30:00 UTC 1 hours   POSIXct    NA
+                             values    
+x    [87x118] -80.6113,...,-74.8822 [x]
+y      [87x118] 32.4413,...,37.6193 [y]
+time                           NULL    
+curvilinear grid
+```
+]
+
+---
+count: false
+ 
+#Total Rainfall...
+.left-panel-hurricane3-auto[
+
+```r
+ppt %&gt;%  
+* aggregate(by = nc, FUN = sum)
+```
+]
+ 
+.right-panel-hurricane3-auto[
+
+```
+stars object with 2 dimensions and 1 attribute
+attribute(s):
+ Total_precipitation_surface_1_Hour_Accumulation 
+ Min.   :   0.00                                 
+ 1st Qu.:   0.76                                 
+ Median :  42.46                                 
+ Mean   : 301.44                                 
+ 3rd Qu.: 356.85                                 
+ Max.   :5590.72                                 
+ NA's   :966                                     
+dimension(s):
+     from  to                  offset   delta    refsys point
+geom    1 100                      NA      NA EPSG:4326 FALSE
+time    1  23 2018-09-13 18:30:00 UTC 1 hours   POSIXct    NA
+                                                                values
+geom MULTIPOLYGON (((-81.47276 3...,...,MULTIPOLYGON (((-78.65572 3...
+time                                                              NULL
+```
+]
+
+---
+count: false
+ 
+#Total Rainfall...
+.left-panel-hurricane3-auto[
+
+```r
+ppt %&gt;%  
+  aggregate(by = nc, FUN = sum) %&gt;%  
+* st_apply("geom", max)
+```
+]
+ 
+.right-panel-hurricane3-auto[
+
+```
+stars object with 1 dimensions and 1 attribute
+attribute(s):
+      max         
+ Min.   :   0.00  
+ 1st Qu.:  85.77  
+ Median : 414.12  
+ Mean   : 873.70  
+ 3rd Qu.:1267.48  
+ Max.   :5590.72  
+ NA's   :42       
+dimension(s):
+     from  to offset delta    refsys point
+geom    1 100     NA    NA EPSG:4326 FALSE
+                                                                values
+geom MULTIPOLYGON (((-81.47276 3...,...,MULTIPOLYGON (((-78.65572 3...
+```
+]
+
+---
+count: false
+ 
+#Total Rainfall...
+.left-panel-hurricane3-auto[
+
+```r
+ppt %&gt;%  
+  aggregate(by = nc, FUN = sum) %&gt;%  
+  st_apply("geom", max) %&gt;%  
+* plot(main = "Total Rainfall kg/m^2")
+```
+]
+ 
+.right-panel-hurricane3-auto[
+&lt;img src="lecture-02_files/figure-html/hurricane3_auto_4_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-hurricane3-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-hurricane3-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-hurricane3-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# Today...
+
+- New Storm
+
+--
+
+- New State(s)
+
+--
+
+- same analysis ...
+
+--
+
+&lt;img src="lec-img/isaias-track.png"&gt;
+
+---
+class: center, middle
+&lt;iframe width="750" height="600" src="https://www.youtube.com/embed/s3JldKoA0zw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+
+---
+
+In many ways, the benefits of using R over a desktop GIS are similar to the benefits of using R over Excel for data analysis.
+
+- R is free and open source, not limited to university or employer licenses
+- As a full-fledged programming language, you have greater flexibility than the point-and-click interface of a desktop GIS or a dedicated language like arcpy. 
+- Analysis are self documenting and reproducible
+- There is a large community of developers working on spatial workflows, design and implementation
+
+---
+
+## Summary 
+
+- GIS is an "awkward" combination of information and data science that involves a unique type of data (coordinates with spatial reference)
+
+- Thus the confusion around what is "GIS"
+
+- Events and characteristics are continuous in space and time and are discretized by human imposed units. These discrete units are stored as tables.
+
+- spatial data can be seen as *tables*, _extended_ with geometries.
+
+- tables can be evaluated with core data science practices, 
+
+- geometries can be anaylsized with existing geometric practices.
+
+- In order to best leverage spatial data there is a strong advantage in being fluent in working with the table and geometry and working within a system in which these can be 
+
+- for DS, many new operators become available (predicates, measures, intersection/buffer/union)
+
+Such a view gives us the advantages of the attribute AND the spatial components
+
+- geometry sets, with attributes in tables (GIS view)
+
+---
+# Coming soon ... <i class="fas  fa-clock "></i>
+
+- Tomorrow - Naming things, building projects, data types
+
+--
+
+- Thursday - Data Structures &amp; Indexing (1D, 2D, 3D, ...)
+
+--
+
+- Week 2: Working with Tables
+
+--
+
+- Week 3-4: Working with Geometry
+
+--
+
+- Week 4-5: Working with Arrays (Fields)
+
+--
+
+# Assignment: [Set up Git and Github](02-intro-bash.html)
+
+---
+class: middle, center
+
+# END
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
