@@ -1,0 +1,3791 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 176A</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/font-awesome-5.3.1/css/fontawesome-all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 176A
+## Lecture 03: The Digital Environment
+### Mike Johnson
+
+---
+
+
+
+
+class: center, middle
+
+&lt;img src="lec-img/03-R-situated.png" width="75%"&gt;
+
+---
+class: middle, center
+
+## Today
+
+--
+
+Files
+
+--
+
+Naming Things
+
+--
+
+Data Types
+
+---
+
+class: center, middle
+
+## Managing your projects in a reproducible way doesn't just make your science better, but it makes your life easier
+---
+# Your Computer
+
+**Computer**: an electronic device for _storing_ and _processing_ data, typically in binary form, according to instructions 
+
+&lt;center&gt;
+&lt;i class="fas fa-laptop-code fa-5x"&gt;&lt;/i&gt;
+&lt;/center&gt;
+
+--
+
+**File**: a block of arbitrary information available to a computer program
+
+&lt;center&gt;
+&lt;i class="fas fa-file fa-5x"&gt;&lt;/i&gt;
+&lt;/center&gt;
+
+---
+
+# File Storage 
+
+- Files are stored as a collection of bytes on a hard drive
+
+--
+
+- Hard drives do not understand files  - they just store bytes
+
+--
+ 
+- We need ways to retrieve (and write) **bytes** from (to) the hard drive.
+
+---
+# Bytes?
+
+But what is a byte?
+
+- a group of binary digits or bits (usually eight) operated on as a unit.
+- a byte considered as a unit of memory size.
+
+- The bit is a basic unit of information in computing and represents a logical state with two possible values (0 or 1).
+
+&lt;img src="lec-img/03-bit-byte.png"&gt;
+
+---
+
+class: center, middle
+
+# [Example](https://www.rapidtables.com/convert/number/ascii-hex-bin-dec-converter.html)
+
+---
+count: false
+ 
+#Bytes - Raw - Human Readable...
+.left-panel-bytes-auto[
+
+```r
+*(x &lt;- "GIS is Great!!!")
+```
+]
+ 
+.right-panel-bytes-auto[
+
+```
+[1] "GIS is Great!!!"
+```
+]
+
+---
+count: false
+ 
+#Bytes - Raw - Human Readable...
+.left-panel-bytes-auto[
+
+```r
+(x &lt;- "GIS is Great!!!")  
+
+*(y &lt;- charToRaw(x))
+```
+]
+ 
+.right-panel-bytes-auto[
+
+```
+[1] "GIS is Great!!!"
+```
+
+```
+ [1] 47 49 53 20 69 73 20 47 72 65 61 74 21 21 21
+```
+]
+
+---
+count: false
+ 
+#Bytes - Raw - Human Readable...
+.left-panel-bytes-auto[
+
+```r
+(x &lt;- "GIS is Great!!!")  
+
+(y &lt;- charToRaw(x))  
+
+*(z &lt;- rawToBits(y))
+```
+]
+ 
+.right-panel-bytes-auto[
+
+```
+[1] "GIS is Great!!!"
+```
+
+```
+ [1] 47 49 53 20 69 73 20 47 72 65 61 74 21 21 21
+```
+
+```
+  [1] 01 01 01 00 00 00 01 00 01 00 00 01 00 00 01 00 01 01 00 00 01 00 01 00 00
+ [26] 00 00 00 00 01 00 00 01 00 00 01 00 01 01 00 01 01 00 00 01 01 01 00 00 00
+ [51] 00 00 00 01 00 00 01 01 01 00 00 00 01 00 00 01 00 00 01 01 01 00 01 00 01
+ [76] 00 00 01 01 00 01 00 00 00 00 01 01 00 00 00 01 00 01 01 01 00 01 00 00 00
+[101] 00 01 00 00 01 00 00 00 00 01 00 00 01 00 00 00 00 01 00 00
+```
+]
+
+---
+count: false
+ 
+#Bytes - Raw - Human Readable...
+.left-panel-bytes-auto[
+
+```r
+(x &lt;- "GIS is Great!!!")  
+
+(y &lt;- charToRaw(x))  
+
+(z &lt;- rawToBits(y))  
+
+*length(z)
+```
+]
+ 
+.right-panel-bytes-auto[
+
+```
+[1] "GIS is Great!!!"
+```
+
+```
+ [1] 47 49 53 20 69 73 20 47 72 65 61 74 21 21 21
+```
+
+```
+  [1] 01 01 01 00 00 00 01 00 01 00 00 01 00 00 01 00 01 01 00 00 01 00 01 00 00
+ [26] 00 00 00 00 01 00 00 01 00 00 01 00 01 01 00 01 01 00 00 01 01 01 00 00 00
+ [51] 00 00 00 01 00 00 01 01 01 00 00 00 01 00 00 01 00 00 01 01 01 00 01 00 01
+ [76] 00 00 01 01 00 01 00 00 00 00 01 01 00 00 00 01 00 01 01 01 00 01 00 00 00
+[101] 00 01 00 00 01 00 00 00 00 01 00 00 01 00 00 00 00 01 00 00
+```
+
+```
+[1] 120
+```
+]
+
+---
+count: false
+ 
+#Bytes - Raw - Human Readable...
+.left-panel-bytes-auto[
+
+```r
+(x &lt;- "GIS is Great!!!")  
+
+(y &lt;- charToRaw(x))  
+
+(z &lt;- rawToBits(y))  
+
+length(z)  
+
+*nchar(x)
+```
+]
+ 
+.right-panel-bytes-auto[
+
+```
+[1] "GIS is Great!!!"
+```
+
+```
+ [1] 47 49 53 20 69 73 20 47 72 65 61 74 21 21 21
+```
+
+```
+  [1] 01 01 01 00 00 00 01 00 01 00 00 01 00 00 01 00 01 01 00 00 01 00 01 00 00
+ [26] 00 00 00 00 01 00 00 01 00 00 01 00 01 01 00 01 01 00 00 01 01 01 00 00 00
+ [51] 00 00 00 01 00 00 01 01 01 00 00 00 01 00 00 01 00 00 01 01 01 00 01 00 01
+ [76] 00 00 01 01 00 01 00 00 00 00 01 01 00 00 00 01 00 01 01 01 00 01 00 00 00
+[101] 00 01 00 00 01 00 00 00 00 01 00 00 01 00 00 00 00 01 00 00
+```
+
+```
+[1] 120
+```
+
+```
+[1] 15
+```
+]
+
+---
+count: false
+ 
+#Bytes - Raw - Human Readable...
+.left-panel-bytes-auto[
+
+```r
+(x &lt;- "GIS is Great!!!")  
+
+(y &lt;- charToRaw(x))  
+
+(z &lt;- rawToBits(y))  
+
+length(z)  
+
+nchar(x)  
+
+*nchar(x) == (length(z)/8)
+```
+]
+ 
+.right-panel-bytes-auto[
+
+```
+[1] "GIS is Great!!!"
+```
+
+```
+ [1] 47 49 53 20 69 73 20 47 72 65 61 74 21 21 21
+```
+
+```
+  [1] 01 01 01 00 00 00 01 00 01 00 00 01 00 00 01 00 01 01 00 00 01 00 01 00 00
+ [26] 00 00 00 00 01 00 00 01 00 00 01 00 01 01 00 01 01 00 00 01 01 01 00 00 00
+ [51] 00 00 00 01 00 00 01 01 01 00 00 00 01 00 00 01 00 00 01 01 01 00 01 00 01
+ [76] 00 00 01 01 00 01 00 00 00 00 01 01 00 00 00 01 00 01 01 01 00 01 00 00 00
+[101] 00 01 00 00 01 00 00 00 00 01 00 00 01 00 00 00 00 01 00 00
+```
+
+```
+[1] 120
+```
+
+```
+[1] 15
+```
+
+```
+[1] TRUE
+```
+]
+
+&lt;style&gt;
+.left-panel-bytes-auto {
+  color: #777;
+  width: 29.4117647058824%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-bytes-auto {
+  width: 68.6274509803922%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-bytes-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+class: center, middle
+&lt;img src="lec-img/03-units-of-data.jpg" width="50%"&gt;
+---
+class: center, middle
+&lt;img src="lec-img/03-new-mac-hd.png" width="75%"&gt;
+---
+class: center, middle
+# File Storage
+&lt;img src="lec-img/03-disk-sectors.png" width="50%"&gt;
+---
+class: center, middle
+#Defragmentation
+&lt;img src="lec-img/03-defrag.jpg"&gt;
+---
+
+**File**: files save data on the hard drive as bytes in a meaningful way.
+
+&lt;center&gt;
+&lt;i class="fas fa-file fa-5x"&gt;&lt;/i&gt;
+&lt;/center&gt;
+
+A file has three key properties: 
+
+--
+
+- an _extension_ (how to/what program reads the format)
+
+--
+
+- a _path_ (a location in the file system)
+
+--
+
+- a _name_ (machine and human interpretable address)
+
+---
+
+# Extensions
+
+- All files store bits.
+
+--
+
+- There are 1000's of different formats for data
+
+--
+
+- Each format defines how the sequence of bits and bytes are laid out
+
+--
+
+- indicate the characteristics of the file, its intended use, and the default applications that can open/use the file.
+
+--
+
+ - If you double click a .docx file it opens in Word and the Word software interprets the meaning of the bytes
+ 
+--
+ 
+ - If you double click an .R file it opens with RStudio, and RStudio interprets the meaning of the bytes
+
+--
+ 
+can be considered a type of metadata that provides information about the way data might be stored 
+
+-- 
+
+- common extensions include .doc, .docx, .txt, .csv, .ppt, .shp, .R ...
+
+&lt;br&gt;
+
+&lt;center&gt;
+&lt;i class="fas fa-file-code fa-5x"&gt;&lt;/i&gt; &lt;i class="fas fa-file-word fa-5x"&gt;&lt;/i&gt; &lt;i class="fas fa-file-pdf fa-5x"&gt;&lt;/i&gt; &lt;i class="fas fa-file-image fa-5x"&gt;&lt;/i&gt; &lt;i class="fas fa-file-video fa-5x"&gt;&lt;/i&gt; &lt;i class="fas fa-file-csv fa-5x"&gt;&lt;/i&gt;
+&lt;/center&gt;
+
+---
+
+**Filesystem**: describes the methods that an operating system uses to organize files
+
+&lt;center&gt;
+<i class="fas  fa-code-branch fa-5x fa-rotate-180 "></i>
+&lt;/center&gt;
+
+---
+# ...
+
+**Directory**: is a location for storing, organizing, and separating files and other directories on a computer. Think of folders!
+
+&lt;center&gt;
+&lt;i class="fas fa-folder fa-5x"&gt;&lt;/i&gt; &lt;i class="fas fa-folder-open fa-5x"&gt;&lt;/i&gt;
+&lt;/center&gt;
+
+---
+
+**Root directory**: the "highest" or top-level directory in the hierarchy. The root directory contains all other folders/files in the drive or folder
+
+&lt;center&gt;
+&lt;i class="fas fa-home fa-5x"&gt;&lt;/i&gt;
+&lt;/center&gt;
+
+- Sometimes referred to as the home directory
+---
+
+# File Paths
+
+ - File paths tell us the location of a file within the file system
+--
+
+- Directories are heirchical, again with root (home) directory being the one holding everything on a system
+
+--
+
+![](lec-img/03-file-system.png)
+
+- The folder you are in, is called your **working directory**. (think pwd)
+- The folder above <i class="fas  fa-arrow-up "></i> the working directory is the **parent directory**
+- All folders within the working directory are **subfolders** or **child** folder
+---
+
+# Declaring File Paths
+
+Files are located by their path. Think of this as the directions - from the root directory.
+
+ - Directories are separated with backslashes ("\") on windows, and forward slashes ("/") or MacOS and Linux machines.
+ 
+ ## Examle:
+ 
+&lt;span style="     color: red !important;font-size: 24px;" &gt;/Users/mikejohnson/github/spds/lectures/lec-img/02-isaias-track.png&lt;/span&gt;
+
+- **Root**: /Users/mikejohnson
+
+
+```bash
+cd ~
+pwd
+```
+
+```
+/Users/mikejohnson
+```
+
+- **git-enabled projects**: github
+- **project**: spds
+- **subdirectory**: lectures
+- **subdirectory**: lec-img
+- **file**: 02-isaias-track.png
+
+---
+
+# Absolute vs Realative Paths
+
+There are two ways to specify a file path.
+
+- An absolute path always begins in the **root folder**
+
+- A relative path is relative to the current working directory
+
+- The dot (.) and dot-dot (..) notation to help us write shorter paths 
+
+- A single '.' denotes “this directory”. 
+
+- Two periods (“..”) means “the parent directory”
+
+&lt;center&gt;
+&lt;img src="lec-img/03-realtive-absolute-paths.jpg" width="60%"&gt;
+&lt;/center&gt;
+
+---
+class: inverse, middle, center
+
+## Working with absolute paths can be a pain compared to relative paths...
+---
+
+# Enforcing Relative Paths ...
+
+It is a good practice to keep all the files associated with a project  — input data, R scripts, analytic results, figures - together. 
+
+--
+
+This is such a common practice that RStudio has built-in support for this via **projects**.
+
+--
+
+A good project layout will ultimately make your life easier:
+
+--
+
+- It will help ensure the integrity of your data;
+- It makes it simpler to share your code with someone else (a lab-mate, collaborator, or supervisor);
+- It allows you to easily upload your code with your manuscript submission;
+- It makes it easier to pick the project back up after a break.
+
+---
+class: middle, center
+# Things that are good but not fun
+
+&lt;img src="lec-img/03-laundry.jpeg" width="100%"&gt;
+---
+
+# Code Organization
+
+## Typical Project
+
+
+```r
+.
+└── github
+    └── my_project
+        └── my_project.Rproj
+        └── .gitignore
+        └── README.md
+        ├── R
+        │   └── some-code.R
+        |   └── utils.R
+        ├── img
+        |   └── cool-img.png
+        ├── docs
+        |   └── index.Rmd
+        |   └── index.html
+        ├── data
+            └── data.csv
+```
+
+---
+
+# my_project
+
+- This is a project called "my_project"
+
+--
+
+- The name of the project is the same as the directory
+
+--
+
+  - &lt;i class="fa fa-ban" aria-hidden="true"&gt;&lt;/i&gt; spaces
+--
+
+  - &lt;i class="fa fa-ban" aria-hidden="true"&gt;&lt;/i&gt; special characters
+  
+--
+
+- Each Project is a directory containing files relevant to that project
+
+--
+
+- all git enabled projects can go in our `~/github` directory
+
+---
+
+# Creating an R Project
+
+- RStudio can help us create a new R project.
+- An RStudio Project file (.Rproj) is analogous to an .mxd file for ArcMap. It contains information about the specific settings for a “project”.
+
+--
+
+ - File --&gt; New Project
+ 
+--
+ 
+Everything we do in R should be version controlled (with git!). When making a new project:
+
+--
+
+  - File --&gt; New Project --&gt; New Directory --&gt; New Project
+
+--
+
+  - Create the project as a subfolder of the `~github` directory
+
+--
+
+  - &lt;i class="fas fa-check-square"&gt;&lt;/i&gt; create git repository
+  
+-- 
+
+
+```r
+.
+└── github
+    └── my_project
+        └── my_project.Rproj
+        └── .gitignore
+```
+
+The "." in front of a file name denotes it is a "hidden" file.
+---
+
+# R Project
+
+- An R project is a working directory designated with a .RProj file. 
+
+
+```r
+.
+└── github
+    └── my_project
+        └── my_project.Rproj
+        └── .gitignore
+```
+
+--
+
+- When you open a project:
+   - In RStudio: File --&gt; Open Project 
+   - Outside RStudio: double–clicking on the .Rproj file 
+  
+  the working directory is automatically be set to the directory where .RProj file is located!
+  
+--
+
+- Allows you to work with relative rather then absolute paths!
+
+--
+
+- Consider creating a new R Project whenever you are starting a new project.
+
+--
+
+- This will enforce a self contained project with associated data, scripts, and output
+
+---
+
+# Building the rest of the Project...
+
+---
+# README.md
+
+README files are the "users manual" for the project
+
+- What is the name
+- purpose
+- installation directions
+- rules of use
+
+We use the md extension (markdown) because GitHub
+
+For us, a title, 1-2 sentence description and data attribution is plenty.
+
+
+```bash
+touch README.md
+```
+
+
+```r
+.
+└── github
+    └── my_project
+        └── my_project.Rproj
+        └── .gitignore
+        └── README.md
+```
+---
+# R or (src)
+
+- A directory call R (or src) is used to hold all scripts used in the analysis. 
+- The can be data processing, analysis, or figure generation sripcts
+
+
+```bash
+mkdir R # make a R directory
+cd R # Enter the R directory
+touch some-code.R # make a file
+touch utils.R # make a file
+cd.. # move back up to my_project directory
+```
+
+
+```r
+.
+└── github
+    └── my_project
+        └── my_project.Rproj
+        └── .gitignore
+        └── README.md
+        ├── R
+            └── some-code.R
+            └── utils.R
+```
+---
+# imgs (or img or figs or output)
+
+This folder is for things that are saved as a result of your scripts
+- Plot images
+- Maps
+- Ect
+
+This directory only contains generated files; that is, you should always be able to delete the contents and regenerate them.
+
+
+```bash
+mkdir imgs # make a imgs directory
+```
+
+
+```r
+.
+└── github
+    └── my_project
+        └── my_project.Rproj
+        └── .gitignore
+        └── README.md
+        ├── R
+        │   └── some-code.R
+        |   └── utils.R
+        ├── img
+            └── cool-img.png
+```
+---
+# docs (only docs)
+
+- the docs folder should hold your Rmarkdown files and there rendered output
+- Github Pages can be deployed from the docs folder making this a good practive if you want to share information over the web in a free secure way
+
+
+```bash
+mkdir R # make a docs directory
+cd docs # Enter the docs directory
+touch index.Rmd # make a file
+cd.. # move back up to my_project directory
+```
+
+
+```r
+.
+└── github
+    └── my_project
+        └── my_project.Rproj
+        └── .gitignore
+        └── README.md
+        ├── R
+        │   └── some-code.R
+        |   └── utils.R
+        ├── img
+        |   └── cool-img.png
+        ├── docs
+            └── index.Rmd
+            └── index.html
+```
+---
+
+# data
+
+- the data folder is an storage archive for  raw data
+- Its **crucial** to make a distinction between source/raw data and generated data:
+
+Treat source/raw data as **read-only**
+Treat generated data as disposable.
+
+- Some might separate raw and generated data into separate sub directories. I prefer to segment them through the naming
+
+
+```bash
+mkdir data # make a data directory
+```
+
+
+```r
+.
+└── github
+    └── my_project
+        └── my_project.Rproj
+        └── .gitignore
+        └── README.md
+        ├── R
+        │   └── some-code.R
+        |   └── utils.R
+        ├── img
+        |   └── some-code.R
+        ├── docs
+        |   └── index.Rmd
+        |   └── index.html
+        ├── data
+            └── data.csv
+```
+
+---
+
+# Rules...
+
+###1. Treat data as read only
+###2. Treat generated output as disposable
+###3. Other then that, structure should match the project goals and is flexable!
+
+&lt;img src="lec-img/03-rules.jpeg" width="100%"&gt;
+---
+
+# The goal for workflows: 
+
+We will do everything in **well-annotated**, **organized** scripts that contain streamlined and easy-to-follow records of our entire analyses from **raw data** through **final reports**, with **unbreakable** file paths and with a **complete history** of changes made ^[Allison Horst].   
+
+--
+
+- **Well-annotated**: Through documentation and comments
+
+--
+
+- **Organized**: Directory Strucutre
+
+--
+
+- **Raw Data**: Keep raw data raw!
+
+--
+
+- **Final Reports**: Rmarkdown files
+
+--
+
+- **Unbreakable Paths**: Rproj to the rescue
+
+--
+
+- **Complete History**: Version control with git and GitHub
+
+---
+
+class: inverse, middle, center
+# File Names
+
+File names are how we locate and identify information stored on on machine. File names should be machine readable, human readable, and play well with default ordering:
+
+---
+
+class: middle, center
+
+## "There are only two hard things in Computer Science: cache invalidation and naming things."
+
+-- Phil Karlton
+---
+
+# Three Principles for file names
+
+- machine readable
+- human readable
+- sortable
+
+---
+
+## machine readable
+
+--
+
+  - avoid spaces, punctuation, accented characters, and mixed cases
+  
+--
+  
+  - regular expression friendly (e.g. use patterns!)
+  
+--
+
+  - use ISO 8601 dates (YYYY-MM-DD)
+
+--
+
+  - be consistent with delimiters (easy to compute on)
+      - Use "_" (underscores) to separate "metadata" you want latter
+      - Use "-" (hyphens) to separate words for readability (like dates or names)
+      
+      
+---
+
+## Doing so makes files ... easy to search for &amp; narrow 
+  
+
+```r
+# Only those files with pattern "_tx"
+files = list.files("data/usgs-files", pattern = "_tx") 
+length(files) # total number of Texas files
+```
+
+```
+[1] 27
+```
+
+
+```
+[1] "1903-07-01_08033500_00060_tyler_tx.txt"   
+[2] "1923-10-01_08033000_00060_angelina_tx.txt"
+```
+
+### and metadata easy to recover (easy to compute on)
+
+
+```r
+str_split(files, "[_\\.]", simplify = TRUE) 
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; StartDate &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; siteID &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; parameterCode &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; county &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; state &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; extension &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1903-07-01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 08033500 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 00060 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tyler &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tx &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; txt &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1923-10-01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 08033000 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 00060 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; angelina &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tx &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; txt &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1923-10-01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 08180500 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 00060 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; medina &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tx &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; txt &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1923-12-01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 08082500 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 00060 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; baylor &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tx &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; txt &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1924-08-01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 08062500 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 00060 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; ellis &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tx &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; txt &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## human readable
+
+ - File names contain information about the content and purpose of the file
+ - easy to find the right file a year from now
+   
+   
+
+```r
+list.files("R/code-files")
+```
+
+
+```
+[1] "00_src_utils.R"         "01_src_data-download.R" "02_src-data-clean.R"   
+[4] "03_src_analysis.R"      "04_src_figures.R"      
+```
+ 
+Here, we see the order that the files run (utilities, download, clean, analyze, figures), the project they belong to (src), are archived in the file names.
+
+---
+
+## Sort easily 
+
+-  put numeric values first (use leading 0 for 1-9)
+-  use ISO 8601 dates (YYYY-MM-DD)
+
+### Chronological
+
+```r
+list.files("data/usgs-files")[1:5] %&gt;% 
+  sort()
+```
+
+```
+[1] "1873-06-02_05420500_00060_clinton_ia.txt" 
+[2] "1877-04-01_03193000_00060_fayette_wv.txt" 
+[3] "1887-10-01_01335754_00060_saratoga_ny.txt"
+[4] "1892-11-01_14174000_00060_linn_or.txt"    
+[5] "1895-03-01_01551500_00060_lycoming_pa.txt"
+```
+
+### Logical
+
+```r
+list.files("R/code-files") %&gt;% 
+  sort()
+```
+
+
+```
+[1] "00_src_utils.R"         "01_src_data-download.R" "02_src-data-clean.R"   
+[4] "03_src_analysis.R"      "04_src_figures.R"      
+```
+
+---
+class: center, middle
+#Now we have a project, a project structure, and well named files... Lets get into R
+
+
+![](lec-img/03-R-full.jpeg)
+---
+
+# Variables
+
+- Variables store data (values) (my.school = "UCSB")
+
+--
+
+- Values can be changed according to our need. (my.school = "Cal Poly")
+
+--
+
+- A variable provides us with **named** storage that our programs can manipulate.
+
+--
+
+  - Variables have a human readable **name** -- a unique identifier
+
+--
+
+  - An operable value
+  
+--
+
+  - A location in memory where it is stored
+  
+-- 
+
+## So how do we define variables?
+
+---
+
+# Variable Names &amp; Values
+
+- The variable `name` is arbitrary and helps reference `values.`
+
+--
+
+- Names are used by reader (<i class="fas  fa-user " style="color:#FEBC11;"></i>) of the program
+
+--
+
+- Variable `values` are "bound" to a `name` using the `=` or `&lt;-` assignment operators
+
+
+```r
+a = 3
+a &lt;- 3
+```
+
+--
+
+The result is the value 3 is bound to the name "a". And R can interpret the name as the object/value it holds.
+
+
+```r
+3*a
+```
+
+```
+[1] 9
+```
+
+```r
+a = 5
+
+rep("TEXT", a)
+```
+
+```
+[1] "TEXT" "TEXT" "TEXT" "TEXT" "TEXT"
+```
+
+---
+
+### Binding 101
+
+It is easy to read this statement as "create an object, named x, containing the value 10"
+
+
+```r
+x = 10
+```
+
+--
+
+But this is a simplification, in actuality:
+
+--
+
+  - It's creating a object of value 10
+  
+--
+
+  - And binding that object to a name 'x'
+  
+--
+
+- Therefore the value (10) does not have a name, rather, the name (x) has a value
+
+---
+### Object Address
+
+- Objects have unique identifiers. 
+- These identifiers have a form that looks like the object’s memory “address” 
+- The actual memory addresses changes every time the code is run, so we use these identifiers instead.
+
+
+```r
+x = 10
+obj_addr(x)
+```
+
+```
+[1] "0x7fbb0941a398"
+```
+
+---
+
+## To illustate this...
+
+In the code below, `y` doesn't make another copy of the value `10`, but instead creates an additional binding to the existing object.
+
+
+```r
+x = 10
+y = x
+
+obj_addr(x)
+```
+
+```
+[1] "0x7fbb05ccbf50"
+```
+
+```r
+obj_addr(y)
+```
+
+```
+[1] "0x7fbb05ccbf50"
+```
+--
+
+Equally, if we create two unique objects (even with the same value), they are different:
+
+
+```r
+x2 = 10; y2 = 10
+
+obj_addr(x2)
+```
+
+```
+[1] "0x7fbb095211a8"
+```
+
+```r
+obj_addr(y2)
+```
+
+```
+[1] "0x7fbb09521100"
+```
+
+
+This is because the values are stored as bytes in memory rather then on hard disk!
+
+---
+class: center, middle
+&lt;img src="lec-img/03-new-mac-mem.png" width="75%"&gt;
+---
+class: center, middle
+&lt;img src="lec-img/03-memory-storage.jpg"&gt;
+---
+
+### So what can we do with objects?
+
+Remember our school example &lt;i class='fas fa-university'&gt;&lt;/i&gt; ? 
+
+We wanted to store information about the school as named values:
+
+
+```r
+my.school = "UCSB"
+lat = 34.4140
+lng = -119.8489
+```
+--
+
+But these are very different kinds of information with  defined capabilities.
+
+--
+
+What would happen if we tried to add `lng` to `lat`?
+
+
+```r
+lng + lat
+```
+
+```
+[1] -85.4349
+```
+
+--
+What would happen if we tried to add `lng` to `my.school`?
+
+```r
+lng + my.school
+```
+
+```
+Error in lng + my.school: non-numeric argument to binary operator
+```
+
+We see a `non-numeric` argument error telling us that name is not a numeric value. This is our first hint that values have different classes/types.
+
+---
+
+#Also ...
+
+
+```r
+charToRaw("3")
+```
+
+```
+[1] 33
+```
+
+```r
+charToRaw(3)
+```
+
+```
+Error in charToRaw(3): argument must be a character vector of length 1
+```
+
+---
+### Computers convert bytes &lt;-&gt; hex &lt;-&gt; value
+
+--
+
+What's the difference between '3' (the number) and 3 (the character)? 
+
+--
+
+One we can add to 4 (the number) and one we can't...
+
+---
+
+class: inverse, center, middle
+
+# <i class="fas  fa-layer-group " style="color:#003660;"></i>
+# Data Types
+
+---
+# Data Types
+
+**Values** in R can be one of 6 different **types** :
+    1. numeric (e.g. `2`, `2.15`)
+    2. integer (e.g. `2L`)
+    3. character (e.g. `"x"`, `"Welcome!"`)
+    4. logical (e.g. `TRUE`, `FALSE`)
+    5. raw (e.g. holds `bytes`)
+    6. complex (e.g. `1+4i`)
+    
+- The `class` function tells us what kind of object is it (high-level)
+- The `typeof` function can tell us the object’s data type (low-level)
+
+---
+
+## 1. Numeric
+
+- Values with decimals 
+- Of type "double" in computer science terms
+- Default computational data type in R. 
+---
+
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+*(x = 4.75)
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+*class(x)
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+*typeof(x)
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+typeof(x)  
+
+*x * 2
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 9.5
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+typeof(x)  
+
+x * 2  
+*x + 2
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 9.5
+```
+
+```
+[1] 6.75
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+typeof(x)  
+
+x * 2  
+x + 2  
+*x - 5
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 9.5
+```
+
+```
+[1] 6.75
+```
+
+```
+[1] -0.25
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+typeof(x)  
+
+x * 2  
+x + 2  
+x - 5  
+*x / 4
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 9.5
+```
+
+```
+[1] 6.75
+```
+
+```
+[1] -0.25
+```
+
+```
+[1] 1.1875
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+typeof(x)  
+
+x * 2  
+x + 2  
+x - 5  
+x / 4  
+
+
+*x == 4
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 9.5
+```
+
+```
+[1] 6.75
+```
+
+```
+[1] -0.25
+```
+
+```
+[1] 1.1875
+```
+
+```
+[1] FALSE
+```
+]
+
+&lt;style&gt;
+.left-panel-numerics-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-numerics-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-numerics-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+
+### 2. Integer
+- Values without decimals 
+- Take less memory then doubles but this is rarely an issue
+- To create an integer in R you must follow the a number with an uppercase L.
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+*(x = 2)  # defaults to numeric
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+*typeof(x)
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+*(y = 2L)  # specifies integer
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+*typeof(y)
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+typeof(y)  
+*class(y)
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] "integer"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+typeof(y)  
+class(y)  
+
+*(t = 1L / 5L)
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 0.2
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+typeof(y)  
+class(y)  
+
+(t = 1L / 5L)  
+*typeof(t)
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 0.2
+```
+
+```
+[1] "double"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+typeof(y)  
+class(y)  
+
+(t = 1L / 5L)  
+typeof(t)  
+
+## Casting
+
+*as.integer(c(4.1, 5.2, 6.3, 6.4))
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 0.2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 4 5 6 6
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+typeof(y)  
+class(y)  
+
+(t = 1L / 5L)  
+typeof(t)  
+
+## Casting
+
+as.integer(c(4.1, 5.2, 6.3, 6.4))  
+
+*.Machine$integer.max
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 0.2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 4 5 6 6
+```
+
+```
+[1] 2147483647
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+typeof(y)  
+class(y)  
+
+(t = 1L / 5L)  
+typeof(t)  
+
+## Casting
+
+as.integer(c(4.1, 5.2, 6.3, 6.4))  
+
+.Machine$integer.max  
+*.Machine$double.xmax
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 0.2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 4 5 6 6
+```
+
+```
+[1] 2147483647
+```
+
+```
+[1] 1.797693e+308
+```
+]
+
+&lt;style&gt;
+.left-panel-integers-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-integers-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-integers-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+### 3. Character
+
+character values stores text ranging in size from a single letter to a novel.
+character values are defined by being "surrounded by quotes":
+
+---
+
+count: false
+ 
+
+.left-panel-character-auto[
+
+```r
+*(x = "a")
+```
+]
+ 
+.right-panel-character-auto[
+
+```
+[1] "a"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-character-auto[
+
+```r
+(x = "a")  
+*(y = "bc")
+```
+]
+ 
+.right-panel-character-auto[
+
+```
+[1] "a"
+```
+
+```
+[1] "bc"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-character-auto[
+
+```r
+(x = "a")  
+(y = "bc")  
+
+*grepl("a", c(x,y))
+```
+]
+ 
+.right-panel-character-auto[
+
+```
+[1] "a"
+```
+
+```
+[1] "bc"
+```
+
+```
+[1]  TRUE FALSE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-character-auto[
+
+```r
+(x = "a")  
+(y = "bc")  
+
+grepl("a", c(x,y))  
+
+*"a" == x
+```
+]
+ 
+.right-panel-character-auto[
+
+```
+[1] "a"
+```
+
+```
+[1] "bc"
+```
+
+```
+[1]  TRUE FALSE
+```
+
+```
+[1] TRUE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-character-auto[
+
+```r
+(x = "a")  
+(y = "bc")  
+
+grepl("a", c(x,y))  
+
+"a" == x  
+*"b" == x
+```
+]
+ 
+.right-panel-character-auto[
+
+```
+[1] "a"
+```
+
+```
+[1] "bc"
+```
+
+```
+[1]  TRUE FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] FALSE
+```
+]
+
+&lt;style&gt;
+.left-panel-character-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-character-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-character-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+### 4. Logical 
+
+Logical values store boolean values (`TRUE` and `FALSE`). 
+- Usefull for checking conditions and controlling the flow of a program.
+- Or, for checking binary conditions (like on,off;  open/closed; &gt;100)
+- The idea of the T/F boolean will be one of the most important in this class
+
+---
+
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+*u = TRUE
+```
+]
+ 
+.right-panel-logical-auto[
+
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+*v = FALSE
+```
+]
+ 
+.right-panel-logical-auto[
+
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+*typeof(u)
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+*class(u)
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+class(u)  
+
+*as.numeric(u)
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 1
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+class(u)  
+
+as.numeric(u)  
+*as.numeric(v)
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+class(u)  
+
+as.numeric(u)  
+as.numeric(v)  
+
+*u  * 1
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] 1
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+class(u)  
+
+as.numeric(u)  
+as.numeric(v)  
+
+u  * 1  
+*v  * 1
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+class(u)  
+
+as.numeric(u)  
+as.numeric(v)  
+
+u  * 1  
+v  * 1  
+
+# if u AND v are TRUE
+*u &amp; v
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] FALSE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+class(u)  
+
+as.numeric(u)  
+as.numeric(v)  
+
+u  * 1  
+v  * 1  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+*u | v
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+class(u)  
+
+as.numeric(u)  
+as.numeric(v)  
+
+u  * 1  
+v  * 1  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+u | v  
+# The opposite
+*!u
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] FALSE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+class(u)  
+
+as.numeric(u)  
+as.numeric(v)  
+
+u  * 1  
+v  * 1  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+u | v  
+# The opposite
+!u  
+
+# Equality / conditions
+*2 == 6
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] FALSE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+class(u)  
+
+as.numeric(u)  
+as.numeric(v)  
+
+u  * 1  
+v  * 1  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+u | v  
+# The opposite
+!u  
+
+# Equality / conditions
+2 == 6  
+*"test" == "test"
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+class(u)  
+
+as.numeric(u)  
+as.numeric(v)  
+
+u  * 1  
+v  * 1  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+u | v  
+# The opposite
+!u  
+
+# Equality / conditions
+2 == 6  
+"test" == "test"  
+*6 &gt; 2
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] TRUE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+class(u)  
+
+as.numeric(u)  
+as.numeric(v)  
+
+u  * 1  
+v  * 1  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+u | v  
+# The opposite
+!u  
+
+# Equality / conditions
+2 == 6  
+"test" == "test"  
+6 &gt; 2  
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] 1
+```
+
+```
+[1] 0
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] TRUE
+```
+]
+
+&lt;style&gt;
+.left-panel-logical-auto {
+  color: #777;
+  width: 49.0196078431373%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-logical-auto {
+  width: 49.0196078431373%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-logical-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+### 5. Raw
+
+- The raw type is intended to hold raw bytes.
+- Useful to introduce, but will only be used at a conceptual level.
+
+---
+
+count: false
+ 
+
+.left-panel-raw-auto[
+
+```r
+*(x &lt;- charToRaw("GIS is great!"))
+```
+]
+ 
+.right-panel-raw-auto[
+
+```
+ [1] 47 49 53 20 69 73 20 67 72 65 61 74 21
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raw-auto[
+
+```r
+(x &lt;- charToRaw("GIS is great!"))  
+*typeof(x)
+```
+]
+ 
+.right-panel-raw-auto[
+
+```
+ [1] 47 49 53 20 69 73 20 67 72 65 61 74 21
+```
+
+```
+[1] "raw"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raw-auto[
+
+```r
+(x &lt;- charToRaw("GIS is great!"))  
+typeof(x)  
+*class(x)
+```
+]
+ 
+.right-panel-raw-auto[
+
+```
+ [1] 47 49 53 20 69 73 20 67 72 65 61 74 21
+```
+
+```
+[1] "raw"
+```
+
+```
+[1] "raw"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raw-auto[
+
+```r
+(x &lt;- charToRaw("GIS is great!"))  
+typeof(x)  
+class(x)  
+
+*rawToChar(x[1])
+```
+]
+ 
+.right-panel-raw-auto[
+
+```
+ [1] 47 49 53 20 69 73 20 67 72 65 61 74 21
+```
+
+```
+[1] "raw"
+```
+
+```
+[1] "raw"
+```
+
+```
+[1] "G"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raw-auto[
+
+```r
+(x &lt;- charToRaw("GIS is great!"))  
+typeof(x)  
+class(x)  
+
+rawToChar(x[1])  
+*rawToChar(x)
+```
+]
+ 
+.right-panel-raw-auto[
+
+```
+ [1] 47 49 53 20 69 73 20 67 72 65 61 74 21
+```
+
+```
+[1] "raw"
+```
+
+```
+[1] "raw"
+```
+
+```
+[1] "G"
+```
+
+```
+[1] "GIS is great!"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raw-auto[
+
+```r
+(x &lt;- charToRaw("GIS is great!"))  
+typeof(x)  
+class(x)  
+
+rawToChar(x[1])  
+rawToChar(x)  
+*rawToBits(x)
+```
+]
+ 
+.right-panel-raw-auto[
+
+```
+ [1] 47 49 53 20 69 73 20 67 72 65 61 74 21
+```
+
+```
+[1] "raw"
+```
+
+```
+[1] "raw"
+```
+
+```
+[1] "G"
+```
+
+```
+[1] "GIS is great!"
+```
+
+```
+  [1] 01 01 01 00 00 00 01 00 01 00 00 01 00 00 01 00 01 01 00 00 01 00 01 00 00
+ [26] 00 00 00 00 01 00 00 01 00 00 01 00 01 01 00 01 01 00 00 01 01 01 00 00 00
+ [51] 00 00 00 01 00 00 01 01 01 00 00 01 01 00 00 01 00 00 01 01 01 00 01 00 01
+ [76] 00 00 01 01 00 01 00 00 00 00 01 01 00 00 00 01 00 01 01 01 00 01 00 00 00
+[101] 00 01 00 00
+```
+]
+
+&lt;style&gt;
+.left-panel-raw-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-raw-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-raw-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+### Bonus: Time
+
+Representing time is a somewhat complex problem. There are different calendars, hours, days, months, and leap years to consider. As a basic introduction, here is simple way to create date values.
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+*(start &lt;- as.Date('2020-08-03'))
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+*(end   &lt;- as.Date('2020-09-11'))
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+(end   &lt;- as.Date('2020-09-11'))  
+*class(start)
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+
+```
+[1] "Date"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+(end   &lt;- as.Date('2020-09-11'))  
+class(start)  
+*typeof(start)
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+
+```
+[1] "Date"
+```
+
+```
+[1] "double"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+(end   &lt;- as.Date('2020-09-11'))  
+class(start)  
+typeof(start)  
+
+*end - start
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+
+```
+[1] "Date"
+```
+
+```
+[1] "double"
+```
+
+```
+Time difference of 39 days
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+(end   &lt;- as.Date('2020-09-11'))  
+class(start)  
+typeof(start)  
+
+end - start  
+
+*format(start, "%m")
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+
+```
+[1] "Date"
+```
+
+```
+[1] "double"
+```
+
+```
+Time difference of 39 days
+```
+
+```
+[1] "08"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+(end   &lt;- as.Date('2020-09-11'))  
+class(start)  
+typeof(start)  
+
+end - start  
+
+format(start, "%m")  
+*format(start, "%y")
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+
+```
+[1] "Date"
+```
+
+```
+[1] "double"
+```
+
+```
+Time difference of 39 days
+```
+
+```
+[1] "08"
+```
+
+```
+[1] "20"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+(end   &lt;- as.Date('2020-09-11'))  
+class(start)  
+typeof(start)  
+
+end - start  
+
+format(start, "%m")  
+format(start, "%y")  
+*format(start, "%Y")
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+
+```
+[1] "Date"
+```
+
+```
+[1] "double"
+```
+
+```
+Time difference of 39 days
+```
+
+```
+[1] "08"
+```
+
+```
+[1] "20"
+```
+
+```
+[1] "2020"
+```
+]
+
+&lt;style&gt;
+.left-panel-time-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-time-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-time-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+And there are more advanced classes as well that capture date and time. We will get into these latter in class.
+
+
+```r
+as.POSIXlt(start)
+```
+
+```
+[1] "2020-08-03 UTC"
+```
+
+```r
+as.POSIXct(start)
+```
+
+```
+[1] "2020-08-02 17:00:00 PDT"
+```
+---
+
+
+```r
+head(dplyr::storms)
+```
+
+```
+# A tibble: 6 x 13
+  name   year month   day  hour   lat  long status category  wind pressure
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;ord&gt;    &lt;int&gt;    &lt;int&gt;
+1 Amy    1975     6    27     0  27.5 -79   tropi… -1          25     1013
+2 Amy    1975     6    27     6  28.5 -79   tropi… -1          25     1013
+3 Amy    1975     6    27    12  29.5 -79   tropi… -1          25     1013
+4 Amy    1975     6    27    18  30.5 -79   tropi… -1          25     1013
+5 Amy    1975     6    28     0  31.5 -78.8 tropi… -1          25     1012
+6 Amy    1975     6    28     6  32.4 -78.7 tropi… -1          25     1012
+# … with 2 more variables: ts_diameter &lt;dbl&gt;, hu_diameter &lt;dbl&gt;
+```
+---
+
+
+```r
+str(dplyr::storms)
+```
+
+```
+tibble [10,010 × 13] (S3: tbl_df/tbl/data.frame)
+ $ name       : chr [1:10010] "Amy" "Amy" "Amy" "Amy" ...
+ $ year       : num [1:10010] 1975 1975 1975 1975 1975 ...
+ $ month      : num [1:10010] 6 6 6 6 6 6 6 6 6 6 ...
+ $ day        : int [1:10010] 27 27 27 27 28 28 28 28 29 29 ...
+ $ hour       : num [1:10010] 0 6 12 18 0 6 12 18 0 6 ...
+ $ lat        : num [1:10010] 27.5 28.5 29.5 30.5 31.5 32.4 33.3 34 34.4 34 ...
+ $ long       : num [1:10010] -79 -79 -79 -79 -78.8 -78.7 -78 -77 -75.8 -74.8 ...
+ $ status     : chr [1:10010] "tropical depression" "tropical depression" "tropical depression" "tropical depression" ...
+ $ category   : Ord.factor w/ 7 levels "-1"&lt;"0"&lt;"1"&lt;"2"&lt;..: 1 1 1 1 1 1 1 1 2 2 ...
+ $ wind       : int [1:10010] 25 25 25 25 25 25 25 30 35 40 ...
+ $ pressure   : int [1:10010] 1013 1013 1013 1013 1012 1012 1011 1006 1004 1002 ...
+ $ ts_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+ $ hu_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+```
+
+---
+# Tommorrow: Data Strucutes
+- Vectors, data.frames, tibbles, arrays
+---
+
+# Assignment
+
+- Today you are going to make your first project.
+- Starting from Github you are going to make a repository, clone it in RStudio
+- Then use you knowledge of a good project structure and the Terminal to create an empty project structure.
+- You will then push this project back to github and submit it via URL
+
+# [Details](03-github-project.html)
+
+---
+
+# END
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
