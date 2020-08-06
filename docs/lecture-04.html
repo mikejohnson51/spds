@@ -1,0 +1,6361 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 176A</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/font-awesome-5.3.1/css/fontawesome-all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 176A
+## Lecture 04: Data Type &amp; Structure
+### Mike Johnson
+
+---
+
+
+
+
+
+## Reminder 
+&lt;center&gt;
+&lt;img src="lec-img/01-learning-curve.png" width="75%"&gt;
+&lt;/center&gt;
+
+---
+
+"I feel like I'm learning a new language right now"
+
+--
+
+"there is a difference between practical knowledge and understanding the concepts"
+
+--
+
+"I am still confused on the meaning of things, like why exactly do we need to use GitHub, what the difference is between the terminal and console, and the differences between file types. I know these are all very simple things, but I feel like I'm learning a new language right now."
+
+--
+
+&lt;img src="lec-img/week-01-gforms.png" width ="35%"&gt;
+
+---
+
+# Changes:
+
+- Daily Assignments will be due at **5pm** the following class
+- I will start **recording** lectures on Monday 
+- Today, after lab, I will hang on from **5 - 6** to walk through parts of the lab in some detail
+
+--
+
+### If you are having trouble setting up R, RStudio, ect email me ASAP!
+
+---
+
+# Computers convert bytes &lt;-&gt; hex &lt;-&gt; value
+
+&lt;img src="lec-img/04-ascii-hex-binary.png"&gt;
+
+---
+
+# What's the difference between 3 (the number) and '3' (the character)? 
+
+`To us`: meaning
+`To software`: hows its handled
+`To a computer`: nothing
+
+--
+
+
+```r
+3+ 3
+```
+
+```
+[1] 6
+```
+
+```r
+'3' + 3
+```
+
+```
+Error in "3" + 3: non-numeric argument to binary operator
+```
+
+---
+
+class: inverse, center, middle
+
+# <i class="fas  fa-layer-group " style="color:#003660;"></i>
+# Data Types
+
+---
+# Data Types
+
+**Values** in R can be one of 6 different **types** :
+    1. numeric (e.g. `2`, `2.15`)
+    2. integer (e.g. `2L`)
+    3. character (e.g. `"x"`, `"Welcome!"`)
+    4. logical (e.g. `TRUE`, `FALSE`)
+    5. raw (e.g. holds `bytes`)
+    6. complex (e.g. `1+4i`) - _we are going to ignore_
+    
+- The `class` function tells us what kind of object is it (high-level)
+- The `typeof` function can tell us the object’s data type (low-level)
+
+---
+
+## 1. Numeric
+
+- Values with decimals 
+
+--
+
+- Of type "double" in computer science terms
+
+--
+
+- Default computational data type in R.
+
+--
+
+- Doubles can be specified in decimal (0.1234), scientific (1.23e4), or hexadecimal (0xcafe) form. 
+
+--
+
+- There are three special values unique to doubles: `Inf`, `-Inf`, and `NaN` (not a number). 
+
+---
+
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+*(x = 4.75)
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+*class(x)
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+*typeof(x)
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+typeof(x)  
+
+*x * 2
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 9.5
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+typeof(x)  
+
+x * 2  
+*x + 2
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 9.5
+```
+
+```
+[1] 6.75
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+typeof(x)  
+
+x * 2  
+x + 2  
+*x - 5
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 9.5
+```
+
+```
+[1] 6.75
+```
+
+```
+[1] -0.25
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+typeof(x)  
+
+x * 2  
+x + 2  
+x - 5  
+*x / 4
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 9.5
+```
+
+```
+[1] 6.75
+```
+
+```
+[1] -0.25
+```
+
+```
+[1] 1.1875
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-numerics-auto[
+
+```r
+(x = 4.75)  
+class(x)  
+typeof(x)  
+
+x * 2  
+x + 2  
+x - 5  
+x / 4  
+
+
+*x == 4
+```
+]
+ 
+.right-panel-numerics-auto[
+
+```
+[1] 4.75
+```
+
+```
+[1] "numeric"
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 9.5
+```
+
+```
+[1] 6.75
+```
+
+```
+[1] -0.25
+```
+
+```
+[1] 1.1875
+```
+
+```
+[1] FALSE
+```
+]
+
+&lt;style&gt;
+.left-panel-numerics-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-numerics-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-numerics-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+
+### 2. Integer
+
+- Values without decimals 
+
+--
+
+- To create an integer in R you must follow the a number with an uppercase L.
+
+--
+
+- Take less memory then doubles but this is rarely an issue
+
+--
+
+ - One byte is **8** bits, 
+ - Each **bit** can represent two values (0,1), 
+ - One **byte** can hold  2^8^=256  values. 
+ - used for  (0  to  255) --or--  (−128  to  127). 
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+*(x = 2)  # defaults to numeric
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+*typeof(x)
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+*(y = 2L)  # specifies integer
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+*typeof(y)
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+typeof(y)  
+*class(y)
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] "integer"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+typeof(y)  
+class(y)  
+
+*(t = 1L / 5L)
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 0.2
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+typeof(y)  
+class(y)  
+
+(t = 1L / 5L)  
+*typeof(t)
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 0.2
+```
+
+```
+[1] "double"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-integers-auto[
+
+```r
+(x = 2)  # defaults to numeric
+typeof(x)  
+(y = 2L)  # specifies integer
+typeof(y)  
+class(y)  
+
+(t = 1L / 5L)  
+typeof(t)  
+
+## Casting
+
+*as.integer(c(4.1, 5.2, 6.3, 6.4))
+```
+]
+ 
+.right-panel-integers-auto[
+
+```
+[1] 2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 2
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 0.2
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 4 5 6 6
+```
+]
+
+&lt;style&gt;
+.left-panel-integers-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-integers-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-integers-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+### 3. Character
+
+- character values stores text ranging in size from a single letter to a novel.
+
+--
+
+- surrounded by `"` ("here") or `'` ('there'). 
+
+--
+
+- Special characters are escaped with `\`; see `?Quotes` for full details.
+
+---
+
+count: false
+ 
+
+.left-panel-character-auto[
+
+```r
+*(x = "a")
+```
+]
+ 
+.right-panel-character-auto[
+
+```
+[1] "a"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-character-auto[
+
+```r
+(x = "a")  
+*(y = "bc")
+```
+]
+ 
+.right-panel-character-auto[
+
+```
+[1] "a"
+```
+
+```
+[1] "bc"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-character-auto[
+
+```r
+(x = "a")  
+(y = "bc")  
+*(z = "GIS is Great!!!")
+```
+]
+ 
+.right-panel-character-auto[
+
+```
+[1] "a"
+```
+
+```
+[1] "bc"
+```
+
+```
+[1] "GIS is Great!!!"
+```
+]
+
+&lt;style&gt;
+.left-panel-character-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-character-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-character-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+### 4. Logical 
+
+- Logical values store boolean values (`TRUE` and `FALSE`). 
+
+--
+
+- Usefull for checking conditions and controlling the flow of a program.
+
+--
+
+- Or, for checking binary conditions (like on,off;  open/closed; &gt;100)
+
+--
+
+- The idea of the T/F boolean will be one of the most important in this class
+
+--
+
+- Logicals can be written in full (TRUE or FALSE), or abbreviated (T or F).
+
+
+---
+
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+*u = TRUE
+```
+]
+ 
+.right-panel-logical-auto[
+
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+*v = FALSE
+```
+]
+ 
+.right-panel-logical-auto[
+
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+*typeof(u)
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+
+# if u AND v are TRUE
+*u &amp; v
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] FALSE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+*u | v
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+u | v  
+# The opposite
+*!u
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] FALSE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+u | v  
+# The opposite
+!u  
+
+# Equality / conditions
+*2 == 6
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] FALSE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+u | v  
+# The opposite
+!u  
+
+# Equality / conditions
+2 == 6  
+*2 != 6
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+u | v  
+# The opposite
+!u  
+
+# Equality / conditions
+2 == 6  
+2 != 6  
+
+*"test" == "test"
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] TRUE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-logical-auto[
+
+```r
+u = TRUE  
+v = FALSE  
+typeof(u)  
+
+# if u AND v are TRUE
+u &amp; v  
+# if u OR v are TRUE
+u | v  
+# The opposite
+!u  
+
+# Equality / conditions
+2 == 6  
+2 != 6  
+
+"test" == "test"  
+
+*6 &gt; 2
+```
+]
+ 
+.right-panel-logical-auto[
+
+```
+[1] "logical"
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] FALSE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] TRUE
+```
+
+```
+[1] TRUE
+```
+]
+
+&lt;style&gt;
+.left-panel-logical-auto {
+  color: #777;
+  width: 49.0196078431373%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-logical-auto {
+  width: 49.0196078431373%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-logical-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+### 5. Raw
+
+- The raw type is intended to hold raw bytes.
+- Useful to introduce, but will only be used at a conceptual level.
+
+---
+
+count: false
+ 
+
+.left-panel-raw-auto[
+
+```r
+*(x &lt;- charToRaw("GIS is great!"))
+```
+]
+ 
+.right-panel-raw-auto[
+
+```
+ [1] 47 49 53 20 69 73 20 67 72 65 61 74 21
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raw-auto[
+
+```r
+(x &lt;- charToRaw("GIS is great!"))  
+*typeof(x)
+```
+]
+ 
+.right-panel-raw-auto[
+
+```
+ [1] 47 49 53 20 69 73 20 67 72 65 61 74 21
+```
+
+```
+[1] "raw"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raw-auto[
+
+```r
+(x &lt;- charToRaw("GIS is great!"))  
+typeof(x)  
+
+*rawToChar(x[1])
+```
+]
+ 
+.right-panel-raw-auto[
+
+```
+ [1] 47 49 53 20 69 73 20 67 72 65 61 74 21
+```
+
+```
+[1] "raw"
+```
+
+```
+[1] "G"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raw-auto[
+
+```r
+(x &lt;- charToRaw("GIS is great!"))  
+typeof(x)  
+
+rawToChar(x[1])  
+*rawToChar(x)
+```
+]
+ 
+.right-panel-raw-auto[
+
+```
+ [1] 47 49 53 20 69 73 20 67 72 65 61 74 21
+```
+
+```
+[1] "raw"
+```
+
+```
+[1] "G"
+```
+
+```
+[1] "GIS is great!"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raw-auto[
+
+```r
+(x &lt;- charToRaw("GIS is great!"))  
+typeof(x)  
+
+rawToChar(x[1])  
+rawToChar(x)  
+*rawToBits(x)
+```
+]
+ 
+.right-panel-raw-auto[
+
+```
+ [1] 47 49 53 20 69 73 20 67 72 65 61 74 21
+```
+
+```
+[1] "raw"
+```
+
+```
+[1] "G"
+```
+
+```
+[1] "GIS is great!"
+```
+
+```
+  [1] 01 01 01 00 00 00 01 00 01 00 00 01 00 00 01 00 01 01 00 00 01 00 01 00 00 00 00 00 00 01 00 00 01 00 00 01 00 01 01 00 01 01 00 00 01 01 01 00 00 00 00 00 00 01 00 00 01 01
+ [59] 01 00 00 01 01 00 00 01 00 00 01 01 01 00 01 00 01 00 00 01 01 00 01 00 00 00 00 01 01 00 00 00 01 00 01 01 01 00 01 00 00 00 00 01 00 00
+```
+]
+
+&lt;style&gt;
+.left-panel-raw-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-raw-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-raw-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+### Bonus: Time
+
+Representing time is a somewhat complex problem. There are different calendars, hours, days, months, and leap years to consider. As a basic introduction, here is simple way to create date values.
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+*(start &lt;- as.Date('2020-08-03'))
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+*(end   &lt;- as.Date('2020-09-11'))
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+(end   &lt;- as.Date('2020-09-11'))  
+*typeof(start)
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+
+```
+[1] "double"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+(end   &lt;- as.Date('2020-09-11'))  
+typeof(start)  
+
+*end - start
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+
+```
+[1] "double"
+```
+
+```
+Time difference of 39 days
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+(end   &lt;- as.Date('2020-09-11'))  
+typeof(start)  
+
+end - start  
+
+*format(start, "%m")
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+
+```
+[1] "double"
+```
+
+```
+Time difference of 39 days
+```
+
+```
+[1] "08"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+(end   &lt;- as.Date('2020-09-11'))  
+typeof(start)  
+
+end - start  
+
+format(start, "%m")  
+*format(start, "%y")
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+
+```
+[1] "double"
+```
+
+```
+Time difference of 39 days
+```
+
+```
+[1] "08"
+```
+
+```
+[1] "20"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-time-auto[
+
+```r
+(start &lt;- as.Date('2020-08-03'))  
+(end   &lt;- as.Date('2020-09-11'))  
+typeof(start)  
+
+end - start  
+
+format(start, "%m")  
+format(start, "%y")  
+*format(start, "%Y")
+```
+]
+ 
+.right-panel-time-auto[
+
+```
+[1] "2020-08-03"
+```
+
+```
+[1] "2020-09-11"
+```
+
+```
+[1] "double"
+```
+
+```
+Time difference of 39 days
+```
+
+```
+[1] "08"
+```
+
+```
+[1] "20"
+```
+
+```
+[1] "2020"
+```
+]
+
+&lt;style&gt;
+.left-panel-time-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-time-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-time-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+And there are more advanced classes as well that capture date and time. We will get into these latter in class.
+
+
+```r
+as.POSIXlt(start)
+```
+
+```
+[1] "2020-08-03 UTC"
+```
+
+```r
+as.POSIXct(start)
+```
+
+```
+[1] "2020-08-02 17:00:00 PDT"
+```
+
+---
+
+class: inverse, center, middle
+
+# <i class="fas  fa-database " style="color:#003660;"></i>
+# Data Structures
+
+### Storing more then one value requires structure.
+
+---
+
+- Vectors come in two types: **atomic** and **lists** 
+
+--
+
+- For atomic vectors, all elements must have the same **type**;
+
+--
+
+- For lists, elements can have different types. 
+
+--
+
+- NULL serves as a generic zero length vector. 
+
+--
+
+- This diagram - taken from [here](https://adv-r.hadley.nz/vectors-chap.html) illustrates the basic relationships:
+
+
+&lt;img src="lec-img/04-vec-list-01.png"&gt;
+
+
+---
+
+### Atomic Vectors
+
+A vector containing on type of data is called an "atom"
+  - Can created using the `c()` (combine) function.
+  - The length can be checked with `length()`
+  
+- There are four primary types of atomic vectors: logical, integer, double, and character (which contains strings). 
+
+- Collectively integer and double vectors are known as numeric vectors. 
+
+- Complex and raw atomic vectors are rare. 
+
+&lt;img src="lec-img/04-data-types.png" width="40%"&gt;
+
+---
+
+&lt;img src="lec-img/04-vec-list-02.png"&gt;
+
+---
+
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+*(dbl_vec = c(1.9,2,3.5))
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+(dbl_vec = c(1.9,2,3.5))  
+*typeof(dbl_vec)
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+
+```
+[1] "double"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+(dbl_vec = c(1.9,2,3.5))  
+typeof(dbl_vec)  
+*length(dbl_vec)
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 3
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+(dbl_vec = c(1.9,2,3.5))  
+typeof(dbl_vec)  
+length(dbl_vec)  
+
+*(int_vec = c(1L, 17L, 3L))
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  1 17  3
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+(dbl_vec = c(1.9,2,3.5))  
+typeof(dbl_vec)  
+length(dbl_vec)  
+
+(int_vec = c(1L, 17L, 3L))  
+*typeof(int_vec)
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  1 17  3
+```
+
+```
+[1] "integer"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+(dbl_vec = c(1.9,2,3.5))  
+typeof(dbl_vec)  
+length(dbl_vec)  
+
+(int_vec = c(1L, 17L, 3L))  
+typeof(int_vec)  
+*length(int_vec)
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  1 17  3
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 3
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+(dbl_vec = c(1.9,2,3.5))  
+typeof(dbl_vec)  
+length(dbl_vec)  
+
+(int_vec = c(1L, 17L, 3L))  
+typeof(int_vec)  
+length(int_vec)  
+
+*(lg_vec = c(TRUE, FALSE, F, T))
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  1 17  3
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  TRUE FALSE FALSE  TRUE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+(dbl_vec = c(1.9,2,3.5))  
+typeof(dbl_vec)  
+length(dbl_vec)  
+
+(int_vec = c(1L, 17L, 3L))  
+typeof(int_vec)  
+length(int_vec)  
+
+(lg_vec = c(TRUE, FALSE, F, T))  
+*typeof(lg_vec)
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  1 17  3
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  TRUE FALSE FALSE  TRUE
+```
+
+```
+[1] "logical"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+(dbl_vec = c(1.9,2,3.5))  
+typeof(dbl_vec)  
+length(dbl_vec)  
+
+(int_vec = c(1L, 17L, 3L))  
+typeof(int_vec)  
+length(int_vec)  
+
+(lg_vec = c(TRUE, FALSE, F, T))  
+typeof(lg_vec)  
+*length(lg_vec)
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  1 17  3
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  TRUE FALSE FALSE  TRUE
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 4
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+(dbl_vec = c(1.9,2,3.5))  
+typeof(dbl_vec)  
+length(dbl_vec)  
+
+(int_vec = c(1L, 17L, 3L))  
+typeof(int_vec)  
+length(int_vec)  
+
+(lg_vec = c(TRUE, FALSE, F, T))  
+typeof(lg_vec)  
+length(lg_vec)  
+
+*(char_vec = c("GIS", "is", "Great!", "GIS is Great!"))
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  1 17  3
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  TRUE FALSE FALSE  TRUE
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 4
+```
+
+```
+[1] "GIS"           "is"            "Great!"        "GIS is Great!"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+(dbl_vec = c(1.9,2,3.5))  
+typeof(dbl_vec)  
+length(dbl_vec)  
+
+(int_vec = c(1L, 17L, 3L))  
+typeof(int_vec)  
+length(int_vec)  
+
+(lg_vec = c(TRUE, FALSE, F, T))  
+typeof(lg_vec)  
+length(lg_vec)  
+
+(char_vec = c("GIS", "is", "Great!", "GIS is Great!"))  
+*typeof(char_vec)
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  1 17  3
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  TRUE FALSE FALSE  TRUE
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 4
+```
+
+```
+[1] "GIS"           "is"            "Great!"        "GIS is Great!"
+```
+
+```
+[1] "character"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atom-auto[
+
+```r
+# Numeric
+(dbl_vec = c(1.9,2,3.5))  
+typeof(dbl_vec)  
+length(dbl_vec)  
+
+(int_vec = c(1L, 17L, 3L))  
+typeof(int_vec)  
+length(int_vec)  
+
+(lg_vec = c(TRUE, FALSE, F, T))  
+typeof(lg_vec)  
+length(lg_vec)  
+
+(char_vec = c("GIS", "is", "Great!", "GIS is Great!"))  
+typeof(char_vec)  
+*length(char_vec)
+```
+]
+ 
+.right-panel-atom-auto[
+
+```
+[1] 1.9 2.0 3.5
+```
+
+```
+[1] "double"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  1 17  3
+```
+
+```
+[1] "integer"
+```
+
+```
+[1] 3
+```
+
+```
+[1]  TRUE FALSE FALSE  TRUE
+```
+
+```
+[1] "logical"
+```
+
+```
+[1] 4
+```
+
+```
+[1] "GIS"           "is"            "Great!"        "GIS is Great!"
+```
+
+```
+[1] "character"
+```
+
+```
+[1] 4
+```
+]
+
+&lt;style&gt;
+.left-panel-atom-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-atom-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-atom-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+# Missing Values!
+
+- Missing values still need a place holder
+- Missing values are denoted with `NA` (short for not applicable). 
+- Missing values are 'infectious': most computations involving a missing value will return another missing value.
+
+---
+count: false
+ 
+
+.left-panel-na-auto[
+
+```r
+*(vec = c(5,6,7,8,NA))
+```
+]
+ 
+.right-panel-na-auto[
+
+```
+[1]  5  6  7  8 NA
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-na-auto[
+
+```r
+(vec = c(5,6,7,8,NA))  
+*mean(vec)
+```
+]
+ 
+.right-panel-na-auto[
+
+```
+[1]  5  6  7  8 NA
+```
+
+```
+[1] NA
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-na-auto[
+
+```r
+(vec = c(5,6,7,8,NA))  
+mean(vec)  
+*mean(vec, na.rm = TRUE)
+```
+]
+ 
+.right-panel-na-auto[
+
+```
+[1]  5  6  7  8 NA
+```
+
+```
+[1] NA
+```
+
+```
+[1] 6.5
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-na-auto[
+
+```r
+(vec = c(5,6,7,8,NA))  
+mean(vec)  
+mean(vec, na.rm = TRUE)  
+
+*x &lt;- c(NA, 50, NA, 9)
+```
+]
+ 
+.right-panel-na-auto[
+
+```
+[1]  5  6  7  8 NA
+```
+
+```
+[1] NA
+```
+
+```
+[1] 6.5
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-na-auto[
+
+```r
+(vec = c(5,6,7,8,NA))  
+mean(vec)  
+mean(vec, na.rm = TRUE)  
+
+x &lt;- c(NA, 50, NA, 9)  
+*x == NA
+```
+]
+ 
+.right-panel-na-auto[
+
+```
+[1]  5  6  7  8 NA
+```
+
+```
+[1] NA
+```
+
+```
+[1] 6.5
+```
+
+```
+[1] NA NA NA NA
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-na-auto[
+
+```r
+(vec = c(5,6,7,8,NA))  
+mean(vec)  
+mean(vec, na.rm = TRUE)  
+
+x &lt;- c(NA, 50, NA, 9)  
+x == NA  
+
+*is.na(x)
+```
+]
+ 
+.right-panel-na-auto[
+
+```
+[1]  5  6  7  8 NA
+```
+
+```
+[1] NA
+```
+
+```
+[1] 6.5
+```
+
+```
+[1] NA NA NA NA
+```
+
+```
+[1]  TRUE FALSE  TRUE FALSE
+```
+]
+
+&lt;style&gt;
+.left-panel-na-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-na-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-na-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+```r
+(vec = c(5,6,7,8,NA))
+```
+
+```
+[1]  5  6  7  8 NA
+```
+
+```r
+mean(vec)
+```
+
+```
+[1] NA
+```
+
+```r
+mean(vec, na.rm = TRUE)
+```
+
+```
+[1] 6.5
+```
+
+```r
+x &lt;- c(NA, 50, NA, 9)
+x == NA
+```
+
+```
+[1] NA NA NA NA
+```
+
+```r
+is.na(x)
+```
+
+```
+[1]  TRUE FALSE  TRUE FALSE
+```
+---
+# Atoms must be of the same type!
+## Cohersion
+
+- type is a property of the entire vector
+
+- When you try and combine different types they will be coerced in a fixed order: 
+
+- character → double → integer → logical
+
+- Coercion often happens automatically.
+
+- You can deliberately coerce by using an as.*() function, like as.logical(), as.integer(), as.double(), or as.character().
+
+- Failed coercion of strings generates a warning and a missing value
+
+---
+count: false
+ 
+
+.left-panel-atoms-auto[
+
+```r
+*c("a", 1)
+```
+]
+ 
+.right-panel-atoms-auto[
+
+```
+[1] "a" "1"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atoms-auto[
+
+```r
+c("a", 1)  
+
+*c("a", TRUE)
+```
+]
+ 
+.right-panel-atoms-auto[
+
+```
+[1] "a" "1"
+```
+
+```
+[1] "a"    "TRUE"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atoms-auto[
+
+```r
+c("a", 1)  
+
+c("a", TRUE)  
+
+*c(4.5, 1L)
+```
+]
+ 
+.right-panel-atoms-auto[
+
+```
+[1] "a" "1"
+```
+
+```
+[1] "a"    "TRUE"
+```
+
+```
+[1] 4.5 1.0
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atoms-auto[
+
+```r
+c("a", 1)  
+
+c("a", TRUE)  
+
+c(4.5, 1L)  
+
+*c(4.5, 1L)
+```
+]
+ 
+.right-panel-atoms-auto[
+
+```
+[1] "a" "1"
+```
+
+```
+[1] "a"    "TRUE"
+```
+
+```
+[1] 4.5 1.0
+```
+
+```
+[1] 4.5 1.0
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atoms-auto[
+
+```r
+c("a", 1)  
+
+c("a", TRUE)  
+
+c(4.5, 1L)  
+
+c(4.5, 1L)  
+
+*c("1", 18, "GIS")
+```
+]
+ 
+.right-panel-atoms-auto[
+
+```
+[1] "a" "1"
+```
+
+```
+[1] "a"    "TRUE"
+```
+
+```
+[1] 4.5 1.0
+```
+
+```
+[1] 4.5 1.0
+```
+
+```
+[1] "1"   "18"  "GIS"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atoms-auto[
+
+```r
+c("a", 1)  
+
+c("a", TRUE)  
+
+c(4.5, 1L)  
+
+c(4.5, 1L)  
+
+c("1", 18, "GIS")  
+
+*as.numeric(c("1", 18, "GIS"))
+```
+]
+ 
+.right-panel-atoms-auto[
+
+```
+[1] "a" "1"
+```
+
+```
+[1] "a"    "TRUE"
+```
+
+```
+[1] 4.5 1.0
+```
+
+```
+[1] 4.5 1.0
+```
+
+```
+[1] "1"   "18"  "GIS"
+```
+
+```
+[1]  1 18 NA
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-atoms-auto[
+
+```r
+c("a", 1)  
+
+c("a", TRUE)  
+
+c(4.5, 1L)  
+
+c(4.5, 1L)  
+
+c("1", 18, "GIS")  
+
+as.numeric(c("1", 18, "GIS"))  
+
+*as.logical(c("1", 18, "GIS"))
+```
+]
+ 
+.right-panel-atoms-auto[
+
+```
+[1] "a" "1"
+```
+
+```
+[1] "a"    "TRUE"
+```
+
+```
+[1] 4.5 1.0
+```
+
+```
+[1] 4.5 1.0
+```
+
+```
+[1] "1"   "18"  "GIS"
+```
+
+```
+[1]  1 18 NA
+```
+
+```
+[1] NA NA NA
+```
+]
+
+&lt;style&gt;
+.left-panel-atoms-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-atoms-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-atoms-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# Names
+
+- In addition to naming the object, you can name the elements
+- names should be unique, and non-missing
+
+
+```r
+(x &lt;- c(a = 1, b = 2, c = 3))
+```
+
+```
+a b c 
+1 2 3 
+```
+
+```r
+# Using the attribute names()
+names(x) &lt;- c("d", "e", "f")
+names(x)
+```
+
+```
+[1] "d" "e" "f"
+```
+
+```r
+x
+```
+
+```
+d e f 
+1 2 3 
+```
+
+```r
+# With the function setNames():
+x &lt;- setNames(1:3, c("g", "h", "i"))
+```
+
+---
+
+# Diminsions
+
+- You probably noticed that the set of atomic vectors do not include a number of important  structures like matrices (2D) or arrays (3D), factors, or date-times. 
+
+- These types are built on top of atomic vectors by adding attributes.
+
+- Adding a `dim` attribute to a vector allows it to behave like a 2D matrix or a XD array.
+
+---
+### Matrix
+
+A matrix is also an 2D atom (row, column)
+ - Same data types
+ - Same column length
+
+---
+count: false
+ 
+
+.left-panel-matrix-auto[
+
+```r
+# Use matrix
+*(mat = matrix(1:9, nrow = 3))
+```
+]
+ 
+.right-panel-matrix-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-matrix-auto[
+
+```r
+# Use matrix
+(mat = matrix(1:9, nrow = 3))  
+
+# Use matrix
+*(mat2 = matrix(1:9, nrow = 3, byrow = TRUE))
+```
+]
+ 
+.right-panel-matrix-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    2    3
+[2,]    4    5    6
+[3,]    7    8    9
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-matrix-auto[
+
+```r
+# Use matrix
+(mat = matrix(1:9, nrow = 3))  
+
+# Use matrix
+(mat2 = matrix(1:9, nrow = 3, byrow = TRUE))  
+
+## dim returns dimensions of an object
+*dim(mat2)
+```
+]
+ 
+.right-panel-matrix-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    2    3
+[2,]    4    5    6
+[3,]    7    8    9
+```
+
+```
+[1] 3 3
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-matrix-auto[
+
+```r
+# Use matrix
+(mat = matrix(1:9, nrow = 3))  
+
+# Use matrix
+(mat2 = matrix(1:9, nrow = 3, byrow = TRUE))  
+
+## dim returns dimensions of an object
+dim(mat2)  
+
+# set names using colnames
+*colnames(mat2) = c("A", "B", "C")
+```
+]
+ 
+.right-panel-matrix-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    2    3
+[2,]    4    5    6
+[3,]    7    8    9
+```
+
+```
+[1] 3 3
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-matrix-auto[
+
+```r
+# Use matrix
+(mat = matrix(1:9, nrow = 3))  
+
+# Use matrix
+(mat2 = matrix(1:9, nrow = 3, byrow = TRUE))  
+
+## dim returns dimensions of an object
+dim(mat2)  
+
+# set names using colnames
+colnames(mat2) = c("A", "B", "C")  
+*mat2
+```
+]
+ 
+.right-panel-matrix-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    2    3
+[2,]    4    5    6
+[3,]    7    8    9
+```
+
+```
+[1] 3 3
+```
+
+```
+     A B C
+[1,] 1 2 3
+[2,] 4 5 6
+[3,] 7 8 9
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-matrix-auto[
+
+```r
+# Use matrix
+(mat = matrix(1:9, nrow = 3))  
+
+# Use matrix
+(mat2 = matrix(1:9, nrow = 3, byrow = TRUE))  
+
+## dim returns dimensions of an object
+dim(mat2)  
+
+# set names using colnames
+colnames(mat2) = c("A", "B", "C")  
+mat2  
+
+*mat2[1,1]
+```
+]
+ 
+.right-panel-matrix-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    2    3
+[2,]    4    5    6
+[3,]    7    8    9
+```
+
+```
+[1] 3 3
+```
+
+```
+     A B C
+[1,] 1 2 3
+[2,] 4 5 6
+[3,] 7 8 9
+```
+
+```
+A 
+1 
+```
+]
+
+&lt;style&gt;
+.left-panel-matrix-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-matrix-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-matrix-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+### Arrays
+
+An array is a 3D atom [row, column, slice]
+---
+
+count: false
+ 
+
+.left-panel-arrays-auto[
+
+```r
+*array(c(1:12), dim = c(3,2,2))
+```
+]
+ 
+.right-panel-arrays-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    4
+[2,]    2    5
+[3,]    3    6
+
+, , 2
+
+     [,1] [,2]
+[1,]    7   10
+[2,]    8   11
+[3,]    9   12
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-arrays-auto[
+
+```r
+array(c(1:12), dim = c(3,2,2))  
+
+*(arr = array(c(1:12), dim = c(2,3,2)))
+```
+]
+ 
+.right-panel-arrays-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    4
+[2,]    2    5
+[3,]    3    6
+
+, , 2
+
+     [,1] [,2]
+[1,]    7   10
+[2,]    8   11
+[3,]    9   12
+```
+
+```
+, , 1
+
+     [,1] [,2] [,3]
+[1,]    1    3    5
+[2,]    2    4    6
+
+, , 2
+
+     [,1] [,2] [,3]
+[1,]    7    9   11
+[2,]    8   10   12
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-arrays-auto[
+
+```r
+array(c(1:12), dim = c(3,2,2))  
+
+(arr = array(c(1:12), dim = c(2,3,2)))  
+
+*arr[1,1,1]
+```
+]
+ 
+.right-panel-arrays-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    4
+[2,]    2    5
+[3,]    3    6
+
+, , 2
+
+     [,1] [,2]
+[1,]    7   10
+[2,]    8   11
+[3,]    9   12
+```
+
+```
+, , 1
+
+     [,1] [,2] [,3]
+[1,]    1    3    5
+[2,]    2    4    6
+
+, , 2
+
+     [,1] [,2] [,3]
+[1,]    7    9   11
+[2,]    8   10   12
+```
+
+```
+[1] 1
+```
+]
+
+&lt;style&gt;
+.left-panel-arrays-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-arrays-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-arrays-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+- A vector without a `dim` attribute set is often thought of as 1-dimensional, but actually has NULL dimensions. 
+
+- Why?
+
+- Matrices with a single row or single column, or arrays with a single dimension are 1D. They may print similarly, but will behave differently. The differences aren’t too important, but it’s useful to know they exist in case you get strange output from a function (tapply() is a frequent offender). As always, use str() to reveal the differences.
+
+
+
+```r
+str(c(1:3))                   # 1d vector
+```
+
+```
+ int [1:3] 1 2 3
+```
+
+```r
+str(matrix(1:3, ncol = 1))   # column vector
+```
+
+```
+ int [1:3, 1] 1 2 3
+```
+
+```r
+str(matrix(1:3, nrow = 1))   # row vector
+```
+
+```
+ int [1, 1:3] 1 2 3
+```
+
+```r
+str(array(1:3, 3))           # "array" vector
+```
+
+```
+ int [1:3(1d)] 1 2 3
+```
+
+---
+
+# Lists
+
+Lists `extend` atomic vectors and allow each element can be any type.
+
+
+```r
+(my_list &lt;- list(
+  1:5, 
+  "GIS is great!", 
+  c(TRUE, FALSE, TRUE), 
+  c(2.3, 5.9)
+))
+```
+
+```
+[[1]]
+[1] 1 2 3 4 5
+
+[[2]]
+[1] "GIS is great!"
+
+[[3]]
+[1]  TRUE FALSE  TRUE
+
+[[4]]
+[1] 2.3 5.9
+```
+
+```r
+typeof(my_list)
+```
+
+```
+[1] "list"
+```
+
+---
+# Lists can be recursive
+
+
+```r
+(list_list = list(list("hi")))
+```
+
+```
+[[1]]
+[[1]][[1]]
+[1] "hi"
+```
+
+```r
+str(list_list)
+```
+
+```
+List of 1
+ $ :List of 1
+  ..$ : chr "hi"
+```
+---
+
+### Data Frames
+
+A `data.frame` is a data structure built on top of lists
+
+--
+
+- a named _list of vectors_.
+
+--
+
+- data.frames are one of the biggest and most important ideas in R, and one of the things that make R different from other programming languages
+
+--
+
+- Unlike a regular list, in a `data.frame`,  the length of each vector **must** be the same. 
+
+--
+
+- This gives data frames their rectangular structure and explains why they share the properties of both matrices and lists
+
+---
+
+count: false
+ 
+# A small data.frame
+.left-panel-smalldf-auto[
+
+```r
+*df1 &lt;- data.frame(name = c("George", "Stan", "Carly"),
+*                 age  = c(75,15,31),
+*                 retired = c(T,F,F))
+```
+]
+ 
+.right-panel-smalldf-auto[
+
+]
+
+---
+count: false
+ 
+# A small data.frame
+.left-panel-smalldf-auto[
+
+```r
+df1 &lt;- data.frame(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F))  
+
+*typeof(df1)
+```
+]
+ 
+.right-panel-smalldf-auto[
+
+```
+[1] "list"
+```
+]
+
+---
+count: false
+ 
+# A small data.frame
+.left-panel-smalldf-auto[
+
+```r
+df1 &lt;- data.frame(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F))  
+
+typeof(df1)  
+*attributes(df1)
+```
+]
+ 
+.right-panel-smalldf-auto[
+
+```
+[1] "list"
+```
+
+```
+$names
+[1] "name"    "age"     "retired"
+
+$class
+[1] "data.frame"
+
+$row.names
+[1] 1 2 3
+```
+]
+
+---
+count: false
+ 
+# A small data.frame
+.left-panel-smalldf-auto[
+
+```r
+df1 &lt;- data.frame(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F))  
+
+typeof(df1)  
+attributes(df1)  
+*str(df1)
+```
+]
+ 
+.right-panel-smalldf-auto[
+
+```
+[1] "list"
+```
+
+```
+$names
+[1] "name"    "age"     "retired"
+
+$class
+[1] "data.frame"
+
+$row.names
+[1] 1 2 3
+```
+
+```
+'data.frame':	3 obs. of  3 variables:
+ $ name   : chr  "George" "Stan" "Carly"
+ $ age    : num  75 15 31
+ $ retired: logi  TRUE FALSE FALSE
+```
+]
+
+&lt;style&gt;
+.left-panel-smalldf-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-smalldf-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-smalldf-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+count: false
+ 
+
+.left-panel-df-auto[
+
+```r
+*(num &lt;- c(1,2,3,4))
+```
+]
+ 
+.right-panel-df-auto[
+
+```
+[1] 1 2 3 4
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-df-auto[
+
+```r
+(num &lt;- c(1,2,3,4))  
+
+*(color &lt;- c("red", "white",
+*          "green", NA))
+```
+]
+ 
+.right-panel-df-auto[
+
+```
+[1] 1 2 3 4
+```
+
+```
+[1] "red"   "white" "green" NA     
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-df-auto[
+
+```r
+(num &lt;- c(1,2,3,4))  
+
+(color &lt;- c("red", "white",  
+           "green", NA))  
+
+*(boolean &lt;- c(TRUE,TRUE,
+*            TRUE,FALSE))
+```
+]
+ 
+.right-panel-df-auto[
+
+```
+[1] 1 2 3 4
+```
+
+```
+[1] "red"   "white" "green" NA     
+```
+
+```
+[1]  TRUE  TRUE  TRUE FALSE
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-df-auto[
+
+```r
+(num &lt;- c(1,2,3,4))  
+
+(color &lt;- c("red", "white",  
+           "green", NA))  
+
+(boolean &lt;- c(TRUE,TRUE,  
+             TRUE,FALSE))  
+
+*(df = data.frame(num, color, boolean))
+```
+]
+ 
+.right-panel-df-auto[
+
+```
+[1] 1 2 3 4
+```
+
+```
+[1] "red"   "white" "green" NA     
+```
+
+```
+[1]  TRUE  TRUE  TRUE FALSE
+```
+
+```
+  num color boolean
+1   1   red    TRUE
+2   2 white    TRUE
+3   3 green    TRUE
+4   4  &lt;NA&gt;   FALSE
+```
+]
+
+&lt;style&gt;
+.left-panel-df-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-df-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-df-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+### tibble
+
+A tibble (tbl_df), is a data.frame that enforces best practices:
+- Never changes the input type.
+- Can have columns that are lists.
+- Can have non-standard variable names.
+- Names can start with a number or contain spaces.
+- It only recycles vectors of length 1.
+- It never creates row names.
+
+---
+
+count: false
+ 
+
+.left-panel-tibble-auto[
+
+```r
+# data.frames can be converted to tibbles
+*(tib = as_tibble(df))
+```
+]
+ 
+.right-panel-tibble-auto[
+
+```
+# A tibble: 3 x 3
+  name     age retired
+  &lt;chr&gt;  &lt;dbl&gt; &lt;lgl&gt;  
+1 George    75 TRUE   
+2 Stan      15 FALSE  
+3 Carly     31 FALSE  
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-tibble-auto[
+
+```r
+# data.frames can be converted to tibbles
+(tib = as_tibble(df))  
+
+*class(tib)
+```
+]
+ 
+.right-panel-tibble-auto[
+
+```
+# A tibble: 3 x 3
+  name     age retired
+  &lt;chr&gt;  &lt;dbl&gt; &lt;lgl&gt;  
+1 George    75 TRUE   
+2 Stan      15 FALSE  
+3 Carly     31 FALSE  
+```
+
+```
+[1] "tbl_df"     "tbl"        "data.frame"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-tibble-auto[
+
+```r
+# data.frames can be converted to tibbles
+(tib = as_tibble(df))  
+
+class(tib)  
+*typeof(tib)
+```
+]
+ 
+.right-panel-tibble-auto[
+
+```
+# A tibble: 3 x 3
+  name     age retired
+  &lt;chr&gt;  &lt;dbl&gt; &lt;lgl&gt;  
+1 George    75 TRUE   
+2 Stan      15 FALSE  
+3 Carly     31 FALSE  
+```
+
+```
+[1] "tbl_df"     "tbl"        "data.frame"
+```
+
+```
+[1] "list"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-tibble-auto[
+
+```r
+# data.frames can be converted to tibbles
+(tib = as_tibble(df))  
+
+class(tib)  
+typeof(tib)  
+
+# can be converted back
+*data.frame(tib)
+```
+]
+ 
+.right-panel-tibble-auto[
+
+```
+# A tibble: 3 x 3
+  name     age retired
+  &lt;chr&gt;  &lt;dbl&gt; &lt;lgl&gt;  
+1 George    75 TRUE   
+2 Stan      15 FALSE  
+3 Carly     31 FALSE  
+```
+
+```
+[1] "tbl_df"     "tbl"        "data.frame"
+```
+
+```
+[1] "list"
+```
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+]
+
+&lt;style&gt;
+.left-panel-tibble-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-tibble-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-tibble-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# Subsetting
+
+ - R’s subsetting operators are **fast** and powerful. 
+ - Subsetting in R is easy to learn but hard to master.
+ - There are 3 subsetting operators, `[[`, `[`, and `$`.
+ - Subsetting operators interact differently with different vector types (e.g., atomic vectors, lists, factors, matrices, and data frames).
+ - Subsetting can be combined with assignment.
+
+
+---
+count: false
+ 
+#Atomics
+.left-panel-subvec-auto[
+
+```r
+*(x = c(3.4, 7, 18, 9.6))
+```
+]
+ 
+.right-panel-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.left-panel-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))  
+
+*x[3]
+```
+]
+ 
+.right-panel-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.left-panel-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))  
+
+x[3]  
+
+*x[c(3,4)]
+```
+]
+ 
+.right-panel-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.left-panel-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))  
+
+x[3]  
+
+x[c(3,4)]  
+
+*x[-3]
+```
+]
+ 
+.right-panel-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.left-panel-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))  
+
+x[3]  
+
+x[c(3,4)]  
+
+x[-3]  
+
+*x[c(T,T,F,F)]
+```
+]
+ 
+.right-panel-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.left-panel-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))  
+
+x[3]  
+
+x[c(3,4)]  
+
+x[-3]  
+
+x[c(T,T,F,F)]  
+
+*x = setNames(x, c('A', 'B','C','D'))
+```
+]
+ 
+.right-panel-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.left-panel-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))  
+
+x[3]  
+
+x[c(3,4)]  
+
+x[-3]  
+
+x[c(T,T,F,F)]  
+
+x = setNames(x, c('A', 'B','C','D'))  
+
+*x["A"]
+```
+]
+ 
+.right-panel-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+
+```
+  A 
+3.4 
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.left-panel-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))  
+
+x[3]  
+
+x[c(3,4)]  
+
+x[-3]  
+
+x[c(T,T,F,F)]  
+
+x = setNames(x, c('A', 'B','C','D'))  
+
+x["A"]  
+*x[c("A", "C")]
+```
+]
+ 
+.right-panel-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+
+```
+  A 
+3.4 
+```
+
+```
+   A    C 
+ 3.4 18.0 
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.left-panel-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))  
+
+x[3]  
+
+x[c(3,4)]  
+
+x[-3]  
+
+x[c(T,T,F,F)]  
+
+x = setNames(x, c('A', 'B','C','D'))  
+
+x["A"]  
+x[c("A", "C")]  
+*x[c("A", "A")]
+```
+]
+ 
+.right-panel-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+
+```
+  A 
+3.4 
+```
+
+```
+   A    C 
+ 3.4 18.0 
+```
+
+```
+  A   A 
+3.4 3.4 
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.left-panel-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))  
+
+x[3]  
+
+x[c(3,4)]  
+
+x[-3]  
+
+x[c(T,T,F,F)]  
+
+x = setNames(x, c('A', 'B','C','D'))  
+
+x["A"]  
+x[c("A", "C")]  
+x[c("A", "A")]  
+```
+]
+ 
+.right-panel-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+
+```
+  A 
+3.4 
+```
+
+```
+   A    C 
+ 3.4 18.0 
+```
+
+```
+  A   A 
+3.4 3.4 
+```
+]
+
+&lt;style&gt;
+.left-panel-subvec-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-subvec-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-subvec-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+count: false
+ 
+#Matrices
+.left-panel-submat-auto[
+
+```r
+*(x = matrix(1:9, nrow = 3))
+```
+]
+ 
+.right-panel-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+]
+
+---
+count: false
+ 
+#Matrices
+.left-panel-submat-auto[
+
+```r
+(x = matrix(1:9, nrow = 3))  
+
+*x[3,]
+```
+]
+ 
+.right-panel-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+[1] 3 6 9
+```
+]
+
+---
+count: false
+ 
+#Matrices
+.left-panel-submat-auto[
+
+```r
+(x = matrix(1:9, nrow = 3))  
+
+x[3,]  
+*x[,3]
+```
+]
+ 
+.right-panel-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+[1] 3 6 9
+```
+
+```
+[1] 7 8 9
+```
+]
+
+---
+count: false
+ 
+#Matrices
+.left-panel-submat-auto[
+
+```r
+(x = matrix(1:9, nrow = 3))  
+
+x[3,]  
+x[,3]  
+*x[3,3]
+```
+]
+ 
+.right-panel-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+[1] 3 6 9
+```
+
+```
+[1] 7 8 9
+```
+
+```
+[1] 9
+```
+]
+
+---
+count: false
+ 
+#Matrices
+.left-panel-submat-auto[
+
+```r
+(x = matrix(1:9, nrow = 3))  
+
+x[3,]  
+x[,3]  
+x[3,3]  
+*x[1:2,1:2]
+```
+]
+ 
+.right-panel-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+[1] 3 6 9
+```
+
+```
+[1] 7 8 9
+```
+
+```
+[1] 9
+```
+
+```
+     [,1] [,2]
+[1,]    1    4
+[2,]    2    5
+```
+]
+
+---
+count: false
+ 
+#Matrices
+.left-panel-submat-auto[
+
+```r
+(x = matrix(1:9, nrow = 3))  
+
+x[3,]  
+x[,3]  
+x[3,3]  
+x[1:2,1:2]  
+*x[-1,]
+```
+]
+ 
+.right-panel-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+[1] 3 6 9
+```
+
+```
+[1] 7 8 9
+```
+
+```
+[1] 9
+```
+
+```
+     [,1] [,2]
+[1,]    1    4
+[2,]    2    5
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    2    5    8
+[2,]    3    6    9
+```
+]
+
+&lt;style&gt;
+.left-panel-submat-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-submat-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-submat-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+count: false
+ 
+#Arrays
+.left-panel-subarr-auto[
+
+```r
+*(x = array(1:12, dim = c(2,2,3)))
+```
+]
+ 
+.right-panel-subarr-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+, , 2
+
+     [,1] [,2]
+[1,]    5    7
+[2,]    6    8
+
+, , 3
+
+     [,1] [,2]
+[1,]    9   11
+[2,]   10   12
+```
+]
+
+---
+count: false
+ 
+#Arrays
+.left-panel-subarr-auto[
+
+```r
+(x = array(1:12, dim = c(2,2,3)))  
+
+*x[1,,]
+```
+]
+ 
+.right-panel-subarr-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+, , 2
+
+     [,1] [,2]
+[1,]    5    7
+[2,]    6    8
+
+, , 3
+
+     [,1] [,2]
+[1,]    9   11
+[2,]   10   12
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    3    7   11
+```
+]
+
+---
+count: false
+ 
+#Arrays
+.left-panel-subarr-auto[
+
+```r
+(x = array(1:12, dim = c(2,2,3)))  
+
+x[1,,]  
+*x[,1,]
+```
+]
+ 
+.right-panel-subarr-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+, , 2
+
+     [,1] [,2]
+[1,]    5    7
+[2,]    6    8
+
+, , 3
+
+     [,1] [,2]
+[1,]    9   11
+[2,]   10   12
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    3    7   11
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    2    6   10
+```
+]
+
+---
+count: false
+ 
+#Arrays
+.left-panel-subarr-auto[
+
+```r
+(x = array(1:12, dim = c(2,2,3)))  
+
+x[1,,]  
+x[,1,]  
+*x[,,1]
+```
+]
+ 
+.right-panel-subarr-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+, , 2
+
+     [,1] [,2]
+[1,]    5    7
+[2,]    6    8
+
+, , 3
+
+     [,1] [,2]
+[1,]    9   11
+[2,]   10   12
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    3    7   11
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    2    6   10
+```
+
+```
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+```
+]
+
+---
+count: false
+ 
+#Arrays
+.left-panel-subarr-auto[
+
+```r
+(x = array(1:12, dim = c(2,2,3)))  
+
+x[1,,]  
+x[,1,]  
+x[,,1]  
+```
+]
+ 
+.right-panel-subarr-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+, , 2
+
+     [,1] [,2]
+[1,]    5    7
+[2,]    6    8
+
+, , 3
+
+     [,1] [,2]
+[1,]    9   11
+[2,]   10   12
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    3    7   11
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    2    6   10
+```
+
+```
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+```
+]
+
+&lt;style&gt;
+.left-panel-subarr-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-subarr-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-subarr-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+count: false
+ 
+#Lists
+.left-panel-sublist-auto[
+
+```r
+*(ll &lt;- list(name = c("George", "Stan", "Carly"),
+*                 age  = c(75,15,31),
+*                 retired = c(T,F,F)))
+```
+]
+ 
+.right-panel-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+]
+
+---
+count: false
+ 
+#Lists
+.left-panel-sublist-auto[
+
+```r
+(ll &lt;- list(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F)))  
+*ll$name
+```
+]
+ 
+.right-panel-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+]
+
+---
+count: false
+ 
+#Lists
+.left-panel-sublist-auto[
+
+```r
+(ll &lt;- list(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F)))  
+ll$name  
+*ll$name[1]
+```
+]
+ 
+.right-panel-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+]
+
+---
+count: false
+ 
+#Lists
+.left-panel-sublist-auto[
+
+```r
+(ll &lt;- list(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F)))  
+ll$name  
+ll$name[1]  
+
+*ll[[1]]
+```
+]
+ 
+.right-panel-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+]
+
+---
+count: false
+ 
+#Lists
+.left-panel-sublist-auto[
+
+```r
+(ll &lt;- list(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F)))  
+ll$name  
+ll$name[1]  
+
+ll[[1]]  
+*ll[[1]][1]
+```
+]
+ 
+.right-panel-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+]
+
+---
+count: false
+ 
+#Lists
+.left-panel-sublist-auto[
+
+```r
+(ll &lt;- list(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F)))  
+ll$name  
+ll$name[1]  
+
+ll[[1]]  
+ll[[1]][1]  
+
+*ll[['name']][1]
+```
+]
+ 
+.right-panel-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+
+```
+[1] "George"
+```
+]
+
+&lt;style&gt;
+.left-panel-sublist-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-sublist-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-sublist-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+# Lists are not Matrices
+
+
+```r
+# The name "Stan"
+ll[1,2]
+```
+
+```
+Error in ll[1, 2]: incorrect number of dimensions
+```
+
+```r
+# Stans Information
+ll[2,]
+```
+
+```
+Error in ll[2, ]: incorrect number of dimensions
+```
+
+---
+# Enter data.frames
+
+count: false
+ 
+#data.frames
+.left-panel-subdf-auto[
+
+```r
+*(df &lt;- data.frame(name = c("George", "Stan", "Carly"),
+*                 age  = c(75,15,31),
+*                 retired = c(T,F,F)))
+```
+]
+ 
+.right-panel-subdf-auto[
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+]
+
+---
+count: false
+ 
+#data.frames
+.left-panel-subdf-auto[
+
+```r
+(df &lt;- data.frame(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F)))  
+
+# Like a Matrix!
+*df[1,2]
+```
+]
+ 
+.right-panel-subdf-auto[
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+
+```
+[1] 75
+```
+]
+
+---
+count: false
+ 
+#data.frames
+.left-panel-subdf-auto[
+
+```r
+(df &lt;- data.frame(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F)))  
+
+# Like a Matrix!
+df[1,2]  
+*df[2,]
+```
+]
+ 
+.right-panel-subdf-auto[
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+
+```
+[1] 75
+```
+
+```
+  name age retired
+2 Stan  15   FALSE
+```
+]
+
+---
+count: false
+ 
+#data.frames
+.left-panel-subdf-auto[
+
+```r
+(df &lt;- data.frame(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F)))  
+
+# Like a Matrix!
+df[1,2]  
+df[2,]  
+
+# Like a list!
+*df[[1]][1]
+```
+]
+ 
+.right-panel-subdf-auto[
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+
+```
+[1] 75
+```
+
+```
+  name age retired
+2 Stan  15   FALSE
+```
+
+```
+[1] "George"
+```
+]
+
+---
+count: false
+ 
+#data.frames
+.left-panel-subdf-auto[
+
+```r
+(df &lt;- data.frame(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F)))  
+
+# Like a Matrix!
+df[1,2]  
+df[2,]  
+
+# Like a list!
+df[[1]][1]  
+*df$name[1]
+```
+]
+ 
+.right-panel-subdf-auto[
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+
+```
+[1] 75
+```
+
+```
+  name age retired
+2 Stan  15   FALSE
+```
+
+```
+[1] "George"
+```
+
+```
+[1] "George"
+```
+]
+
+---
+count: false
+ 
+#data.frames
+.left-panel-subdf-auto[
+
+```r
+(df &lt;- data.frame(name = c("George", "Stan", "Carly"),  
+                  age  = c(75,15,31),  
+                  retired = c(T,F,F)))  
+
+# Like a Matrix!
+df[1,2]  
+df[2,]  
+
+# Like a list!
+df[[1]][1]  
+df$name[1]  
+```
+]
+ 
+.right-panel-subdf-auto[
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+
+```
+[1] 75
+```
+
+```
+  name age retired
+2 Stan  15   FALSE
+```
+
+```
+[1] "George"
+```
+
+```
+[1] "George"
+```
+]
+
+&lt;style&gt;
+.left-panel-subdf-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-subdf-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-subdf-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+```r
+(df &lt;- data.frame(name = c("George", "Stan", "Carly"), 
+                  age  = c(75,15,31),
+                  retired = c(T,F,F)))
+```
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+
+```r
+# Like a Matrix!
+df[1,2]
+```
+
+```
+[1] 75
+```
+
+```r
+df[2,]
+```
+
+```
+  name age retired
+2 Stan  15   FALSE
+```
+
+```r
+# Like a list!
+df[[1]][1]
+```
+
+```
+[1] "George"
+```
+
+```r
+df$name[1]
+```
+
+```
+[1] "George"
+```
+
+---
+class: center, middle, inverse
+# Type and Structure in Practice
+### Real data examples
+---
+### Storm Dataset
+
+- Many packages come with loaded datasets.
+- `dplyr` (part of the tidyverse) has a `storms` dataset
+
+&lt;img src="lecture-04_files/figure-html/unnamed-chunk-8-1.png" width="432" /&gt;
+
+
+---
+
+count: false
+ 
+
+.left-panel-storms-auto[
+
+```r
+#preview dataset
+*head(storms,3)
+```
+]
+ 
+.right-panel-storms-auto[
+
+```
+# A tibble: 3 x 13
+  name   year month   day  hour   lat  long status              category  wind pressure ts_diameter hu_diameter
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;               &lt;ord&gt;    &lt;int&gt;    &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+1 Amy    1975     6    27     0  27.5   -79 tropical depression -1          25     1013          NA          NA
+2 Amy    1975     6    27     6  28.5   -79 tropical depression -1          25     1013          NA          NA
+3 Amy    1975     6    27    12  29.5   -79 tropical depression -1          25     1013          NA          NA
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-storms-auto[
+
+```r
+#preview dataset
+head(storms,3)  
+# Get data diminsions
+*dim(storms)
+```
+]
+ 
+.right-panel-storms-auto[
+
+```
+# A tibble: 3 x 13
+  name   year month   day  hour   lat  long status              category  wind pressure ts_diameter hu_diameter
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;               &lt;ord&gt;    &lt;int&gt;    &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+1 Amy    1975     6    27     0  27.5   -79 tropical depression -1          25     1013          NA          NA
+2 Amy    1975     6    27     6  28.5   -79 tropical depression -1          25     1013          NA          NA
+3 Amy    1975     6    27    12  29.5   -79 tropical depression -1          25     1013          NA          NA
+```
+
+```
+[1] 10010    13
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-storms-auto[
+
+```r
+#preview dataset
+head(storms,3)  
+# Get data diminsions
+dim(storms)  
+*str(storms)
+```
+]
+ 
+.right-panel-storms-auto[
+
+```
+# A tibble: 3 x 13
+  name   year month   day  hour   lat  long status              category  wind pressure ts_diameter hu_diameter
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;               &lt;ord&gt;    &lt;int&gt;    &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+1 Amy    1975     6    27     0  27.5   -79 tropical depression -1          25     1013          NA          NA
+2 Amy    1975     6    27     6  28.5   -79 tropical depression -1          25     1013          NA          NA
+3 Amy    1975     6    27    12  29.5   -79 tropical depression -1          25     1013          NA          NA
+```
+
+```
+[1] 10010    13
+```
+
+```
+tibble [10,010 × 13] (S3: tbl_df/tbl/data.frame)
+ $ name       : chr [1:10010] "Amy" "Amy" "Amy" "Amy" ...
+ $ year       : num [1:10010] 1975 1975 1975 1975 1975 ...
+ $ month      : num [1:10010] 6 6 6 6 6 6 6 6 6 6 ...
+ $ day        : int [1:10010] 27 27 27 27 28 28 28 28 29 29 ...
+ $ hour       : num [1:10010] 0 6 12 18 0 6 12 18 0 6 ...
+ $ lat        : num [1:10010] 27.5 28.5 29.5 30.5 31.5 32.4 33.3 34 34.4 34 ...
+ $ long       : num [1:10010] -79 -79 -79 -79 -78.8 -78.7 -78 -77 -75.8 -74.8 ...
+ $ status     : chr [1:10010] "tropical depression" "tropical depression" "tropical depression" "tropical depression" ...
+ $ category   : Ord.factor w/ 7 levels "-1"&lt;"0"&lt;"1"&lt;"2"&lt;..: 1 1 1 1 1 1 1 1 2 2 ...
+ $ wind       : int [1:10010] 25 25 25 25 25 25 25 30 35 40 ...
+ $ pressure   : int [1:10010] 1013 1013 1013 1013 1012 1012 1011 1006 1004 1002 ...
+ $ ts_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+ $ hu_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-storms-auto[
+
+```r
+#preview dataset
+head(storms,3)  
+# Get data diminsions
+dim(storms)  
+str(storms)  
+
+*storms$name[1:5]
+```
+]
+ 
+.right-panel-storms-auto[
+
+```
+# A tibble: 3 x 13
+  name   year month   day  hour   lat  long status              category  wind pressure ts_diameter hu_diameter
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;               &lt;ord&gt;    &lt;int&gt;    &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+1 Amy    1975     6    27     0  27.5   -79 tropical depression -1          25     1013          NA          NA
+2 Amy    1975     6    27     6  28.5   -79 tropical depression -1          25     1013          NA          NA
+3 Amy    1975     6    27    12  29.5   -79 tropical depression -1          25     1013          NA          NA
+```
+
+```
+[1] 10010    13
+```
+
+```
+tibble [10,010 × 13] (S3: tbl_df/tbl/data.frame)
+ $ name       : chr [1:10010] "Amy" "Amy" "Amy" "Amy" ...
+ $ year       : num [1:10010] 1975 1975 1975 1975 1975 ...
+ $ month      : num [1:10010] 6 6 6 6 6 6 6 6 6 6 ...
+ $ day        : int [1:10010] 27 27 27 27 28 28 28 28 29 29 ...
+ $ hour       : num [1:10010] 0 6 12 18 0 6 12 18 0 6 ...
+ $ lat        : num [1:10010] 27.5 28.5 29.5 30.5 31.5 32.4 33.3 34 34.4 34 ...
+ $ long       : num [1:10010] -79 -79 -79 -79 -78.8 -78.7 -78 -77 -75.8 -74.8 ...
+ $ status     : chr [1:10010] "tropical depression" "tropical depression" "tropical depression" "tropical depression" ...
+ $ category   : Ord.factor w/ 7 levels "-1"&lt;"0"&lt;"1"&lt;"2"&lt;..: 1 1 1 1 1 1 1 1 2 2 ...
+ $ wind       : int [1:10010] 25 25 25 25 25 25 25 30 35 40 ...
+ $ pressure   : int [1:10010] 1013 1013 1013 1013 1012 1012 1011 1006 1004 1002 ...
+ $ ts_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+ $ hu_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+```
+
+```
+[1] "Amy" "Amy" "Amy" "Amy" "Amy"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-storms-auto[
+
+```r
+#preview dataset
+head(storms,3)  
+# Get data diminsions
+dim(storms)  
+str(storms)  
+
+storms$name[1:5]  
+*storms[[1]][1:5]
+```
+]
+ 
+.right-panel-storms-auto[
+
+```
+# A tibble: 3 x 13
+  name   year month   day  hour   lat  long status              category  wind pressure ts_diameter hu_diameter
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;               &lt;ord&gt;    &lt;int&gt;    &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+1 Amy    1975     6    27     0  27.5   -79 tropical depression -1          25     1013          NA          NA
+2 Amy    1975     6    27     6  28.5   -79 tropical depression -1          25     1013          NA          NA
+3 Amy    1975     6    27    12  29.5   -79 tropical depression -1          25     1013          NA          NA
+```
+
+```
+[1] 10010    13
+```
+
+```
+tibble [10,010 × 13] (S3: tbl_df/tbl/data.frame)
+ $ name       : chr [1:10010] "Amy" "Amy" "Amy" "Amy" ...
+ $ year       : num [1:10010] 1975 1975 1975 1975 1975 ...
+ $ month      : num [1:10010] 6 6 6 6 6 6 6 6 6 6 ...
+ $ day        : int [1:10010] 27 27 27 27 28 28 28 28 29 29 ...
+ $ hour       : num [1:10010] 0 6 12 18 0 6 12 18 0 6 ...
+ $ lat        : num [1:10010] 27.5 28.5 29.5 30.5 31.5 32.4 33.3 34 34.4 34 ...
+ $ long       : num [1:10010] -79 -79 -79 -79 -78.8 -78.7 -78 -77 -75.8 -74.8 ...
+ $ status     : chr [1:10010] "tropical depression" "tropical depression" "tropical depression" "tropical depression" ...
+ $ category   : Ord.factor w/ 7 levels "-1"&lt;"0"&lt;"1"&lt;"2"&lt;..: 1 1 1 1 1 1 1 1 2 2 ...
+ $ wind       : int [1:10010] 25 25 25 25 25 25 25 30 35 40 ...
+ $ pressure   : int [1:10010] 1013 1013 1013 1013 1012 1012 1011 1006 1004 1002 ...
+ $ ts_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+ $ hu_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+```
+
+```
+[1] "Amy" "Amy" "Amy" "Amy" "Amy"
+```
+
+```
+[1] "Amy" "Amy" "Amy" "Amy" "Amy"
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-storms-auto[
+
+```r
+#preview dataset
+head(storms,3)  
+# Get data diminsions
+dim(storms)  
+str(storms)  
+
+storms$name[1:5]  
+storms[[1]][1:5]  
+*storms[1:5,1:5]
+```
+]
+ 
+.right-panel-storms-auto[
+
+```
+# A tibble: 3 x 13
+  name   year month   day  hour   lat  long status              category  wind pressure ts_diameter hu_diameter
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;               &lt;ord&gt;    &lt;int&gt;    &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+1 Amy    1975     6    27     0  27.5   -79 tropical depression -1          25     1013          NA          NA
+2 Amy    1975     6    27     6  28.5   -79 tropical depression -1          25     1013          NA          NA
+3 Amy    1975     6    27    12  29.5   -79 tropical depression -1          25     1013          NA          NA
+```
+
+```
+[1] 10010    13
+```
+
+```
+tibble [10,010 × 13] (S3: tbl_df/tbl/data.frame)
+ $ name       : chr [1:10010] "Amy" "Amy" "Amy" "Amy" ...
+ $ year       : num [1:10010] 1975 1975 1975 1975 1975 ...
+ $ month      : num [1:10010] 6 6 6 6 6 6 6 6 6 6 ...
+ $ day        : int [1:10010] 27 27 27 27 28 28 28 28 29 29 ...
+ $ hour       : num [1:10010] 0 6 12 18 0 6 12 18 0 6 ...
+ $ lat        : num [1:10010] 27.5 28.5 29.5 30.5 31.5 32.4 33.3 34 34.4 34 ...
+ $ long       : num [1:10010] -79 -79 -79 -79 -78.8 -78.7 -78 -77 -75.8 -74.8 ...
+ $ status     : chr [1:10010] "tropical depression" "tropical depression" "tropical depression" "tropical depression" ...
+ $ category   : Ord.factor w/ 7 levels "-1"&lt;"0"&lt;"1"&lt;"2"&lt;..: 1 1 1 1 1 1 1 1 2 2 ...
+ $ wind       : int [1:10010] 25 25 25 25 25 25 25 30 35 40 ...
+ $ pressure   : int [1:10010] 1013 1013 1013 1013 1012 1012 1011 1006 1004 1002 ...
+ $ ts_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+ $ hu_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+```
+
+```
+[1] "Amy" "Amy" "Amy" "Amy" "Amy"
+```
+
+```
+[1] "Amy" "Amy" "Amy" "Amy" "Amy"
+```
+
+```
+# A tibble: 5 x 5
+  name   year month   day  hour
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;
+1 Amy    1975     6    27     0
+2 Amy    1975     6    27     6
+3 Amy    1975     6    27    12
+4 Amy    1975     6    27    18
+5 Amy    1975     6    28     0
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-storms-auto[
+
+```r
+#preview dataset
+head(storms,3)  
+# Get data diminsions
+dim(storms)  
+str(storms)  
+
+storms$name[1:5]  
+storms[[1]][1:5]  
+storms[1:5,1:5]  
+```
+]
+ 
+.right-panel-storms-auto[
+
+```
+# A tibble: 3 x 13
+  name   year month   day  hour   lat  long status              category  wind pressure ts_diameter hu_diameter
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;               &lt;ord&gt;    &lt;int&gt;    &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+1 Amy    1975     6    27     0  27.5   -79 tropical depression -1          25     1013          NA          NA
+2 Amy    1975     6    27     6  28.5   -79 tropical depression -1          25     1013          NA          NA
+3 Amy    1975     6    27    12  29.5   -79 tropical depression -1          25     1013          NA          NA
+```
+
+```
+[1] 10010    13
+```
+
+```
+tibble [10,010 × 13] (S3: tbl_df/tbl/data.frame)
+ $ name       : chr [1:10010] "Amy" "Amy" "Amy" "Amy" ...
+ $ year       : num [1:10010] 1975 1975 1975 1975 1975 ...
+ $ month      : num [1:10010] 6 6 6 6 6 6 6 6 6 6 ...
+ $ day        : int [1:10010] 27 27 27 27 28 28 28 28 29 29 ...
+ $ hour       : num [1:10010] 0 6 12 18 0 6 12 18 0 6 ...
+ $ lat        : num [1:10010] 27.5 28.5 29.5 30.5 31.5 32.4 33.3 34 34.4 34 ...
+ $ long       : num [1:10010] -79 -79 -79 -79 -78.8 -78.7 -78 -77 -75.8 -74.8 ...
+ $ status     : chr [1:10010] "tropical depression" "tropical depression" "tropical depression" "tropical depression" ...
+ $ category   : Ord.factor w/ 7 levels "-1"&lt;"0"&lt;"1"&lt;"2"&lt;..: 1 1 1 1 1 1 1 1 2 2 ...
+ $ wind       : int [1:10010] 25 25 25 25 25 25 25 30 35 40 ...
+ $ pressure   : int [1:10010] 1013 1013 1013 1013 1012 1012 1011 1006 1004 1002 ...
+ $ ts_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+ $ hu_diameter: num [1:10010] NA NA NA NA NA NA NA NA NA NA ...
+```
+
+```
+[1] "Amy" "Amy" "Amy" "Amy" "Amy"
+```
+
+```
+[1] "Amy" "Amy" "Amy" "Amy" "Amy"
+```
+
+```
+# A tibble: 5 x 5
+  name   year month   day  hour
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;
+1 Amy    1975     6    27     0
+2 Amy    1975     6    27     6
+3 Amy    1975     6    27    12
+4 Amy    1975     6    27    18
+5 Amy    1975     6    28     0
+```
+]
+
+&lt;style&gt;
+.left-panel-storms-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-storms-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-storms-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+count: false
+ 
+
+.left-panel-raster-auto[
+
+```r
+*matrix(1:100, nrow = 10)
+```
+]
+ 
+.right-panel-raster-auto[
+
+```
+      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+ [1,]    1   11   21   31   41   51   61   71   81    91
+ [2,]    2   12   22   32   42   52   62   72   82    92
+ [3,]    3   13   23   33   43   53   63   73   83    93
+ [4,]    4   14   24   34   44   54   64   74   84    94
+ [5,]    5   15   25   35   45   55   65   75   85    95
+ [6,]    6   16   26   36   46   56   66   76   86    96
+ [7,]    7   17   27   37   47   57   67   77   87    97
+ [8,]    8   18   28   38   48   58   68   78   88    98
+ [9,]    9   19   29   39   49   59   69   79   89    99
+[10,]   10   20   30   40   50   60   70   80   90   100
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raster-auto[
+
+```r
+matrix(1:100, nrow = 10) %&gt;%  
+* raster()
+```
+]
+ 
+.right-panel-raster-auto[
+
+```
+class      : RasterLayer 
+dimensions : 10, 10, 100  (nrow, ncol, ncell)
+resolution : 0.1, 0.1  (x, y)
+extent     : 0, 1, 0, 1  (xmin, xmax, ymin, ymax)
+crs        : NA 
+source     : memory
+names      : layer 
+values     : 1, 100  (min, max)
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raster-auto[
+
+```r
+matrix(1:100, nrow = 10) %&gt;%  
+  raster() %&gt;%  
+* rasterVis::levelplot()
+```
+]
+ 
+.right-panel-raster-auto[
+&lt;img src="lecture-04_files/figure-html/raster_auto_3_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-raster-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-raster-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-raster-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+count: false
+ 
+
+.left-panel-raster3-auto[
+
+```r
+*array(1:300, dim = c(10,10,3))
+```
+]
+ 
+.right-panel-raster3-auto[
+
+```
+, , 1
+
+      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+ [1,]    1   11   21   31   41   51   61   71   81    91
+ [2,]    2   12   22   32   42   52   62   72   82    92
+ [3,]    3   13   23   33   43   53   63   73   83    93
+ [4,]    4   14   24   34   44   54   64   74   84    94
+ [5,]    5   15   25   35   45   55   65   75   85    95
+ [6,]    6   16   26   36   46   56   66   76   86    96
+ [7,]    7   17   27   37   47   57   67   77   87    97
+ [8,]    8   18   28   38   48   58   68   78   88    98
+ [9,]    9   19   29   39   49   59   69   79   89    99
+[10,]   10   20   30   40   50   60   70   80   90   100
+
+, , 2
+
+      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+ [1,]  101  111  121  131  141  151  161  171  181   191
+ [2,]  102  112  122  132  142  152  162  172  182   192
+ [3,]  103  113  123  133  143  153  163  173  183   193
+ [4,]  104  114  124  134  144  154  164  174  184   194
+ [5,]  105  115  125  135  145  155  165  175  185   195
+ [6,]  106  116  126  136  146  156  166  176  186   196
+ [7,]  107  117  127  137  147  157  167  177  187   197
+ [8,]  108  118  128  138  148  158  168  178  188   198
+ [9,]  109  119  129  139  149  159  169  179  189   199
+[10,]  110  120  130  140  150  160  170  180  190   200
+
+, , 3
+
+      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+ [1,]  201  211  221  231  241  251  261  271  281   291
+ [2,]  202  212  222  232  242  252  262  272  282   292
+ [3,]  203  213  223  233  243  253  263  273  283   293
+ [4,]  204  214  224  234  244  254  264  274  284   294
+ [5,]  205  215  225  235  245  255  265  275  285   295
+ [6,]  206  216  226  236  246  256  266  276  286   296
+ [7,]  207  217  227  237  247  257  267  277  287   297
+ [8,]  208  218  228  238  248  258  268  278  288   298
+ [9,]  209  219  229  239  249  259  269  279  289   299
+[10,]  210  220  230  240  250  260  270  280  290   300
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raster3-auto[
+
+```r
+array(1:300, dim = c(10,10,3)) %&gt;%  
+* brick()
+```
+]
+ 
+.right-panel-raster3-auto[
+
+```
+class      : RasterBrick 
+dimensions : 10, 10, 100, 3  (nrow, ncol, ncell, nlayers)
+resolution : 0.1, 0.1  (x, y)
+extent     : 0, 1, 0, 1  (xmin, xmax, ymin, ymax)
+crs        : NA 
+source     : memory
+names      : layer.1, layer.2, layer.3 
+min values :       1,     101,     201 
+max values :     100,     200,     300 
+```
+]
+
+---
+count: false
+ 
+
+.left-panel-raster3-auto[
+
+```r
+array(1:300, dim = c(10,10,3)) %&gt;%  
+  brick() %&gt;%  
+* rasterVis::levelplot()
+```
+]
+ 
+.right-panel-raster3-auto[
+&lt;img src="lecture-04_files/figure-html/raster3_auto_3_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-raster3-auto {
+  color: #777;
+  width: 38.6138613861386%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-raster3-auto {
+  width: 59.4059405940594%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-raster3-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+class: center, middle
+### [Assignment](https://github.com/mikejohnson51/exercise-04)
+
+---
+ 
+&lt;style type="text/css"&gt;
+.remark-code{font-size: 100%}
+&lt;/style&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
