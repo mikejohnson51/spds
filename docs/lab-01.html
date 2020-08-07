@@ -423,11 +423,11 @@ img.outline {
 <p>Last, make a new directory called <code>img</code></p>
 <p>Your resulting project should match this structure:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;first-webpage&quot;</span>)</span></code></pre></div>
-<pre><code>first-webpage
-├── _site.yml
-├── geog176A.rmd
-├── img
-└── index.rmd</code></pre>
+<pre><code>## first-webpage
+## ├── _site.yml
+## ├── geog176A.rmd
+## ├── img
+## └── index.rmd</code></pre>
 <p>Now open all of these files in RStudio.</p>
 </div>
 <div id="filling-in-our-information" class="section level2">
@@ -537,8 +537,9 @@ img.outline {
 <p>You can also check which themes are valid for the html_document engine:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">## Note the 3 :::</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a>rmarkdown<span class="op">:::</span><span class="kw">themes</span>()</span></code></pre></div>
-<pre><code> [1] &quot;default&quot;   &quot;cerulean&quot;  &quot;journal&quot;   &quot;flatly&quot;    &quot;darkly&quot;    &quot;readable&quot;  &quot;spacelab&quot;  &quot;united&quot;    &quot;cosmo&quot;     &quot;lumen&quot;    
-[11] &quot;paper&quot;     &quot;sandstone&quot; &quot;simplex&quot;   &quot;yeti&quot;     </code></pre>
+<pre><code>##  [1] &quot;default&quot;   &quot;cerulean&quot;  &quot;journal&quot;   &quot;flatly&quot;    &quot;darkly&quot;   
+##  [6] &quot;readable&quot;  &quot;spacelab&quot;  &quot;united&quot;    &quot;cosmo&quot;     &quot;lumen&quot;    
+## [11] &quot;paper&quot;     &quot;sandstone&quot; &quot;simplex&quot;   &quot;yeti&quot;</code></pre>
 <p>To control the output styles of an HTML document in R Markdown, we must specify the output format (<code>html_document</code>) in the YAML metadata. Only by doing this can we specify the theme we want to use. For an example, see our modified <code>_site.yml</code> below, again remembering that tabbing is sensitive:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>name<span class="op">:</span><span class="st"> &quot;first-website&quot;</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>output_dir<span class="op">:</span><span class="st"> &quot;.&quot;</span></span>
@@ -571,7 +572,7 @@ img.outline {
 <span id="cb10-6"><a href="#cb10-6"></a><span class="st">    </span><span class="op">-</span><span class="st"> </span>icon<span class="op">:</span><span class="st"> </span>fa<span class="op">-</span>github</span>
 <span id="cb10-7"><a href="#cb10-7"></a>      href<span class="op">:</span><span class="st"> </span>https<span class="op">:</span><span class="er">//</span>github.com<span class="op">/</span>mikejohnson51<span class="op">/</span>geog176A</span></code></pre></div>
 <p>The result of this would be something similar to:</p>
-<p>&lt;img class=“outline” src="lab-img/01-class-site.png&gt;</p>
+<p><img class="outline" src="lab-img/01-class-site.png"></p>
 <p>Currently, direct support for icons in rmarkdown is limited to FA-4 (see github issue <a href="https://github.com/rstudio/rmarkdown/issues/1554">here</a>). I will update this when/if it changes. Until then, valid FA-4 icon names can be found <a href="https://fontawesome.com/v4.7.0/icons/">here</a></p>
 </div>
 <div id="fa-as-html" class="section level4">
