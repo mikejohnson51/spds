@@ -1,0 +1,2966 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 176A</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/font-awesome-5.3.1/css/fontawesome-all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 176A
+## Lecture 08: Working with Tables Wrap Up
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+# Picking back up!
+
+We’ve covered many topics on how to manipulate and reshape a single data.frame:
+
+--
+
+**Last Week**: Data type and data structures
+
+--
+
+**Monday**: `data.frame` manipulation
+
+--
+
+**Tuesday**: `data.frame` visualization
+
+--
+
+**Wednesday**: Joining and pivoting `data.frames`
+
+---
+
+# Yesterdays Assignment
+
+**Question 1**: Make a _faceted_ plot of the cumulative cases &amp; deaths by USA region. Your _x_ axis should be the _date_ and the _y_ axis value/count. To do this you will need to join and pivot the COVID-19 data.
+
+.pull-left[
+## COVID data from NY-Times
+
+```r
+library(tidyverse)
+url = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv'
+covid = read_csv(url)
+head(covid)
+```
+
+```
+# A tibble: 6 x 6
+  date       county    state      fips  cases deaths
+  &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1 2020-01-21 Snohomish Washington 53061     1      0
+2 2020-01-22 Snohomish Washington 53061     1      0
+3 2020-01-23 Snohomish Washington 53061     1      0
+4 2020-01-24 Cook      Illinois   17031     1      0
+5 2020-01-24 Snohomish Washington 53061     1      0
+6 2020-01-25 Orange    California 06059     1      0
+```
+]
+
+.pull-right[
+## State/Region classifier
+
+```r
+region = data.frame(state = state.name, region = state.region)
+head(region)
+```
+
+```
+       state region
+1    Alabama  South
+2     Alaska   West
+3    Arizona   West
+4   Arkansas  South
+5 California   West
+6   Colorado   West
+```
+]
+
+---
+
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q11-auto[
+
+```r
+*inner_join(covid, region, by = "state")
+```
+]
+ 
+.right-panel-q11-auto[
+
+```
+# A tibble: 418,928 x 7
+   date       county      state      fips  cases deaths region       
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;        
+ 1 2020-01-21 Snohomish   Washington 53061     1      0 West         
+ 2 2020-01-22 Snohomish   Washington 53061     1      0 West         
+ 3 2020-01-23 Snohomish   Washington 53061     1      0 West         
+ 4 2020-01-24 Cook        Illinois   17031     1      0 North Central
+ 5 2020-01-24 Snohomish   Washington 53061     1      0 West         
+ 6 2020-01-25 Orange      California 06059     1      0 West         
+ 7 2020-01-25 Cook        Illinois   17031     1      0 North Central
+ 8 2020-01-25 Snohomish   Washington 53061     1      0 West         
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0 West         
+10 2020-01-26 Los Angeles California 06037     1      0 West         
+# … with 418,918 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q11-auto[
+
+```r
+inner_join(covid, region, by = "state") %&gt;%  
+* count(region)
+```
+]
+ 
+.right-panel-q11-auto[
+
+```
+# A tibble: 4 x 2
+  region             n
+  &lt;fct&gt;          &lt;int&gt;
+1 Northeast      32324
+2 South         194415
+3 North Central 135314
+4 West           56875
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q11-auto[
+
+```r
+inner_join(covid, region, by = "state") %&gt;%  
+  count(region) %&gt;%  
+* mutate(tot = sum(n))
+```
+]
+ 
+.right-panel-q11-auto[
+
+```
+# A tibble: 4 x 3
+  region             n    tot
+  &lt;fct&gt;          &lt;int&gt;  &lt;int&gt;
+1 Northeast      32324 418928
+2 South         194415 418928
+3 North Central 135314 418928
+4 West           56875 418928
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q11-auto[
+
+```r
+inner_join(covid, region, by = "state") %&gt;%  
+  count(region) %&gt;%  
+  mutate(tot = sum(n))  
+
+*full_join(covid, region, by = "state")
+```
+]
+ 
+.right-panel-q11-auto[
+
+```
+# A tibble: 4 x 3
+  region             n    tot
+  &lt;fct&gt;          &lt;int&gt;  &lt;int&gt;
+1 Northeast      32324 418928
+2 South         194415 418928
+3 North Central 135314 418928
+4 West           56875 418928
+```
+
+```
+# A tibble: 427,840 x 7
+   date       county      state      fips  cases deaths region       
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;        
+ 1 2020-01-21 Snohomish   Washington 53061     1      0 West         
+ 2 2020-01-22 Snohomish   Washington 53061     1      0 West         
+ 3 2020-01-23 Snohomish   Washington 53061     1      0 West         
+ 4 2020-01-24 Cook        Illinois   17031     1      0 North Central
+ 5 2020-01-24 Snohomish   Washington 53061     1      0 West         
+ 6 2020-01-25 Orange      California 06059     1      0 West         
+ 7 2020-01-25 Cook        Illinois   17031     1      0 North Central
+ 8 2020-01-25 Snohomish   Washington 53061     1      0 West         
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0 West         
+10 2020-01-26 Los Angeles California 06037     1      0 West         
+# … with 427,830 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q11-auto[
+
+```r
+inner_join(covid, region, by = "state") %&gt;%  
+  count(region) %&gt;%  
+  mutate(tot = sum(n))  
+
+full_join(covid, region, by = "state") %&gt;%  
+* count(region)
+```
+]
+ 
+.right-panel-q11-auto[
+
+```
+# A tibble: 4 x 3
+  region             n    tot
+  &lt;fct&gt;          &lt;int&gt;  &lt;int&gt;
+1 Northeast      32324 418928
+2 South         194415 418928
+3 North Central 135314 418928
+4 West           56875 418928
+```
+
+```
+# A tibble: 5 x 2
+  region             n
+  &lt;fct&gt;          &lt;int&gt;
+1 Northeast      32324
+2 South         194415
+3 North Central 135314
+4 West           56875
+5 &lt;NA&gt;            8912
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q11-auto[
+
+```r
+inner_join(covid, region, by = "state") %&gt;%  
+  count(region) %&gt;%  
+  mutate(tot = sum(n))  
+
+full_join(covid, region, by = "state") %&gt;%  
+  count(region) %&gt;%  
+* mutate(tot = sum(n))
+```
+]
+ 
+.right-panel-q11-auto[
+
+```
+# A tibble: 4 x 3
+  region             n    tot
+  &lt;fct&gt;          &lt;int&gt;  &lt;int&gt;
+1 Northeast      32324 418928
+2 South         194415 418928
+3 North Central 135314 418928
+4 West           56875 418928
+```
+
+```
+# A tibble: 5 x 3
+  region             n    tot
+  &lt;fct&gt;          &lt;int&gt;  &lt;int&gt;
+1 Northeast      32324 427840
+2 South         194415 427840
+3 North Central 135314 427840
+4 West           56875 427840
+5 &lt;NA&gt;            8912 427840
+```
+]
+
+&lt;style&gt;
+.left-panel-q11-auto {
+  color: #777;
+  width: 58.8235294117647%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-q11-auto {
+  width: 39.2156862745098%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-q11-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q12-auto[
+
+```r
+*left_join(covid, region, by = "state")
+```
+]
+ 
+.right-panel-q12-auto[
+
+```
+# A tibble: 427,840 x 7
+   date       county      state      fips  cases deaths region       
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;        
+ 1 2020-01-21 Snohomish   Washington 53061     1      0 West         
+ 2 2020-01-22 Snohomish   Washington 53061     1      0 West         
+ 3 2020-01-23 Snohomish   Washington 53061     1      0 West         
+ 4 2020-01-24 Cook        Illinois   17031     1      0 North Central
+ 5 2020-01-24 Snohomish   Washington 53061     1      0 West         
+ 6 2020-01-25 Orange      California 06059     1      0 West         
+ 7 2020-01-25 Cook        Illinois   17031     1      0 North Central
+ 8 2020-01-25 Snohomish   Washington 53061     1      0 West         
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0 West         
+10 2020-01-26 Los Angeles California 06037     1      0 West         
+# … with 427,830 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q12-auto[
+
+```r
+left_join(covid, region, by = "state") %&gt;%  
+* count(region)
+```
+]
+ 
+.right-panel-q12-auto[
+
+```
+# A tibble: 5 x 2
+  region             n
+  &lt;fct&gt;          &lt;int&gt;
+1 Northeast      32324
+2 South         194415
+3 North Central 135314
+4 West           56875
+5 &lt;NA&gt;            8912
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q12-auto[
+
+```r
+left_join(covid, region, by = "state") %&gt;%  
+  count(region) %&gt;%  
+* mutate(tot = sum(n))
+```
+]
+ 
+.right-panel-q12-auto[
+
+```
+# A tibble: 5 x 3
+  region             n    tot
+  &lt;fct&gt;          &lt;int&gt;  &lt;int&gt;
+1 Northeast      32324 427840
+2 South         194415 427840
+3 North Central 135314 427840
+4 West           56875 427840
+5 &lt;NA&gt;            8912 427840
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q12-auto[
+
+```r
+left_join(covid, region, by = "state") %&gt;%  
+  count(region) %&gt;%  
+  mutate(tot = sum(n))  
+
+*right_join(covid, region, by = "state")
+```
+]
+ 
+.right-panel-q12-auto[
+
+```
+# A tibble: 5 x 3
+  region             n    tot
+  &lt;fct&gt;          &lt;int&gt;  &lt;int&gt;
+1 Northeast      32324 427840
+2 South         194415 427840
+3 North Central 135314 427840
+4 West           56875 427840
+5 &lt;NA&gt;            8912 427840
+```
+
+```
+# A tibble: 418,928 x 7
+   date       county      state      fips  cases deaths region       
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;        
+ 1 2020-01-21 Snohomish   Washington 53061     1      0 West         
+ 2 2020-01-22 Snohomish   Washington 53061     1      0 West         
+ 3 2020-01-23 Snohomish   Washington 53061     1      0 West         
+ 4 2020-01-24 Cook        Illinois   17031     1      0 North Central
+ 5 2020-01-24 Snohomish   Washington 53061     1      0 West         
+ 6 2020-01-25 Orange      California 06059     1      0 West         
+ 7 2020-01-25 Cook        Illinois   17031     1      0 North Central
+ 8 2020-01-25 Snohomish   Washington 53061     1      0 West         
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0 West         
+10 2020-01-26 Los Angeles California 06037     1      0 West         
+# … with 418,918 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q12-auto[
+
+```r
+left_join(covid, region, by = "state") %&gt;%  
+  count(region) %&gt;%  
+  mutate(tot = sum(n))  
+
+right_join(covid, region, by = "state") %&gt;%  
+* count(region)
+```
+]
+ 
+.right-panel-q12-auto[
+
+```
+# A tibble: 5 x 3
+  region             n    tot
+  &lt;fct&gt;          &lt;int&gt;  &lt;int&gt;
+1 Northeast      32324 427840
+2 South         194415 427840
+3 North Central 135314 427840
+4 West           56875 427840
+5 &lt;NA&gt;            8912 427840
+```
+
+```
+# A tibble: 4 x 2
+  region             n
+  &lt;fct&gt;          &lt;int&gt;
+1 Northeast      32324
+2 South         194415
+3 North Central 135314
+4 West           56875
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.left-panel-q12-auto[
+
+```r
+left_join(covid, region, by = "state") %&gt;%  
+  count(region) %&gt;%  
+  mutate(tot = sum(n))  
+
+right_join(covid, region, by = "state") %&gt;%  
+  count(region) %&gt;%  
+* mutate(tot = sum(n))
+```
+]
+ 
+.right-panel-q12-auto[
+
+```
+# A tibble: 5 x 3
+  region             n    tot
+  &lt;fct&gt;          &lt;int&gt;  &lt;int&gt;
+1 Northeast      32324 427840
+2 South         194415 427840
+3 North Central 135314 427840
+4 West           56875 427840
+5 &lt;NA&gt;            8912 427840
+```
+
+```
+# A tibble: 4 x 3
+  region             n    tot
+  &lt;fct&gt;          &lt;int&gt;  &lt;int&gt;
+1 Northeast      32324 418928
+2 South         194415 418928
+3 North Central 135314 418928
+4 West           56875 418928
+```
+]
+
+&lt;style&gt;
+.left-panel-q12-auto {
+  color: #777;
+  width: 58.8235294117647%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-q12-auto {
+  width: 39.2156862745098%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-q12-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+# Whats causing the NAs? 
+
+- We know there are non-matching keys between COVID and region
+- We know that the "extras" are in the covid data.frame (NAs produced in `left_join(covid, region)`)
+
+
+```r
+covid %&gt;% 
+  filter(!state %in% state.name) %&gt;% 
+  filter(date == max(date)) %&gt;% 
+  count(state)
+```
+
+```
+# A tibble: 5 x 2
+  state                        n
+  &lt;chr&gt;                    &lt;int&gt;
+1 District of Columbia         1
+2 Guam                         1
+3 Northern Mariana Islands     2
+4 Puerto Rico                 79
+5 Virgin Islands               3
+```
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.left-panel-q13-auto[
+
+```r
+*covid
+```
+]
+ 
+.right-panel-q13-auto[
+
+```
+# A tibble: 427,840 x 6
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish   Washington 53061     1      0
+ 2 2020-01-22 Snohomish   Washington 53061     1      0
+ 3 2020-01-23 Snohomish   Washington 53061     1      0
+ 4 2020-01-24 Cook        Illinois   17031     1      0
+ 5 2020-01-24 Snohomish   Washington 53061     1      0
+ 6 2020-01-25 Orange      California 06059     1      0
+ 7 2020-01-25 Cook        Illinois   17031     1      0
+ 8 2020-01-25 Snohomish   Washington 53061     1      0
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0
+10 2020-01-26 Los Angeles California 06037     1      0
+# … with 427,830 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.left-panel-q13-auto[
+
+```r
+covid %&gt;%  
+* right_join(region, by = "state")
+```
+]
+ 
+.right-panel-q13-auto[
+
+```
+# A tibble: 418,928 x 7
+   date       county      state      fips  cases deaths region       
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;        
+ 1 2020-01-21 Snohomish   Washington 53061     1      0 West         
+ 2 2020-01-22 Snohomish   Washington 53061     1      0 West         
+ 3 2020-01-23 Snohomish   Washington 53061     1      0 West         
+ 4 2020-01-24 Cook        Illinois   17031     1      0 North Central
+ 5 2020-01-24 Snohomish   Washington 53061     1      0 West         
+ 6 2020-01-25 Orange      California 06059     1      0 West         
+ 7 2020-01-25 Cook        Illinois   17031     1      0 North Central
+ 8 2020-01-25 Snohomish   Washington 53061     1      0 West         
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0 West         
+10 2020-01-26 Los Angeles California 06037     1      0 West         
+# … with 418,918 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.left-panel-q13-auto[
+
+```r
+covid %&gt;%  
+  right_join(region, by = "state") %&gt;%  
+* group_by(region, date)
+```
+]
+ 
+.right-panel-q13-auto[
+
+```
+# A tibble: 418,928 x 7
+# Groups:   region, date [784]
+   date       county      state      fips  cases deaths region       
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;        
+ 1 2020-01-21 Snohomish   Washington 53061     1      0 West         
+ 2 2020-01-22 Snohomish   Washington 53061     1      0 West         
+ 3 2020-01-23 Snohomish   Washington 53061     1      0 West         
+ 4 2020-01-24 Cook        Illinois   17031     1      0 North Central
+ 5 2020-01-24 Snohomish   Washington 53061     1      0 West         
+ 6 2020-01-25 Orange      California 06059     1      0 West         
+ 7 2020-01-25 Cook        Illinois   17031     1      0 North Central
+ 8 2020-01-25 Snohomish   Washington 53061     1      0 West         
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0 West         
+10 2020-01-26 Los Angeles California 06037     1      0 West         
+# … with 418,918 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.left-panel-q13-auto[
+
+```r
+covid %&gt;%  
+  right_join(region, by = "state") %&gt;%  
+  group_by(region, date) %&gt;%  
+* summarize(cases  = sum(cases),
+*           deaths = sum(deaths))
+```
+]
+ 
+.right-panel-q13-auto[
+
+```
+# A tibble: 784 x 4
+# Groups:   region [4]
+   region    date       cases deaths
+   &lt;fct&gt;     &lt;date&gt;     &lt;dbl&gt;  &lt;dbl&gt;
+ 1 Northeast 2020-02-01     1      0
+ 2 Northeast 2020-02-02     1      0
+ 3 Northeast 2020-02-03     1      0
+ 4 Northeast 2020-02-04     1      0
+ 5 Northeast 2020-02-05     1      0
+ 6 Northeast 2020-02-06     1      0
+ 7 Northeast 2020-02-07     1      0
+ 8 Northeast 2020-02-08     1      0
+ 9 Northeast 2020-02-09     1      0
+10 Northeast 2020-02-10     1      0
+# … with 774 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.left-panel-q13-auto[
+
+```r
+covid %&gt;%  
+  right_join(region, by = "state") %&gt;%  
+  group_by(region, date) %&gt;%  
+  summarize(cases  = sum(cases),  
+            deaths = sum(deaths)) %&gt;%  
+* pivot_longer(cols = c('cases', 'deaths'))
+```
+]
+ 
+.right-panel-q13-auto[
+
+```
+# A tibble: 1,568 x 4
+# Groups:   region [4]
+   region    date       name   value
+   &lt;fct&gt;     &lt;date&gt;     &lt;chr&gt;  &lt;dbl&gt;
+ 1 Northeast 2020-02-01 cases      1
+ 2 Northeast 2020-02-01 deaths     0
+ 3 Northeast 2020-02-02 cases      1
+ 4 Northeast 2020-02-02 deaths     0
+ 5 Northeast 2020-02-03 cases      1
+ 6 Northeast 2020-02-03 deaths     0
+ 7 Northeast 2020-02-04 cases      1
+ 8 Northeast 2020-02-04 deaths     0
+ 9 Northeast 2020-02-05 cases      1
+10 Northeast 2020-02-05 deaths     0
+# … with 1,558 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.left-panel-q13-auto[
+
+```r
+covid %&gt;%  
+  right_join(region, by = "state") %&gt;%  
+  group_by(region, date) %&gt;%  
+  summarize(cases  = sum(cases),  
+            deaths = sum(deaths)) %&gt;%  
+  pivot_longer(cols = c('cases', 'deaths')) -&gt;  
+* covid_region
+```
+]
+ 
+.right-panel-q13-auto[
+
+]
+
+&lt;style&gt;
+.left-panel-q13-auto {
+  color: #777;
+  width: 58.8235294117647%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-q13-auto {
+  width: 39.2156862745098%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-q13-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.left-panel-q14-auto[
+
+```r
+*ggplot(covid_region, aes(x = date, y = value))
+```
+]
+ 
+.right-panel-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_1_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.left-panel-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +  
+* geom_line(aes(col = region))
+```
+]
+ 
+.right-panel-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_2_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.left-panel-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +  
+  geom_line(aes(col = region)) +  
+* facet_grid(name~region, scale = "free_y")
+```
+]
+ 
+.right-panel-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_3_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.left-panel-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +  
+  geom_line(aes(col = region)) +  
+  facet_grid(name~region, scale = "free_y") +  
+* theme_linedraw()
+```
+]
+ 
+.right-panel-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_4_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.left-panel-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +  
+  geom_line(aes(col = region)) +  
+  facet_grid(name~region, scale = "free_y") +  
+  theme_linedraw() +  
+* theme(legend.position = "bottom")
+```
+]
+ 
+.right-panel-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_5_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.left-panel-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +  
+  geom_line(aes(col = region)) +  
+  facet_grid(name~region, scale = "free_y") +  
+  theme_linedraw() +  
+  theme(legend.position = "bottom") +  
+* theme(legend.position = "NA")
+```
+]
+ 
+.right-panel-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_6_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.left-panel-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +  
+  geom_line(aes(col = region)) +  
+  facet_grid(name~region, scale = "free_y") +  
+  theme_linedraw() +  
+  theme(legend.position = "bottom") +  
+  theme(legend.position = "NA") +  
+* labs(title = "Cummulative Cases and Deaths: Region",
+*      y = "Daily Cumulative Count",
+*      x = "Date",
+*      caption = "Daily Exercise 07",
+*      subtitle = "COVID-19 Data: NY-Times" )
+```
+]
+ 
+.right-panel-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_7_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-q14-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-q14-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-q14-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+class: center, middle, inverse
+# Today: 
+Wrapping up our "working with tables" unit
+---
+
+# Re-cap: Data Types
+
+- **Values** have a type 
+
+--
+
+- Values can be **assigned** to **names**
+
+--
+
+- Assignment creates a permanent **object** (within the working session)
+
+--
+
+- **Objects** can be seen in the Environment tab
+
+--
+
+- names can be referenced in scripts, Rmds, and code
+
+--
+
+- Objects have a **type** and a **class**
+
+--
+
+
+```r
+x = 10
+class(x)
+```
+
+```
+[1] "numeric"
+```
+
+```r
+typeof(x)
+```
+
+```
+[1] "double"
+```
+
+
+---
+
+# S3 Atomic Vectors
+
+- One of the most important vector attributes is `class`, which underlies the S3 object system. 
+
+--
+
+- A class attribute turns an object into an S3 object, which means it will behave differently from a regular vector when passed to a generic function. 
+
+--
+
+- Every S3 object is built on top of a base type, and can store additional information in other `attributes`. 
+
+---
+
+# S3: Use cases
+
+1. Categorical data, where values come from a fixed set of levels recorded in factor vectors.
+
+--
+
+2. Dates (daily resolution), which are recorded in Date vectors.
+
+--
+
+3. Date-times (with second or sub-second resolution), which are stored in POSIXct vectors.
+
+&lt;center&gt;
+&lt;img src="lec-img/04-vec-list-02.png" width = "25%"&gt; &lt;img src="lec-img/08-s3-vectors.png", width ="25%"&gt; 
+&lt;/center&gt;
+
+---
+
+# Categorical
+
+- Much like a categorical raster (think landcover), `factors` store categorical values
+
+--
+
+- A factor vector can only contain only predefined values. 
+
+--
+
+- Factors are built on the `integer` data type with two attributes: 
+
+--
+
+  -  a `class` (factor) which makes it behave differently from integer vectors, 
+
+--
+
+  -  a `levels`, which defines the allowed values.
+
+---
+count: false
+ 
+#Factors
+.left-panel-fac-auto[
+
+```r
+*(x = factor(c("Jan", "Feb", "Mar", "Apr")))
+```
+]
+ 
+.right-panel-fac-auto[
+
+```
+[1] Jan Feb Mar Apr
+Levels: Apr Feb Jan Mar
+```
+]
+
+---
+count: false
+ 
+#Factors
+.left-panel-fac-auto[
+
+```r
+(x = factor(c("Jan", "Feb", "Mar", "Apr")))  
+*class(x)
+```
+]
+ 
+.right-panel-fac-auto[
+
+```
+[1] Jan Feb Mar Apr
+Levels: Apr Feb Jan Mar
+```
+
+```
+[1] "factor"
+```
+]
+
+---
+count: false
+ 
+#Factors
+.left-panel-fac-auto[
+
+```r
+(x = factor(c("Jan", "Feb", "Mar", "Apr")))  
+class(x)  
+*typeof(x)
+```
+]
+ 
+.right-panel-fac-auto[
+
+```
+[1] Jan Feb Mar Apr
+Levels: Apr Feb Jan Mar
+```
+
+```
+[1] "factor"
+```
+
+```
+[1] "integer"
+```
+]
+
+---
+count: false
+ 
+#Factors
+.left-panel-fac-auto[
+
+```r
+(x = factor(c("Jan", "Feb", "Mar", "Apr")))  
+class(x)  
+typeof(x)  
+*attributes(x)
+```
+]
+ 
+.right-panel-fac-auto[
+
+```
+[1] Jan Feb Mar Apr
+Levels: Apr Feb Jan Mar
+```
+
+```
+[1] "factor"
+```
+
+```
+[1] "integer"
+```
+
+```
+$levels
+[1] "Apr" "Feb" "Jan" "Mar"
+
+$class
+[1] "factor"
+```
+]
+
+---
+count: false
+ 
+#Factors
+.left-panel-fac-auto[
+
+```r
+(x = factor(c("Jan", "Feb", "Mar", "Apr")))  
+class(x)  
+typeof(x)  
+attributes(x)  
+*unclass(x)
+```
+]
+ 
+.right-panel-fac-auto[
+
+```
+[1] Jan Feb Mar Apr
+Levels: Apr Feb Jan Mar
+```
+
+```
+[1] "factor"
+```
+
+```
+[1] "integer"
+```
+
+```
+$levels
+[1] "Apr" "Feb" "Jan" "Mar"
+
+$class
+[1] "factor"
+```
+
+```
+[1] 3 2 4 1
+attr(,"levels")
+[1] "Apr" "Feb" "Jan" "Mar"
+```
+]
+
+&lt;style&gt;
+.left-panel-fac-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-fac-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-fac-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# Factors in the "wild"
+
+
+```r
+head(gapminder,1)
+```
+
+```
+# A tibble: 1 x 6
+  country     continent  year lifeExp     pop gdpPercap
+  &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
+1 Afghanistan Asia       1952    28.8 8425333      779.
+```
+
+```r
+head(covid_region,1)
+```
+
+```
+# A tibble: 1 x 4
+# Groups:   region [1]
+  region    date       name  value
+  &lt;fct&gt;     &lt;date&gt;     &lt;chr&gt; &lt;dbl&gt;
+1 Northeast 2020-02-01 cases     1
+```
+
+```r
+levels(covid_region$region)
+```
+
+```
+[1] "Northeast"     "South"         "North Central" "West"         
+```
+
+```r
+nlevels(covid_region$region)
+```
+
+```
+[1] 4
+```
+---
+
+# So what?
+
+--
+
+- Factors are stored as an integer vector with a corresponding set of character values to use when the factor is displayed.
+
+--
+
+- The ordering of factor drives some of our graphics and other functions that rely on order 
+
+--
+
+
+--
+
+
+```r
+levels(covid_region$region)
+```
+
+```
+[1] "Northeast"     "South"         "North Central" "West"         
+```
+--
+
+&lt;img src="lecture-08_files/figure-html/unnamed-chunk-9-1.png" width="432" /&gt;
+---
+
+# Levels
+
+
+```r
+## default order is alphabetical
+covid_region$region %&gt;%
+  levels()
+```
+
+```
+[1] "Northeast"     "South"         "North Central" "West"         
+```
+
+--
+
+
+```r
+## order by frequency
+covid_region$region %&gt;% 
+  fct_infreq() %&gt;%
+  levels()
+```
+
+```
+[1] "West"          "North Central" "Northeast"     "South"        
+```
+
+---
+
+# Levels
+
+
+```r
+## backwards!
+covid_region$region %&gt;% 
+  fct_rev() %&gt;%
+  levels()
+```
+
+```
+[1] "West"          "North Central" "South"         "Northeast"    
+```
+
+---
+
+# Some toy data
+
+- total cases for three states
+
+
+```r
+(today = covid %&gt;% 
+  filter(date == max(date), state %in% c("California", "Hawaii", "Nevada")) %&gt;% 
+  group_by(state) %&gt;% 
+  summarize(totCases = sum(cases)) %&gt;% 
+  mutate(state = as.factor(state)))
+```
+
+```
+# A tibble: 3 x 2
+  state      totCases
+  &lt;fct&gt;         &lt;dbl&gt;
+1 California   595097
+2 Hawaii         3935
+3 Nevada        58132
+```
+
+---
+
+# Factor Manipulation
+
+
+```r
+# Reorder based on characteristic
+fct_reorder(today$state, today$totCases) %&gt;%  levels()
+```
+
+```
+[1] "Hawaii"     "Nevada"     "California"
+```
+
+--
+
+```r
+fct_reorder(today$state, -today$totCases) %&gt;% levels()
+```
+
+```
+[1] "California" "Nevada"     "Hawaii"    
+```
+
+--
+
+```r
+# Reorder based on preference
+fct_relevel(today$state,"Nevada") %&gt;% levels()
+```
+
+```
+[1] "Nevada"     "California" "Hawaii"    
+```
+
+--
+
+```r
+fct_recode(today$state, "NV" = "Nevada", "CA" = "California") %&gt;% levels()
+```
+
+```
+[1] "CA"     "Hawaii" "NV"    
+```
+
+---
+# Recode
+
+```r
+covid_region %&gt;% 
+  mutate(region = fct_recode(region, "SOUTH" = "South")) %&gt;% 
+  ggplot(aes(x = date, y = value)) +
+  geom_line(aes(col = region)) +
+  facet_grid(name~region, scale = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "NA") 
+```
+
+&lt;img src="lecture-08_files/figure-html/unnamed-chunk-18-1.png" width="432" /&gt;
+
+---
+# Reoder By Choice
+
+```r
+covid_region %&gt;% 
+  mutate(region = fct_relevel(region, c("South"))) %&gt;% 
+  ggplot(aes(x = date, y = value)) +
+  geom_line(aes(col = region)) +
+  facet_grid(name~region, scale = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "NA") 
+```
+
+&lt;img src="lecture-08_files/figure-html/unnamed-chunk-19-1.png" width="432" /&gt;
+---
+# Reorder By Frequency of Occurance
+
+```r
+covid_region %&gt;% 
+  mutate(region = fct_infreq(region)) %&gt;% 
+  ggplot(aes(x = date, y = value)) +
+  geom_line(aes(col = region)) +
+  facet_grid(name~region, scale = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "NA")
+```
+
+&lt;img src="lecture-08_files/figure-html/unnamed-chunk-20-1.png" width="432" /&gt;
+
+---
+
+# Dates
+
+- Date vectors are built on double (numeric) vectors.
+
+--
+
+- They have class “Date” and no other attributes
+
+--
+
+- This is why operations like `min`, `max`, `&gt;`, `-` work
+
+--
+
+
+```r
+x = "2020-08-04"; y = as.Date(x)
+class(x)
+```
+
+```
+[1] "character"
+```
+
+```r
+y = as.Date(x)
+class(y)
+```
+
+```
+[1] "Date"
+```
+
+```r
+typeof(y)
+```
+
+```
+[1] "double"
+```
+
+```r
+attributes(y)
+```
+
+```
+$class
+[1] "Date"
+```
+
+```r
+unclass(y)
+```
+
+```
+[1] 18478
+```
+---
+
+# Dates
+
+The numeric value represents the `number of days` since 1970-01-01
+1970-01-01 is the Unix Epoch.
+
+
+```r
+x = as.Date("1970-01-02")
+unclass(x)
+```
+
+```
+[1] 1
+```
+
+```r
+x = as.Date("1969-12-31")
+unclass(x)
+```
+
+```
+[1] -1
+```
+
+---
+
+# Beyond Day-Dates
+
+- R provides two ways of storing date-time information, POSIXct, and POSIXlt. 
+  - “POSIX” = Portable Operating System Interface
+  - “ct”  = calendar time 
+  - “lt”  = local time. Here we’ll focus on 
+- `POSIXct` is most appropriate for use in data frames. 
+- `POSIXct` vectors are built on top of double/numeirc, 
+- The numeric value represents the number of _seconds_ since the Unix Epoch (1970-01-01).
+
+
+```r
+(x =  as.POSIXct("2020-08-02 22:00", tz = 'UTC'))
+```
+
+```
+[1] "2020-08-02 22:00:00 UTC"
+```
+
+```r
+unclass(x)
+```
+
+```
+[1] 1596405600
+attr(,"tzone")
+[1] "UTC"
+```
+
+
+```r
+structure(x, tzone = "America/Chicago")
+```
+
+```
+[1] "2020-08-02 17:00:00 CDT"
+```
+
+```r
+structure(x, tzone = "America/New_York")
+```
+
+```
+[1] "2020-08-02 18:00:00 EDT"
+```
+
+```r
+structure(x, tzone = "America/Los_Angeles")
+```
+
+```
+[1] "2020-08-02 15:00:00 PDT"
+```
+
+---
+
+# The basics and beyond <i class="fas  fa-rocket "></i>
+
+- So far you have learned the basics of working with tables in R
+- But there is 
+
+- Multiple ways to do things
+- Finding help
+- Implementing exsiting solutions
+
+---
+
+# Multiple ways to solve a problem...
+
+**Question**: How many new cases each day has there been in Santa Barbara County?
+
+--
+
+**Task**: Separating cumulative values ... (today - yesterday...)
+
+--
+
+ - `?diff` (base R): Returns suitably lagged and iterated differences.
+
+--
+
+ - `?lag ` (dplyr): Find the "previous" (lag()) or "next" (lead()) values in a vector. 
+
+--
+
+
+```r
+(x = c(5, 15, 19,20,22))
+```
+
+```
+[1]  5 15 19 20 22
+```
+
+```r
+diff(x)
+```
+
+```
+[1] 10  4  1  2
+```
+
+```r
+lag(x)
+```
+
+```
+[1] NA  5 15 19 20
+```
+
+--
+
+- For `diff` the right answers but the wrong length
+- For `lag` the right lengths but the "wrong" answers
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+*covid
+```
+]
+ 
+.right-panel-lag-auto[
+
+```
+# A tibble: 427,840 x 6
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish   Washington 53061     1      0
+ 2 2020-01-22 Snohomish   Washington 53061     1      0
+ 3 2020-01-23 Snohomish   Washington 53061     1      0
+ 4 2020-01-24 Cook        Illinois   17031     1      0
+ 5 2020-01-24 Snohomish   Washington 53061     1      0
+ 6 2020-01-25 Orange      California 06059     1      0
+ 7 2020-01-25 Cook        Illinois   17031     1      0
+ 8 2020-01-25 Snohomish   Washington 53061     1      0
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0
+10 2020-01-26 Los Angeles California 06037     1      0
+# … with 427,830 more rows
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+* filter(county == "Santa Barbara")
+```
+]
+ 
+.right-panel-lag-auto[
+
+```
+# A tibble: 151 x 6
+   date       county        state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;         &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-03-15 Santa Barbara California 06083     1      0
+ 2 2020-03-16 Santa Barbara California 06083     1      0
+ 3 2020-03-17 Santa Barbara California 06083     2      0
+ 4 2020-03-18 Santa Barbara California 06083     2      0
+ 5 2020-03-19 Santa Barbara California 06083     8      0
+ 6 2020-03-20 Santa Barbara California 06083     9      0
+ 7 2020-03-21 Santa Barbara California 06083    17      0
+ 8 2020-03-22 Santa Barbara California 06083    18      0
+ 9 2020-03-23 Santa Barbara California 06083    18      0
+10 2020-03-24 Santa Barbara California 06083    24      0
+# … with 141 more rows
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+  filter(county == "Santa Barbara") %&gt;%  
+* mutate(newCases = cases - lag(cases))
+```
+]
+ 
+.right-panel-lag-auto[
+
+```
+# A tibble: 151 x 7
+   date       county        state      fips  cases deaths newCases
+   &lt;date&gt;     &lt;chr&gt;         &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
+ 1 2020-03-15 Santa Barbara California 06083     1      0       NA
+ 2 2020-03-16 Santa Barbara California 06083     1      0        0
+ 3 2020-03-17 Santa Barbara California 06083     2      0        1
+ 4 2020-03-18 Santa Barbara California 06083     2      0        0
+ 5 2020-03-19 Santa Barbara California 06083     8      0        6
+ 6 2020-03-20 Santa Barbara California 06083     9      0        1
+ 7 2020-03-21 Santa Barbara California 06083    17      0        8
+ 8 2020-03-22 Santa Barbara California 06083    18      0        1
+ 9 2020-03-23 Santa Barbara California 06083    18      0        0
+10 2020-03-24 Santa Barbara California 06083    24      0        6
+# … with 141 more rows
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+  filter(county == "Santa Barbara") %&gt;%  
+  mutate(newCases = cases - lag(cases)) %&gt;%  
+* mutate(newCases2 = c(NA, diff(cases)))
+```
+]
+ 
+.right-panel-lag-auto[
+
+```
+# A tibble: 151 x 8
+   date       county        state      fips  cases deaths newCases newCases2
+   &lt;date&gt;     &lt;chr&gt;         &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+ 1 2020-03-15 Santa Barbara California 06083     1      0       NA        NA
+ 2 2020-03-16 Santa Barbara California 06083     1      0        0         0
+ 3 2020-03-17 Santa Barbara California 06083     2      0        1         1
+ 4 2020-03-18 Santa Barbara California 06083     2      0        0         0
+ 5 2020-03-19 Santa Barbara California 06083     8      0        6         6
+ 6 2020-03-20 Santa Barbara California 06083     9      0        1         1
+ 7 2020-03-21 Santa Barbara California 06083    17      0        8         8
+ 8 2020-03-22 Santa Barbara California 06083    18      0        1         1
+ 9 2020-03-23 Santa Barbara California 06083    18      0        0         0
+10 2020-03-24 Santa Barbara California 06083    24      0        6         6
+# … with 141 more rows
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+  filter(county == "Santa Barbara") %&gt;%  
+  mutate(newCases = cases - lag(cases)) %&gt;%  
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%  
+* pivot_longer(cols = c('cases', 'newCases'))
+```
+]
+ 
+.right-panel-lag-auto[
+
+```
+# A tibble: 302 x 8
+   date       county        state      fips  deaths newCases2 name     value
+   &lt;date&gt;     &lt;chr&gt;         &lt;chr&gt;      &lt;chr&gt;  &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;
+ 1 2020-03-15 Santa Barbara California 06083      0        NA cases        1
+ 2 2020-03-15 Santa Barbara California 06083      0        NA newCases    NA
+ 3 2020-03-16 Santa Barbara California 06083      0         0 cases        1
+ 4 2020-03-16 Santa Barbara California 06083      0         0 newCases     0
+ 5 2020-03-17 Santa Barbara California 06083      0         1 cases        2
+ 6 2020-03-17 Santa Barbara California 06083      0         1 newCases     1
+ 7 2020-03-18 Santa Barbara California 06083      0         0 cases        2
+ 8 2020-03-18 Santa Barbara California 06083      0         0 newCases     0
+ 9 2020-03-19 Santa Barbara California 06083      0         6 cases        8
+10 2020-03-19 Santa Barbara California 06083      0         6 newCases     6
+# … with 292 more rows
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+  filter(county == "Santa Barbara") %&gt;%  
+  mutate(newCases = cases - lag(cases)) %&gt;%  
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%  
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%  
+* mutate(name = fct_recode(name,
+*                          "Cummulative Cases" = "cases",
+*                          "New Cases" = "newCases"))
+```
+]
+ 
+.right-panel-lag-auto[
+
+```
+# A tibble: 302 x 8
+   date       county       state     fips  deaths newCases2 name           value
+   &lt;date&gt;     &lt;chr&gt;        &lt;chr&gt;     &lt;chr&gt;  &lt;dbl&gt;     &lt;dbl&gt; &lt;fct&gt;          &lt;dbl&gt;
+ 1 2020-03-15 Santa Barba… Californ… 06083      0        NA Cummulative C…     1
+ 2 2020-03-15 Santa Barba… Californ… 06083      0        NA New Cases         NA
+ 3 2020-03-16 Santa Barba… Californ… 06083      0         0 Cummulative C…     1
+ 4 2020-03-16 Santa Barba… Californ… 06083      0         0 New Cases          0
+ 5 2020-03-17 Santa Barba… Californ… 06083      0         1 Cummulative C…     2
+ 6 2020-03-17 Santa Barba… Californ… 06083      0         1 New Cases          1
+ 7 2020-03-18 Santa Barba… Californ… 06083      0         0 Cummulative C…     2
+ 8 2020-03-18 Santa Barba… Californ… 06083      0         0 New Cases          0
+ 9 2020-03-19 Santa Barba… Californ… 06083      0         6 Cummulative C…     8
+10 2020-03-19 Santa Barba… Californ… 06083      0         6 New Cases          6
+# … with 292 more rows
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+  filter(county == "Santa Barbara") %&gt;%  
+  mutate(newCases = cases - lag(cases)) %&gt;%  
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%  
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%  
+  mutate(name = fct_recode(name,  
+                           "Cummulative Cases" = "cases",  
+                           "New Cases" = "newCases")) %&gt;%  
+* ggplot(aes(x = date, y = value))
+```
+]
+ 
+.right-panel-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_7_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+  filter(county == "Santa Barbara") %&gt;%  
+  mutate(newCases = cases - lag(cases)) %&gt;%  
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%  
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%  
+  mutate(name = fct_recode(name,  
+                           "Cummulative Cases" = "cases",  
+                           "New Cases" = "newCases")) %&gt;%  
+  ggplot(aes(x = date, y = value)) +  
+* geom_col(aes(color = name, fill = name))
+```
+]
+ 
+.right-panel-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_8_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+  filter(county == "Santa Barbara") %&gt;%  
+  mutate(newCases = cases - lag(cases)) %&gt;%  
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%  
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%  
+  mutate(name = fct_recode(name,  
+                           "Cummulative Cases" = "cases",  
+                           "New Cases" = "newCases")) %&gt;%  
+  ggplot(aes(x = date, y = value)) +  
+  geom_col(aes(color = name, fill = name)) +  
+* facet_wrap(~name)
+```
+]
+ 
+.right-panel-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_9_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+  filter(county == "Santa Barbara") %&gt;%  
+  mutate(newCases = cases - lag(cases)) %&gt;%  
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%  
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%  
+  mutate(name = fct_recode(name,  
+                           "Cummulative Cases" = "cases",  
+                           "New Cases" = "newCases")) %&gt;%  
+  ggplot(aes(x = date, y = value)) +  
+  geom_col(aes(color = name, fill = name)) +  
+  facet_wrap(~name) +  
+* facet_wrap(~name, scales = "free_y")
+```
+]
+ 
+.right-panel-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_10_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+  filter(county == "Santa Barbara") %&gt;%  
+  mutate(newCases = cases - lag(cases)) %&gt;%  
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%  
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%  
+  mutate(name = fct_recode(name,  
+                           "Cummulative Cases" = "cases",  
+                           "New Cases" = "newCases")) %&gt;%  
+  ggplot(aes(x = date, y = value)) +  
+  geom_col(aes(color = name, fill = name)) +  
+  facet_wrap(~name) +  
+  facet_wrap(~name, scales = "free_y") +  
+* theme_linedraw()
+```
+]
+ 
+.right-panel-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_11_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+  filter(county == "Santa Barbara") %&gt;%  
+  mutate(newCases = cases - lag(cases)) %&gt;%  
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%  
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%  
+  mutate(name = fct_recode(name,  
+                           "Cummulative Cases" = "cases",  
+                           "New Cases" = "newCases")) %&gt;%  
+  ggplot(aes(x = date, y = value)) +  
+  geom_col(aes(color = name, fill = name)) +  
+  facet_wrap(~name) +  
+  facet_wrap(~name, scales = "free_y") +  
+  theme_linedraw() +  
+* theme(legend.position = "none")
+```
+]
+ 
+.right-panel-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_12_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.left-panel-lag-auto[
+
+```r
+covid %&gt;%  
+  filter(county == "Santa Barbara") %&gt;%  
+  mutate(newCases = cases - lag(cases)) %&gt;%  
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%  
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%  
+  mutate(name = fct_recode(name,  
+                           "Cummulative Cases" = "cases",  
+                           "New Cases" = "newCases")) %&gt;%  
+  ggplot(aes(x = date, y = value)) +  
+  geom_col(aes(color = name, fill = name)) +  
+  facet_wrap(~name) +  
+  facet_wrap(~name, scales = "free_y") +  
+  theme_linedraw() +  
+  theme(legend.position = "none") +  
+* labs(title = "Santa Barbara Cases Cases")
+```
+]
+ 
+.right-panel-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_13_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-lag-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-lag-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-lag-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+# Real World Application
+
+- From a New York Times Article
+
+&lt;img src="lec-img/08-alabama-covid.png" width = "50%"&gt;
+
+---
+# Getting Help
+
+&lt;img src="lec-img/08-rollmean-google.png"&gt;
+
+---
+# Reading the docs ...
+
+
+```r
+install.packages("zoo")
+library(zoo)
+?rollmean
+```
+
+&lt;img src="lec-img/08-rollmean-doc.png" width = "50%"&gt;
+
+---
+# Testing ...:
+
+
+```r
+(x = c(1:20))
+```
+
+```
+ [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+```
+
+```r
+#k	integer width of the rolling window. Must be odd for rollmedian.
+rollmean(x, k =5)
+```
+
+```
+ [1]  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18
+```
+
+```r
+#fill: a three-component vector or list (recycled otherwise) providing filling values 
+#      at the left/within/to the right of the data range. 
+rollmean(x, k= 5, fill = NA)
+```
+
+```
+ [1] NA NA  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 NA NA
+```
+
+```r
+#align: character specifying whether the index of the result should be 
+#       left- or right-aligned or centered (default) compared to the rolling 
+#       window of observations.
+rollmean(x, k= 5, fill = NA, align = "right")
+```
+
+```
+ [1] NA NA NA NA  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18
+```
+
+
+---
+
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+*state.of.interest = "Alabama"
+```
+]
+ 
+.right-panel-al-auto[
+
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+*covid
+```
+]
+ 
+.right-panel-al-auto[
+
+```
+# A tibble: 427,840 x 6
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish   Washington 53061     1      0
+ 2 2020-01-22 Snohomish   Washington 53061     1      0
+ 3 2020-01-23 Snohomish   Washington 53061     1      0
+ 4 2020-01-24 Cook        Illinois   17031     1      0
+ 5 2020-01-24 Snohomish   Washington 53061     1      0
+ 6 2020-01-25 Orange      California 06059     1      0
+ 7 2020-01-25 Cook        Illinois   17031     1      0
+ 8 2020-01-25 Snohomish   Washington 53061     1      0
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0
+10 2020-01-26 Los Angeles California 06037     1      0
+# … with 427,830 more rows
+```
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+* filter(state == state.of.interest)
+```
+]
+ 
+.right-panel-al-auto[
+
+```
+# A tibble: 9,499 x 6
+   date       county     state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-03-13 Elmore     Alabama 01051     1      0
+ 2 2020-03-13 Jefferson  Alabama 01073     2      0
+ 3 2020-03-13 Limestone  Alabama 01083     1      0
+ 4 2020-03-13 Montgomery Alabama 01101     1      0
+ 5 2020-03-13 Tuscaloosa Alabama 01125     1      0
+ 6 2020-03-14 Baldwin    Alabama 01003     1      0
+ 7 2020-03-14 Elmore     Alabama 01051     1      0
+ 8 2020-03-14 Jefferson  Alabama 01073     6      0
+ 9 2020-03-14 Limestone  Alabama 01083     1      0
+10 2020-03-14 Montgomery Alabama 01101     1      0
+# … with 9,489 more rows
+```
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+  filter(state == state.of.interest) %&gt;%  
+* group_by(date)
+```
+]
+ 
+.right-panel-al-auto[
+
+```
+# A tibble: 9,499 x 6
+# Groups:   date [153]
+   date       county     state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-03-13 Elmore     Alabama 01051     1      0
+ 2 2020-03-13 Jefferson  Alabama 01073     2      0
+ 3 2020-03-13 Limestone  Alabama 01083     1      0
+ 4 2020-03-13 Montgomery Alabama 01101     1      0
+ 5 2020-03-13 Tuscaloosa Alabama 01125     1      0
+ 6 2020-03-14 Baldwin    Alabama 01003     1      0
+ 7 2020-03-14 Elmore     Alabama 01051     1      0
+ 8 2020-03-14 Jefferson  Alabama 01073     6      0
+ 9 2020-03-14 Limestone  Alabama 01083     1      0
+10 2020-03-14 Montgomery Alabama 01101     1      0
+# … with 9,489 more rows
+```
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+  filter(state == state.of.interest) %&gt;%  
+  group_by(date) %&gt;%  
+* summarise(cases = sum(cases))
+```
+]
+ 
+.right-panel-al-auto[
+
+```
+# A tibble: 153 x 2
+   date       cases
+   &lt;date&gt;     &lt;dbl&gt;
+ 1 2020-03-13     6
+ 2 2020-03-14    12
+ 3 2020-03-15    23
+ 4 2020-03-16    29
+ 5 2020-03-17    39
+ 6 2020-03-18    51
+ 7 2020-03-19    78
+ 8 2020-03-20   106
+ 9 2020-03-21   131
+10 2020-03-22   157
+# … with 143 more rows
+```
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+  filter(state == state.of.interest) %&gt;%  
+  group_by(date) %&gt;%  
+  summarise(cases = sum(cases)) %&gt;%  
+* mutate(newCases = cases - lag(cases),
+*        roll7 = rollmean(newCases, 7, fill = NA, align="right"))
+```
+]
+ 
+.right-panel-al-auto[
+
+```
+# A tibble: 153 x 4
+   date       cases newCases roll7
+   &lt;date&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;
+ 1 2020-03-13     6       NA  NA  
+ 2 2020-03-14    12        6  NA  
+ 3 2020-03-15    23       11  NA  
+ 4 2020-03-16    29        6  NA  
+ 5 2020-03-17    39       10  NA  
+ 6 2020-03-18    51       12  NA  
+ 7 2020-03-19    78       27  NA  
+ 8 2020-03-20   106       28  14.3
+ 9 2020-03-21   131       25  17  
+10 2020-03-22   157       26  19.1
+# … with 143 more rows
+```
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+  filter(state == state.of.interest) %&gt;%  
+  group_by(date) %&gt;%  
+  summarise(cases = sum(cases)) %&gt;%  
+  mutate(newCases = cases - lag(cases),  
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%  
+* ggplot(aes(x = date))
+```
+]
+ 
+.right-panel-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_7_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+  filter(state == state.of.interest) %&gt;%  
+  group_by(date) %&gt;%  
+  summarise(cases = sum(cases)) %&gt;%  
+  mutate(newCases = cases - lag(cases),  
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%  
+  ggplot(aes(x = date)) +  
+* geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5")
+```
+]
+ 
+.right-panel-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_8_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+  filter(state == state.of.interest) %&gt;%  
+  group_by(date) %&gt;%  
+  summarise(cases = sum(cases)) %&gt;%  
+  mutate(newCases = cases - lag(cases),  
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%  
+  ggplot(aes(x = date)) +  
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +  
+* geom_line(aes(y = roll7), col = "darkred", size = 1)
+```
+]
+ 
+.right-panel-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_9_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+  filter(state == state.of.interest) %&gt;%  
+  group_by(date) %&gt;%  
+  summarise(cases = sum(cases)) %&gt;%  
+  mutate(newCases = cases - lag(cases),  
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%  
+  ggplot(aes(x = date)) +  
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +  
+  geom_line(aes(y = roll7), col = "darkred", size = 1) +  
+* ggthemes::theme_wsj()
+```
+]
+ 
+.right-panel-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_10_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+  filter(state == state.of.interest) %&gt;%  
+  group_by(date) %&gt;%  
+  summarise(cases = sum(cases)) %&gt;%  
+  mutate(newCases = cases - lag(cases),  
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%  
+  ggplot(aes(x = date)) +  
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +  
+  geom_line(aes(y = roll7), col = "darkred", size = 1) +  
+  ggthemes::theme_wsj() +  
+* labs(title = paste("New Reported cases by day in", state.of.interest))
+```
+]
+ 
+.right-panel-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_11_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+  filter(state == state.of.interest) %&gt;%  
+  group_by(date) %&gt;%  
+  summarise(cases = sum(cases)) %&gt;%  
+  mutate(newCases = cases - lag(cases),  
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%  
+  ggplot(aes(x = date)) +  
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +  
+  geom_line(aes(y = roll7), col = "darkred", size = 1) +  
+  ggthemes::theme_wsj() +  
+  labs(title = paste("New Reported cases by day in", state.of.interest)) +  
+* theme(plot.background = element_rect(fill = "white"),
+*       panel.background = element_rect(fill = "white"),
+*       plot.title = element_text(size = 14, face = 'bold'))
+```
+]
+ 
+.right-panel-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_12_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+  filter(state == state.of.interest) %&gt;%  
+  group_by(date) %&gt;%  
+  summarise(cases = sum(cases)) %&gt;%  
+  mutate(newCases = cases - lag(cases),  
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%  
+  ggplot(aes(x = date)) +  
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +  
+  geom_line(aes(y = roll7), col = "darkred", size = 1) +  
+  ggthemes::theme_wsj() +  
+  labs(title = paste("New Reported cases by day in", state.of.interest)) +  
+  theme(plot.background = element_rect(fill = "white"),  
+        panel.background = element_rect(fill = "white"),  
+        plot.title = element_text(size = 14, face = 'bold')) +  
+* theme(aspect.ratio = .5)
+```
+]
+ 
+.right-panel-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_13_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.left-panel-al-auto[
+
+```r
+state.of.interest = "Alabama"  
+
+covid %&gt;%  
+  filter(state == state.of.interest) %&gt;%  
+  group_by(date) %&gt;%  
+  summarise(cases = sum(cases)) %&gt;%  
+  mutate(newCases = cases - lag(cases),  
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%  
+  ggplot(aes(x = date)) +  
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +  
+  geom_line(aes(y = roll7), col = "darkred", size = 1) +  
+  ggthemes::theme_wsj() +  
+  labs(title = paste("New Reported cases by day in", state.of.interest)) +  
+  theme(plot.background = element_rect(fill = "white"),  
+        panel.background = element_rect(fill = "white"),  
+        plot.title = element_text(size = 14, face = 'bold')) +  
+  theme(aspect.ratio = .5)  
+```
+]
+ 
+.right-panel-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_14_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.left-panel-al-auto {
+  color: #777;
+  width: 49.0196078431373%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-al-auto {
+  width: 49.0196078431373%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-al-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+class: middle, center, inverse
+# Nicely Rendering Tables in Reports:
+---
+
+# Some toy data (hint, hint)
+
+
+```r
+dat = covid %&gt;% 
+  filter(state == "California") %&gt;% 
+  group_by(county) %&gt;% 
+  mutate(newCases = cases - lag(cases)) %&gt;% 
+  ungroup() %&gt;% 
+  filter(date == max(date)) 
+
+(most_new_cases = dat %&gt;% 
+  slice_max(newCases, n = 5) %&gt;% 
+  select(county, newCases))
+```
+
+```
+# A tibble: 5 x 2
+  county         newCases
+  &lt;chr&gt;             &lt;dbl&gt;
+1 Los Angeles        2389
+2 San Bernardino     1100
+3 Riverside           861
+4 Stanislaus          737
+5 Alameda             435
+```
+
+---
+
+# knitr::kable
+
+- base table
+
+
+```r
+knitr::kable(most_new_cases)
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; county &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; newCases &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Los Angeles &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2389 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Bernardino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Riverside &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 861 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Stanislaus &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alameda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 435 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# knitr::kable
+
+- add a caption
+
+
+```r
+knitr::kable(most_new_cases, caption = "Most New Cases California Counties")
+```
+
+&lt;table&gt;
+&lt;caption&gt;Most New Cases California Counties&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; county &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; newCases &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Los Angeles &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2389 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Bernardino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Riverside &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 861 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Stanislaus &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alameda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 435 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# knitr::kable
+
+- Refine col.names
+
+
+```r
+knitr::kable(most_new_cases, 
+             caption = "Most New Cases California Counties",
+             col.names = c("County", "New Cases"))
+```
+
+&lt;table&gt;
+&lt;caption&gt;Most New Cases California Counties&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; County &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; New Cases &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Los Angeles &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2389 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Bernardino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Riverside &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 861 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Stanislaus &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alameda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 435 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# knitr::kable
+
+- Refine number formatting
+
+
+```r
+knitr::kable(most_new_cases, 
+             caption = "Most New Cases California Counties",
+             col.names = c("County", "New Cases"),
+             format.args = list(big.mark = ","))
+```
+
+&lt;table&gt;
+&lt;caption&gt;Most New Cases California Counties&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; County &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; New Cases &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Los Angeles &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2,389 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Bernardino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1,100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Riverside &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 861 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Stanislaus &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alameda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 435 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# kableExtra::kable (optional!)
+
+- Adding style with kableExtra
+
+
+```r
+#install.package("kableExtra")
+knitr::kable(most_new_cases, 
+             caption = "Most New Cases California Counties",
+             col.names = c("County", "New Cases"),
+             format.args = list(big.mark = ",")) %&gt;% 
+  kableExtra::kable_styling("striped", full_width = TRUE, font_size = 14)
+```
+
+&lt;img src="lec-img/08-kableExtra.png"&gt;
+
+---
+
+## Assignment
+
+In your `geog176A-daily-exercises/R` directory
+
+1. Create a new file called `day-08.R`
+2. Open that file and add your name, date, and the purpose of the script as comments (preceded by #)
+
+***
+
+**Question 1**: Plot the daily _new_ cases overlaid with a _7-day rolling mean_ for a **state** of your choice (cannot be Alabama)
+
+---
+
+class: middle, center
+# Submission:
+
+Push your work to Github
+
+Turn in your Rscript, image and image to the Gauchospace dropbox
+
+---
+class: middle, center, inverse
+# END
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
