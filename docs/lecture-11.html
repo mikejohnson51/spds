@@ -1,0 +1,2346 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 176A</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 176A
+## Lecture 11: Projections
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+# Picking up again ...
+
+Yesterday, we discussed the *simple feature* standard
+
+--
+
+ 1.  Geometries (type, dimension, and structure)
+ 
+--
+ 
+    - Empty, Valid, Simple
+    
+--
+
+ 2.  Encoding (WKT &amp; WKB)
+ 
+--
+
+ 3.  A set of operations
+ 
+--
+
+And the implementation of the **simple features** standard in R
+
+--
+  - _sfg_: a _single_ feature geometry
+
+--
+
+  - _sfc_: a _set_ of geometries (`sfg`) stored as a list
+
+--
+
+  - _sf_: a `sfc` list joined with a `data.frame` (attributes)
+
+--
+
+****
+
+This R implementation is ideal/special because it achieves the simple feature abstract goal of:
+
+&gt; "_A simple feature is defined by the OpenGIS Abstract specification to have both **spatial** and **non-spatial** attributes..._"  - [standard](http://www.opengeospatial.org/standards/sfa).
+
+--
+
+The shapefile/GIS traditional GIS view does not do this and seperates geometry (shp), from projection (prj), from data (dbf) and relates them through an shx file
+  
+---
+
+# Integration with `tidyverse`
+
+- We saw how the `dplyr` verbs still work on an `sf` object since `sf` extends the data.frame class
+
+--
+
+- How `geom_sf` support mapping ("spatial plotting") in `ggplot`
+
+--
+
+- How to read spatial data into R via GDAL drivers:
+  - spatial files (`read_sf`) 
+  - flat files via `st_as_sf`
+  
+--
+
+- Integration with a few `GEOS` geometry operations like:
+  - st_combine()
+  - st_union()
+
+---
+
+# Yesterday ...
+.pull-left[
+
+```r
+conus = USAboundaries::us_states() %&gt;%
+  filter(!state_name %in% c("Puerto Rico", 
+                            "Alaska", 
+                            "Hawaii"))
+
+length(st_geometry(conus))
+```
+
+```
+[1] 49
+```
+]
+
+.pull-right[
+&lt;img src="lecture-11_files/figure-html/unnamed-chunk-4-1.png" width="504" /&gt;
+]
+
+---
+
+# 1 feature: resoloved and combined:
+
+.pull-left[
+- st_cast / st_union work on `sfg`, `sfc`, and `sf` objects:
+
+
+```r
+us_c_ml = st_combine(conus) %&gt;%
+  st_cast("MULTILINESTRING")
+   
+us_u_ml = st_union(conus) %&gt;%
+  st_cast("MULTILINESTRING")
+```
+]
+
+.pull-right[
+
+&lt;img src="lecture-11_files/figure-html/unnamed-chunk-6-1.png" width="504" /&gt;
+]
+---
+
+# So what?
+
+Lets imagine we want to know the distance from Denver to the nearest state border:
+
+--
+
+To do this, we need to:
+
+--
+
+  1: define Denver as a geometry in a CRS
+
+--
+
+  2: determine the correct geometry types / representation
+
+--
+
+  3: calculate the distance between (1) and (2)
+
+--
+
+### 1. Make "Denver" in the CRS of our states
+
+
+```r
+denver = data.frame(y = 39.7392, x = -104.9903, name = "Denver")
+(denver_sf = st_as_sf(denver, coords = c("x", "y"), crs = 4326))
+```
+
+```
+Simple feature collection with 1 feature and 1 field
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -104.9903 ymin: 39.7392 xmax: -104.9903 ymax: 39.7392
+geographic CRS: WGS 84
+    name                  geometry
+1 Denver POINT (-104.9903 39.7392)
+```
+
+---
+
+count: false
+ 
+### 2. Determine the 3 closest states:
+.left-panel-q14-auto[
+
+```r
+*conus
+```
+]
+ 
+.right-panel-q14-auto[
+
+```
+Simple feature collection with 49 features and 12 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+geographic CRS: WGS 84
+First 10 features:
+   statefp  statens    affgeoid geoid stusps                 name lsad
+1       23 01779787 0400000US23    23     ME                Maine   00
+2       04 01779777 0400000US04    04     AZ              Arizona   00
+3       05 00068085 0400000US05    05     AR             Arkansas   00
+4       10 01779781 0400000US10    10     DE             Delaware   00
+5       13 01705317 0400000US13    13     GA              Georgia   00
+6       27 00662849 0400000US27    27     MN            Minnesota   00
+7       06 01779778 0400000US06    06     CA           California   00
+8       11 01702382 0400000US11    11     DC District of Columbia   00
+9       12 00294478 0400000US12    12     FL              Florida   00
+10      16 01779783 0400000US16    16     ID                Idaho   00
+          aland      awater           state_name state_abbr jurisdiction_type
+1   79885221885 11748755195                Maine         ME             state
+2  294198560125  1027346486              Arizona         AZ             state
+3  134771517596  2960191698             Arkansas         AR             state
+4    5047194742  1398720828             Delaware         DE             state
+5  149169848456  4741100880              Georgia         GA             state
+6  206232257655 18929176411            Minnesota         MN             state
+7  403501101370 20466718403           California         CA             state
+8     158364992    18633403 District of Columbia         DC          district
+9  138924199212 31386038155              Florida         FL             state
+10 214042908012  2398669593                Idaho         ID             state
+                         geometry
+1  MULTIPOLYGON (((-68.92401 4...
+2  MULTIPOLYGON (((-114.7997 3...
+3  MULTIPOLYGON (((-94.61792 3...
+4  MULTIPOLYGON (((-75.77379 3...
+5  MULTIPOLYGON (((-85.60516 3...
+6  MULTIPOLYGON (((-97.22904 4...
+7  MULTIPOLYGON (((-118.594 33...
+8  MULTIPOLYGON (((-77.11976 3...
+9  MULTIPOLYGON (((-81.81169 2...
+10 MULTIPOLYGON (((-117.243 44...
+```
+]
+
+---
+count: false
+ 
+### 2. Determine the 3 closest states:
+.left-panel-q14-auto[
+
+```r
+conus %&gt;%  
+* select(state_name)
+```
+]
+ 
+.right-panel-q14-auto[
+
+```
+Simple feature collection with 49 features and 1 field
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+geographic CRS: WGS 84
+First 10 features:
+             state_name                       geometry
+1                 Maine MULTIPOLYGON (((-68.92401 4...
+2               Arizona MULTIPOLYGON (((-114.7997 3...
+3              Arkansas MULTIPOLYGON (((-94.61792 3...
+4              Delaware MULTIPOLYGON (((-75.77379 3...
+5               Georgia MULTIPOLYGON (((-85.60516 3...
+6             Minnesota MULTIPOLYGON (((-97.22904 4...
+7            California MULTIPOLYGON (((-118.594 33...
+8  District of Columbia MULTIPOLYGON (((-77.11976 3...
+9               Florida MULTIPOLYGON (((-81.81169 2...
+10                Idaho MULTIPOLYGON (((-117.243 44...
+```
+]
+
+---
+count: false
+ 
+### 2. Determine the 3 closest states:
+.left-panel-q14-auto[
+
+```r
+conus %&gt;%  
+  select(state_name) %&gt;%  
+* mutate(dist = st_distance(., denver_sf))
+```
+]
+ 
+.right-panel-q14-auto[
+
+```
+Simple feature collection with 49 features and 2 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+geographic CRS: WGS 84
+First 10 features:
+             state_name                       geometry          dist
+1                 Maine MULTIPOLYGON (((-68.92401 4... 2831628.4 [m]
+2               Arizona MULTIPOLYGON (((-114.7997 3...  466902.0 [m]
+3              Arkansas MULTIPOLYGON (((-94.61792 3...  977301.5 [m]
+4              Delaware MULTIPOLYGON (((-75.77379 3... 2492187.8 [m]
+5               Georgia MULTIPOLYGON (((-85.60516 3... 1792330.1 [m]
+6             Minnesota MULTIPOLYGON (((-97.22904 4...  824442.3 [m]
+7            California MULTIPOLYGON (((-118.594 33... 1002132.0 [m]
+8  District of Columbia MULTIPOLYGON (((-77.11976 3... 2394802.2 [m]
+9               Florida MULTIPOLYGON (((-81.81169 2... 1849302.8 [m]
+10                Idaho MULTIPOLYGON (((-117.243 44...  568832.7 [m]
+```
+]
+
+---
+count: false
+ 
+### 2. Determine the 3 closest states:
+.left-panel-q14-auto[
+
+```r
+conus %&gt;%  
+  select(state_name) %&gt;%  
+  mutate(dist = st_distance(., denver_sf)) %&gt;%  
+* slice_min(dist, n = 3)
+```
+]
+ 
+.right-panel-q14-auto[
+
+```
+Simple feature collection with 3 features and 2 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -111.0569 ymin: 36.99243 xmax: -95.30829 ymax: 45.0059
+geographic CRS: WGS 84
+  state_name         dist                       geometry
+1   Colorado      0.0 [m] MULTIPOLYGON (((-109.06 38....
+2    Wyoming 139795.3 [m] MULTIPOLYGON (((-111.0569 4...
+3   Nebraska 161173.7 [m] MULTIPOLYGON (((-104.0531 4...
+```
+]
+
+---
+count: false
+ 
+### 2. Determine the 3 closest states:
+.left-panel-q14-auto[
+
+```r
+conus %&gt;%  
+  select(state_name) %&gt;%  
+  mutate(dist = st_distance(., denver_sf)) %&gt;%  
+  slice_min(dist, n = 3) -&gt;  
+* near3
+```
+]
+ 
+.right-panel-q14-auto[
+
+]
+
+&lt;style&gt;
+.left-panel-q14-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-q14-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-q14-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+
+```
+Simple feature collection with 3 features and 2 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -111.0569 ymin: 36.99243 xmax: -95.30829 ymax: 45.0059
+geographic CRS: WGS 84
+  state_name         dist                       geometry
+1   Colorado      0.0 [m] MULTIPOLYGON (((-109.06 38....
+2    Wyoming 139795.3 [m] MULTIPOLYGON (((-111.0569 4...
+3   Nebraska 161173.7 [m] MULTIPOLYGON (((-104.0531 4...
+```
+
+
+- That's close, but the distance to Colorado is 0, that's not a state border.
+
+---
+
+#  Geometry Selection
+
+- `Polygon` (therefore MULTIPOLGYGONS) describe areas! 
+
+--
+
+- The distance to a `point` **in** a `polygon` to that polygon is 0.
+
+---
+
+count: false
+ 
+To determine distance to border we need a linear represnetation:
+.left-panel-q15-auto[
+
+```r
+*conus
+```
+]
+ 
+.right-panel-q15-auto[
+
+```
+Simple feature collection with 49 features and 12 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+geographic CRS: WGS 84
+First 10 features:
+   statefp  statens    affgeoid geoid stusps                 name lsad
+1       23 01779787 0400000US23    23     ME                Maine   00
+2       04 01779777 0400000US04    04     AZ              Arizona   00
+3       05 00068085 0400000US05    05     AR             Arkansas   00
+4       10 01779781 0400000US10    10     DE             Delaware   00
+5       13 01705317 0400000US13    13     GA              Georgia   00
+6       27 00662849 0400000US27    27     MN            Minnesota   00
+7       06 01779778 0400000US06    06     CA           California   00
+8       11 01702382 0400000US11    11     DC District of Columbia   00
+9       12 00294478 0400000US12    12     FL              Florida   00
+10      16 01779783 0400000US16    16     ID                Idaho   00
+          aland      awater           state_name state_abbr jurisdiction_type
+1   79885221885 11748755195                Maine         ME             state
+2  294198560125  1027346486              Arizona         AZ             state
+3  134771517596  2960191698             Arkansas         AR             state
+4    5047194742  1398720828             Delaware         DE             state
+5  149169848456  4741100880              Georgia         GA             state
+6  206232257655 18929176411            Minnesota         MN             state
+7  403501101370 20466718403           California         CA             state
+8     158364992    18633403 District of Columbia         DC          district
+9  138924199212 31386038155              Florida         FL             state
+10 214042908012  2398669593                Idaho         ID             state
+                         geometry
+1  MULTIPOLYGON (((-68.92401 4...
+2  MULTIPOLYGON (((-114.7997 3...
+3  MULTIPOLYGON (((-94.61792 3...
+4  MULTIPOLYGON (((-75.77379 3...
+5  MULTIPOLYGON (((-85.60516 3...
+6  MULTIPOLYGON (((-97.22904 4...
+7  MULTIPOLYGON (((-118.594 33...
+8  MULTIPOLYGON (((-77.11976 3...
+9  MULTIPOLYGON (((-81.81169 2...
+10 MULTIPOLYGON (((-117.243 44...
+```
+]
+
+---
+count: false
+ 
+To determine distance to border we need a linear represnetation:
+.left-panel-q15-auto[
+
+```r
+conus %&gt;%  
+* select(state_name)
+```
+]
+ 
+.right-panel-q15-auto[
+
+```
+Simple feature collection with 49 features and 1 field
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+geographic CRS: WGS 84
+First 10 features:
+             state_name                       geometry
+1                 Maine MULTIPOLYGON (((-68.92401 4...
+2               Arizona MULTIPOLYGON (((-114.7997 3...
+3              Arkansas MULTIPOLYGON (((-94.61792 3...
+4              Delaware MULTIPOLYGON (((-75.77379 3...
+5               Georgia MULTIPOLYGON (((-85.60516 3...
+6             Minnesota MULTIPOLYGON (((-97.22904 4...
+7            California MULTIPOLYGON (((-118.594 33...
+8  District of Columbia MULTIPOLYGON (((-77.11976 3...
+9               Florida MULTIPOLYGON (((-81.81169 2...
+10                Idaho MULTIPOLYGON (((-117.243 44...
+```
+]
+
+---
+count: false
+ 
+To determine distance to border we need a linear represnetation:
+.left-panel-q15-auto[
+
+```r
+conus %&gt;%  
+  select(state_name) %&gt;%  
+* st_cast("MULTILINESTRING")
+```
+]
+ 
+.right-panel-q15-auto[
+
+```
+Simple feature collection with 49 features and 1 field
+geometry type:  MULTILINESTRING
+dimension:      XY
+bbox:           xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+geographic CRS: WGS 84
+First 10 features:
+             state_name                       geometry
+1                 Maine MULTILINESTRING ((-68.92401...
+2               Arizona MULTILINESTRING ((-114.7997...
+3              Arkansas MULTILINESTRING ((-94.61792...
+4              Delaware MULTILINESTRING ((-75.77379...
+5               Georgia MULTILINESTRING ((-85.60516...
+6             Minnesota MULTILINESTRING ((-97.22904...
+7            California MULTILINESTRING ((-118.594 ...
+8  District of Columbia MULTILINESTRING ((-77.11976...
+9               Florida MULTILINESTRING ((-81.81169...
+10                Idaho MULTILINESTRING ((-117.243 ...
+```
+]
+
+---
+count: false
+ 
+To determine distance to border we need a linear represnetation:
+.left-panel-q15-auto[
+
+```r
+conus %&gt;%  
+  select(state_name) %&gt;%  
+  st_cast("MULTILINESTRING") %&gt;%  
+* mutate(dist = st_distance(., denver_sf))
+```
+]
+ 
+.right-panel-q15-auto[
+
+```
+Simple feature collection with 49 features and 2 fields
+geometry type:  MULTILINESTRING
+dimension:      XY
+bbox:           xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+geographic CRS: WGS 84
+First 10 features:
+             state_name                       geometry          dist
+1                 Maine MULTILINESTRING ((-68.92401... 2831628.4 [m]
+2               Arizona MULTILINESTRING ((-114.7997...  466902.0 [m]
+3              Arkansas MULTILINESTRING ((-94.61792...  977301.5 [m]
+4              Delaware MULTILINESTRING ((-75.77379... 2492187.8 [m]
+5               Georgia MULTILINESTRING ((-85.60516... 1792330.1 [m]
+6             Minnesota MULTILINESTRING ((-97.22904...  824442.3 [m]
+7            California MULTILINESTRING ((-118.594 ... 1002132.0 [m]
+8  District of Columbia MULTILINESTRING ((-77.11976... 2394802.2 [m]
+9               Florida MULTILINESTRING ((-81.81169... 1849302.8 [m]
+10                Idaho MULTILINESTRING ((-117.243 ...  568832.7 [m]
+```
+]
+
+---
+count: false
+ 
+To determine distance to border we need a linear represnetation:
+.left-panel-q15-auto[
+
+```r
+conus %&gt;%  
+  select(state_name) %&gt;%  
+  st_cast("MULTILINESTRING") %&gt;%  
+  mutate(dist = st_distance(., denver_sf)) %&gt;%  
+* slice_min(dist, n = 3)
+```
+]
+ 
+.right-panel-q15-auto[
+
+```
+Simple feature collection with 3 features and 2 fields
+geometry type:  MULTILINESTRING
+dimension:      XY
+bbox:           xmin: -111.0569 ymin: 36.99243 xmax: -95.30829 ymax: 45.0059
+geographic CRS: WGS 84
+  state_name         dist                       geometry
+1   Colorado 139795.3 [m] MULTILINESTRING ((-109.06 3...
+2    Wyoming 139795.3 [m] MULTILINESTRING ((-111.0569...
+3   Nebraska 161173.7 [m] MULTILINESTRING ((-104.0531...
+```
+]
+
+---
+count: false
+ 
+To determine distance to border we need a linear represnetation:
+.left-panel-q15-auto[
+
+```r
+conus %&gt;%  
+  select(state_name) %&gt;%  
+  st_cast("MULTILINESTRING") %&gt;%  
+  mutate(dist = st_distance(., denver_sf)) %&gt;%  
+  slice_min(dist, n = 3) -&gt;  
+* near3
+```
+]
+ 
+.right-panel-q15-auto[
+
+]
+
+&lt;style&gt;
+.left-panel-q15-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-q15-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-q15-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+
+```
+Simple feature collection with 3 features and 2 fields
+geometry type:  MULTILINESTRING
+dimension:      XY
+bbox:           xmin: -111.0569 ymin: 36.99243 xmax: -95.30829 ymax: 45.0059
+geographic CRS: WGS 84
+  state_name         dist                       geometry
+1   Colorado 139795.3 [m] MULTILINESTRING ((-109.06 3...
+2    Wyoming 139795.3 [m] MULTILINESTRING ((-111.0569...
+3   Nebraska 161173.7 [m] MULTILINESTRING ((-104.0531...
+```
+
+
+- Good. However, we were only interested in the distance to the closest border not to ALL boarders. Therefore we calculated 48 (49 - 1) more distances then needed!
+
+--
+
+- While this is not to complex for 1 &lt;-&gt; 49 features imagine we had 28,000+ (like) your lab!
+
+--
+
+- That would result in 1,344,000 more calculations then needed ...
+
+---
+
+# Revisting the idea of the feature level:
+
+A "feature" can "be part of the whole" or the whole
+
+--
+
+  - A island (POLYGON), or a set of islands acting as 1 unit (MULTIPOLYGON)
+
+--
+
+  - A city (POINT), or a set of cities meeting a condition (MULTIPOINT)
+
+--
+
+  - A road (LINESTRING), or a route (MULTILINESTRING)
+  
+--
+****
+
+- Since we want the distance to the nearest border, _regardless_ of the state. Our **feature** is the _set of borders with preserved boundaries_.
+
+--
+
+- In other words, a 1 feature `MULTILINESTRING`
+
+--
+
+
+```r
+st_distance(denver_sf, st_cast(st_combine(conus), "MULTILINESTRING"))
+```
+
+```
+Units: [m]
+         [,1]
+[1,] 139795.3
+```
+
+
+--
+****
+
+The same principle would apply if the question was "_distance to national border_"
+
+---
+
+# The stickness of sfc column
+
+- A simple features object (sf) is the connection of a `sfc` list-column and `data.frame` of attributes
+
+&lt;img src="lec-img/11-sticky-geom.png" width="470" style="display: block; margin: auto;" /&gt;
+
+(https://mhweber.github.io/AWRA_2020_R_Spatial/vector-data-with-sf.html)
+
+--
+
+- This binding is unique compared to other column bindings built with things like
+    - `dplyr::bind_cols()`
+    - `cbind()`
+    - `do.call(cbind, list())`
+---
+
+# The stickness of `sfc` column
+
+- Geometry columns are "sticky" meaning they persist through data manipulation:
+
+
+```r
+USAboundaries::us_states() %&gt;% 
+  select(name) %&gt;% 
+  slice(1:2)
+```
+
+```
+Simple feature collection with 2 features and 1 field
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -160.2496 ymin: 18.91747 xmax: -66.9499 ymax: 47.45716
+geographic CRS: WGS 84
+    name                       geometry
+1  Maine MULTIPOLYGON (((-68.92401 4...
+2 Hawaii MULTIPOLYGON (((-156.0497 1...
+```
+
+---
+
+Dropping the geometry column requires dropping the geometry via `sf`:
+
+
+```r
+USAboundaries::us_states() %&gt;% 
+* st_drop_geometry() %&gt;%
+  select(name) %&gt;% 
+  slice(1:2)
+```
+
+```
+    name
+1  Maine
+2 Hawaii
+```
+
+--
+
+Or cohersing the `sf` object to a `data.frame`:
+
+
+```r
+USAboundaries::us_states() %&gt;% 
+* as.data.frame() %&gt;%
+  select(name) %&gt;% 
+  slice(1:2)
+```
+
+```
+    name
+1  Maine
+2 Hawaii
+```
+
+---
+
+# Coordinate Systems
+
+- What makes a feature geometry _spatial_ is the reference system...
+
+&lt;img src="lec-img/09-sf-model.png" width="75%" style="display: block; margin: auto;" /&gt;
+---
+
+# Coordinate Systems
+
+- Coordinate Reference Systems (CRS) defines how spatial features relate to the surface of the Earth. 
+
+--
+
+- CRSs are either geographic or projected...
+
+--
+
+- CRSs are measurement units for coordinates: 
+
+---
+
+# `sf` tools
+
+In `sf` we have _three_ tools for exploring, define, and changing CRS systems:
+
+--
+
+  -  *st_crs* : Retrieve coordinate reference system from sf or sfc object
+
+--
+
+  -  *st_set_crs* : Set or replace coordinate reference system from object
+
+--
+
+  -  *st_transform* : Transform or convert coordinates of simple feature
+
+--
+
+****
+
+- Again, "st" (like PistGIS) denotes it is an operation that can work on a " _s_ patial _t_ ype "  
+  
+---
+
+# Geographic Coordinate Systms (GCS)
+
+A GCS identifies locations on the _curved_ surface of the earth. 
+
+--
+
+Locations are measured in **angular** units from the center of the earth relative to the plane defined by the equator and the plane defined by the prime meridian. 
+
+--
+
+The vertical angle describes the _latitude_ and the horizontal angle the _longitude_
+
+--
+
+In most coordinate systems, the North-South and East-West directions are encoded as +/-.
+
+North and East are positive (`+`) and South and West are negative (`-`) sign.
+
+--
+
+A GCS is defined by 3 components:
+
+
+  - an **ellipsoid** 
+  
+  - a **geoid** 
+
+  - a **datum**
+  
+---
+
+## Sphere and Ellipsoid
+
+- Assuming that the earth is a perfect sphere simplifies calculations and works for small-scale maps (maps that show a *large* area of the earth). 
+
+--
+
+- But ... the earth is not a sphere do to its rotation inducing a centripetal force along the equator. 
+
+--
+
+- This results in an equatorial axis that is roughly 21 km longer than the polar axis.
+
+--
+
+- To account for this, the earth is  modeled as an ellipsoid (slighty squished sphere) defined by two radii: 
+
+  - the **semi-major** axis (along the equatorial radius) 
+  - the **semi-minor** axis (along the polar radius)
+  
+--
+
+&lt;img src="lec-img/11-semi-axis.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+- Thanks to satellite and computational capabilities our estimates of these radii are be quite precise 
+
+--
+
+  - The semi-major axis is 6,378,137 m
+  
+--
+
+  - The semi-minor axis is 6,356,752 m
+
+--
+
+- Differences in distance along the surfaces of an ellipsoid vs. a perfect sphere are small but measurable (the difference can be as high as 20 km)
+
+![](lec-img/11-sphere.svg)&lt;!-- --&gt;![](lec-img/11-ellipsoid.svg)&lt;!-- --&gt;
+
+---
+
+### Geoid
+
+- The _ellipsoid_ gives us the earths form as a perfectly smooth object
+
+--
+
+- But ... the earth is not perfectly smooth
+
+--
+
+- Deviations from the perfect sphere are measurable and can influence measurements. 
+
+--
+
+- A *geoid* is a mathematical model fore representing these deviations
+
+--
+
+  - We are _not_ talking about mountains and ocean trenches but the earth's gravitational potential which is tied to the flow of the earth's hot and fluid core.
+  
+--
+
+  - Therefore the geoid is constantly changing, albeit at a large temporal scale. 
+
+--
+
+
+- The measurement and representation of the earth's shape is at the heart of `geodesy`
+
+
+&lt;img src="lec-img/11-nasa-geoids.jpg" width="25%" style="display: block; margin: auto;" /&gt;
+---
+
+## Datum
+
+- So how are we to reconcile our need to work with a (simple) mathematical model of the earth's shape with the undulating nature of the geoid?
+
+--
+
+- We align the geoid with the ellipsoid to map the the earths departures from the smooth assumption
+
+--
+
+- The alignment can be **local** where the ellipsoid surface is closely fit to the geoid at a particular location on the earth's surface 
+
+or 
+
+- **geocentric** where the ellipsoid is aligned with the center of the earth. 
+
+--
+
+- The alignment of the smooth ellipsoid to the geoid model defines a **datum**. 
+
+---
+
+## Local Datums
+
+
+- There are many local datums to choose from
+
+--
+
+- The choice of datum is largely driven by the location
+
+--
+
+- When working in the USA, a the North American Datum of 1927 (or NAD27 for short) is standard
+  - NAD27 is not well suited for other parts of the world.
+
+--
+
+Examples of common local datums are shown in the following table:
+
+****
+
+Local datum	       | Acronym | Best for|	Comment
+-------------------|---------|--------|-------------------------------
+North American Datum of 1927 |	NAD27	| Continental US	| This is an old datum but still prevalent because of the wide use of older maps.
+European Datum of 1950	| ED50	| Western Europe |	Developed after World War II and still quite popular today. Not used in the UK.
+World Geodetic System 1972	| WGS72 |	Global |	Developed by the Department of Defense.
+
+****
+
+---
+
+# Geocentric Datum
+
+- Many modern datums use a geocentric alignment 
+
+--
+
+  - World Geodetic Survey for 1984 (WGS84) 
+
+--
+
+  - North American Datums of 1983 (NAD83) 
+
+--
+
+- Most popular geocentric datums use the WGS84 _ellipsoid_ or the GRS80 _ellipsoid_  which share nearly identical semi-major and semi-minor axes
+
+--
+
+***
+
+Geocentric datum	       | Acronym | Best for|	Comment
+-------------------|---------|--------|-------------------------------
+North American Datum of 1983 |	NAD83	 | Continental US	| This is one of the most popular modern datums for the contiguous US.
+European Terrestrial Reference System 1989 | ETRS89 |	Western Europe | This is the most popular modern datum for much of Europe.
+World Geodetic System 1984 | WGS84 | Global | Developed by the Department of Defense.
+
+***
+
+**Note**: NAD 27 is based on Clarke Ellipsoid of 1866 which is calculated by manual surveying. NAD83 is based on the Geodetic Reference System (GRS) of 1980. 
+
+---
+
+### Building a GCS
+
+- So, a GCS is defined by the ellipsoid model and its alignment to the geoid defining the datum. 
+
+--
+
+- Smooth Sphere - Mathmatical Geoid (in angular units)
+
+---
+
+## Projected Coordinate Systems
+
+- The surface of the earth is curved but maps (and to data GIS) is flat. 
+
+--
+
+- A projected coordinate system (PCS) is a reference system for identifying locations and measuring features on a flat (2D) surfaces. I
+
+--
+
+- Projected coordinate systems have an origin, an *x* axis, a *y* axis, and a linear unit of measure. 
+
+--
+
+- Going from a GCS to a PCS requires mathematical transformations. 
+
+--
+
+There are three main groups of projection types:
+  - conic
+  - cylindrical
+  - planar
+  
+---
+# Projection Types:
+
+&lt;img src="lec-img/11-projected-crs.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+- In all cases, distortion is _minimized_ at the line/point of **tangency** (denoted by black line/point)
+
+- Distortions are _minimized_ along the tangency lines and increase with the distance from those lines. 
+
+---
+# Plannar
+
+- A planar projection projects data onto a flat surface touching the globe at a _point_ or along 1 line of _tangency._ 
+
+- Typically used to map polar regions.
+
+&lt;img src="lec-img/11-projected-crs.png" width="50%" style="display: block; margin: auto;" /&gt;
+---
+
+# Cylindircal 
+
+- A cylindrical projection maps the surface onto a cylinder. 
+
+- This projection could also be created by touching the Earth’s surface along 1 or 2 lines of _tangency_ 
+
+- Most often when mapping the entire world. 
+
+&lt;img src="lec-img/11-projected-crs.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+# Conic 
+
+In a conic projection, the Earth’s surface is projected onto a cone along 1 or 2 lines of _tangency_ 
+
+Therefore, it is the best suited for maps of mid-latitude areas. 
+
+&lt;img src="lec-img/11-projected-crs.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Spatial Properties
+
+- All projections _distort_ real-world geographic features.
+
+--
+
+- Think about trying to unpeel an orange while preserving the skin
+
+--
+
+The four spatial properties that are subject to distortion are: **shape**, **area**, **distance** and **direction**
+
+--
+
+  - A map that preserves shape is called `conformal`; 
+  
+--
+
+  - one that preserves area is called `equal-area`; 
+
+--
+
+  - one that preserves distance is called `equidistant`
+  
+--
+
+  - one that preserves direction is called `azimuthal`
+
+--
+
+***
+
+
+  - Each map projection can preserve only one or two of the four spatial properties. 
+
+--
+
+  - Often, projections are named after the spatial properties they preserve.
+
+--
+
+- When working with small-scale (large area) maps and when multiple spatial properties are needed, it is best to break the analyses across projections to minimize errors associated with spatial distortion.
+
+---
+
+# Setting CRSs/PCSs
+
+ - We saw that `sfc` objects have two attributes to store a CRS: `epsg` and `proj4string`
+
+
+--
+
+
+```r
+st_geometry(conus)
+```
+
+```
+Geometry set for 49 features 
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+geographic CRS: WGS 84
+First 5 geometries:
+```
+
+```
+MULTIPOLYGON (((-68.92401 43.88541, -68.87478 4...
+```
+
+```
+MULTIPOLYGON (((-114.7997 32.59362, -114.8094 3...
+```
+
+```
+MULTIPOLYGON (((-94.61792 36.49941, -94.3612 36...
+```
+
+```
+MULTIPOLYGON (((-75.77379 39.7222, -75.75323 39...
+```
+
+```
+MULTIPOLYGON (((-85.60516 34.98468, -85.47434 3...
+```
+
+--
+
+ - This implies that all geometries in a geometry list-column (sfc) must have the same CRS. 
+ 
+---
+
+- `proj4string` is a generic, string-based description of a CRS, understood by [PROJ](https://proj4.org/) 
+
+--
+
+- It defines projection types and parameter values for particular projections,
+
+--
+
+- As a result it can cover an infinite amount of different projections.  
+
+--
+
+- `epsg` is the _integer ID_ for a known CRS that can be resolved into a `proj4string`. 
+  - This is somewhat equivalent to the idea that a 6-digit FIP code can be resolved to a state/county pair
+
+--
+
+- Some `proj4string` values can resolved back into their corresponding `epsg` ID, but this does not always work.
+
+--
+
+- The importance of having `epsg` values stored with data besides `proj4string` values is that the `epsg` refers to particular, well-known CRS, whose parameters may change (improve) over time
+
+--
+
+- fixing only the `proj4string` may remove the possibility to benefit from such improvements, and limit some of the provenance of datasets (but may help reproducibility)
+
+---
+
+# `PROJ4` coordinate syntax
+
+The `PROJ4` syntax contains  a list of parameters, each prefixed with the `+` character. 
+
+A list of some `PROJ4` parameters follows and the full list can be found [here](https://proj.org/usage/projections.html):
+
+
+| Parameter      	| Description                             	|
+|---------	|---------------------------------------------------------------------	|
+| +a      	| Semi-major radius of the ellipsoid axis                              	|
+| +b      	| Semi-minor radius of the ellipsoid axis                              	|
+| +datum  	| Datum name                                                          	|
+| +ellps  	| Ellipsoid name                                                      	|
+| +lat_0  	| Latitude of origin                                                  	|
+| +lat_1  	| Latitude of first standard parallel                                 	|
+| +lat_2  	| Latitude of second standard parallel                                	|
+| +lat_ts 	| Latitude of true scale                                              	|
+| +lon_0  	| Central meridian                                                    	|
+| +over   	| Allow longitude output outside -180 to 180 range, disables wrapping 	|
+| +proj   	| Projection name                                                     	|
+| +south  	| Denotes southern hemisphere UTM zone                                	|
+| +units  	| meters, US survey feet, etc.                                        	|
+| +x_0    	| False easting                                                       	|
+| +y_0    	| False northing                                                      	|
+| +zone   	| UTM zone                                                            	|
+
+---
+
+**WGS84**  
+_EPSG_: 4326  
+_PROJ4_: `+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs`  
+  - projection name: longlat
+  - Latitude of origin: WGS84
+  - Longitude of origin: WGS84
+
+***
+
+**WGS84**
+_EPSG_: 5070
+`"+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"`
+  - projection name: `aea` (Albers Equal Area)
+  - Latitude of origin: 23
+  - Longitude of origin: -96
+  - Latitude of first standard parallel: 29.5
+  - Latitude of second standard parallel: 45.5
+  - False Easting: 0
+  - False Northing: 0
+  - Datum: NAD83
+  - Units: m
+  
+---
+
+## Transform and retrive
+
+.pull-left[
+
+```r
+st_crs(conus)$epsg
+```
+
+```
+[1] 4326
+```
+
+```r
+st_crs(conus)$proj4string
+```
+
+```
+[1] "+proj=longlat +datum=WGS84 +no_defs"
+```
+
+```r
+st_crs(conus)$datum
+```
+
+```
+[1] "WGS84"
+```
+]
+
+.pull-right[
+
+```r
+conus5070 = st_transform(conus, 5070)
+
+st_crs(conus5070)$epsg
+```
+
+```
+[1] 5070
+```
+
+```r
+st_crs(conus5070)$proj4string
+```
+
+```
+[1] "+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
+```
+
+```r
+st_crs(conus5070)$datum
+```
+
+```
+[1] "NAD83"
+```
+]
+
+---
+  
+&lt;img src="lecture-11_files/figure-html/unnamed-chunk-26-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Revisit Denver
+
+
+```bash
+echo -104.9903 39.7392 | proj +init=epsg:5070
+```
+
+```
+-762409.05	1893843.60
+```
+
+
+```bash
+echo -104.9903 39.7392 | proj +proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs
+```
+
+```
+-723281.88	6827.29
+```
+
+- red = false origin : blue = Denver
+
+.pull-left[
+
+&lt;img src="lecture-11_files/figure-html/unnamed-chunk-29-1.png" width="75%" /&gt;
+]
+
+.pull-right[
+
+&lt;img src="lecture-11_files/figure-html/unnamed-chunk-30-1.png" width="75%" /&gt;
+]
+
+---
+
+## Geodesic geometries
+
+- PCSs introduce errors in their geometric measurements because the distance between two points on an ellipsoid is difficult to replicate on a projected coordinate system unless these points are close to one another.
+
+--
+
+- In most cases, such errors other sources of error in the feature representation outweigh measurement errors made in a PCS making them tolorable.
+
+--
+
+However, if the domain of analysis is large (i.e. the North American continent), then the measurement errors associated with a projected coordinate system may no longer be acceptable. 
+
+--
+
+A way to circumvent projected coordinate system limitations is to adopt a _geodesic_ solution.
+
+---
+
+## Geodesic Measurments
+
+- A **geodesic distance** is the shortest distance between two points on an ellipsoid
+
+--
+
+- A **geodesic area** measurement is one that is measured on an ellipsoid. 
+
+--
+
+- Such measurements are _independent_ of the underlying projected coordinate system. 
+
+--
+
+- Why does this matter? 
+
+--
+
+- compare the distances measured between Santa Barbara and Amsterdam. The blue line represents the shortest distance between the two points on a *planar* coordinate system. The red line as measured on a *ellipsoid*.
+
+&lt;img src="lecture-11_files/figure-html/unnamed-chunk-31-1.png" width="360" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+- the geodesic distance looks weird given its curved appearance on the projected map. 
+
+- this curvature is a byproduct of the current reference system’s increasing distance distortion as one moves towards the pole! 
+- We can display the geodesic and planar distance on a 3D globe (or a projection that mimics the view of the 3D earth).
+
+
+&lt;img src="lecture-11_files/figure-html/unnamed-chunk-32-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+- So if a geodesic measurement is more precise than a planar measurement, why not perform all spatial operations using geodesic geometry? 
+
+--
+
+- The downside is in its computational requirements. 
+
+--
+
+- It's far more efficient to compute area/distance on a plane than it is on a spheroid. 
+
+--
+
+- This is because geodesic calculations have no simple algebraic solutions and involve approximations that may require iteration! (think optimization or nonlinear solutions) 
+
+--
+
+- So this may be a computationally taxing approach if processing 1,000(s) or 1,000,000(s) of line segments. 
+
+---
+
+# Gedesic Area and Length Measurements
+
+- Not all algorthimns are equal (in terms of speed or accuracy)
+
+--
+
+- Some more efficient algorithms that minimize computation time may reduce precision in the process. 
+
+--
+
+- Some of ArcMap’s functions offer the option to compute geodesic distances and areas however ArcMap does not clearly indicate _how_ its geodesic calculations are implemented ([cite](https://mgimond.github.io/Spatial/coordinate-systems.html#geodesic-geometries) 
+
+--
+
+- R is well documented, and is efficient!
+
+---
+
+# Distances
+
+`?st_distance`
+
+&lt;img src="lec-img/11-sf-geos-measures.png" width="75%" style="display: block; margin: auto;" /&gt;
+---
+
+- native `sf` binds to the libwgeom libray()
+
+.pull-left[
+&lt;img src="lec-img/11-lwgeom.png" width="75%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+&lt;img src="lec-img/09-sf-depends.png" width="75%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+count: false
+ 
+###Distance Example
+.left-panel-dist1-auto[
+
+```r
+*(pts = data.frame(y = c(40.7128, 34.4208), x = c(-74.0060, -119.6982 ), name = c("NYC","SB")))
+```
+]
+ 
+.right-panel-dist1-auto[
+
+```
+        y         x name
+1 40.7128  -74.0060  NYC
+2 34.4208 -119.6982   SB
+```
+]
+
+---
+count: false
+ 
+###Distance Example
+.left-panel-dist1-auto[
+
+```r
+(pts = data.frame(y = c(40.7128, 34.4208), x = c(-74.0060, -119.6982 ), name = c("NYC","SB")))  
+*(pts = st_as_sf(pts, coords = c("x", "y"), crs = 4326))
+```
+]
+ 
+.right-panel-dist1-auto[
+
+```
+        y         x name
+1 40.7128  -74.0060  NYC
+2 34.4208 -119.6982   SB
+```
+
+```
+Simple feature collection with 2 features and 1 field
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -119.6982 ymin: 34.4208 xmax: -74.006 ymax: 40.7128
+geographic CRS: WGS 84
+  name                  geometry
+1  NYC   POINT (-74.006 40.7128)
+2   SB POINT (-119.6982 34.4208)
+```
+]
+
+---
+count: false
+ 
+###Distance Example
+.left-panel-dist1-auto[
+
+```r
+(pts = data.frame(y = c(40.7128, 34.4208), x = c(-74.0060, -119.6982 ), name = c("NYC","SB")))  
+(pts = st_as_sf(pts, coords = c("x", "y"), crs = 4326))  
+
+*eqds = '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'
+```
+]
+ 
+.right-panel-dist1-auto[
+
+```
+        y         x name
+1 40.7128  -74.0060  NYC
+2 34.4208 -119.6982   SB
+```
+
+```
+Simple feature collection with 2 features and 1 field
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -119.6982 ymin: 34.4208 xmax: -74.006 ymax: 40.7128
+geographic CRS: WGS 84
+  name                  geometry
+1  NYC   POINT (-74.006 40.7128)
+2   SB POINT (-119.6982 34.4208)
+```
+]
+
+---
+count: false
+ 
+###Distance Example
+.left-panel-dist1-auto[
+
+```r
+(pts = data.frame(y = c(40.7128, 34.4208), x = c(-74.0060, -119.6982 ), name = c("NYC","SB")))  
+(pts = st_as_sf(pts, coords = c("x", "y"), crs = 4326))  
+
+eqds = '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'  
+
+# Greeat Circle Distance
+*st_distance(pts)
+```
+]
+ 
+.right-panel-dist1-auto[
+
+```
+        y         x name
+1 40.7128  -74.0060  NYC
+2 34.4208 -119.6982   SB
+```
+
+```
+Simple feature collection with 2 features and 1 field
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -119.6982 ymin: 34.4208 xmax: -74.006 ymax: 40.7128
+geographic CRS: WGS 84
+  name                  geometry
+1  NYC   POINT (-74.006 40.7128)
+2   SB POINT (-119.6982 34.4208)
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 4050406
+[2,] 4050406       0
+```
+]
+
+---
+count: false
+ 
+###Distance Example
+.left-panel-dist1-auto[
+
+```r
+(pts = data.frame(y = c(40.7128, 34.4208), x = c(-74.0060, -119.6982 ), name = c("NYC","SB")))  
+(pts = st_as_sf(pts, coords = c("x", "y"), crs = 4326))  
+
+eqds = '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'  
+
+# Greeat Circle Distance
+st_distance(pts)  
+
+# Euclidean Distance
+*st_distance(pts, which = "Euclidean")
+```
+]
+ 
+.right-panel-dist1-auto[
+
+```
+        y         x name
+1 40.7128  -74.0060  NYC
+2 34.4208 -119.6982   SB
+```
+
+```
+Simple feature collection with 2 features and 1 field
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -119.6982 ymin: 34.4208 xmax: -74.006 ymax: 40.7128
+geographic CRS: WGS 84
+  name                  geometry
+1  NYC   POINT (-74.006 40.7128)
+2   SB POINT (-119.6982 34.4208)
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 4050406
+[2,] 4050406       0
+```
+
+```
+Units: [°]
+         [,1]     [,2]
+[1,]  0.00000 46.12338
+[2,] 46.12338  0.00000
+```
+]
+
+---
+count: false
+ 
+###Distance Example
+.left-panel-dist1-auto[
+
+```r
+(pts = data.frame(y = c(40.7128, 34.4208), x = c(-74.0060, -119.6982 ), name = c("NYC","SB")))  
+(pts = st_as_sf(pts, coords = c("x", "y"), crs = 4326))  
+
+eqds = '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'  
+
+# Greeat Circle Distance
+st_distance(pts)  
+
+# Euclidean Distance
+st_distance(pts, which = "Euclidean")  
+
+# Equal Area PCS
+*st_distance(st_transform(pts, 5070))
+```
+]
+ 
+.right-panel-dist1-auto[
+
+```
+        y         x name
+1 40.7128  -74.0060  NYC
+2 34.4208 -119.6982   SB
+```
+
+```
+Simple feature collection with 2 features and 1 field
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -119.6982 ymin: 34.4208 xmax: -74.006 ymax: 40.7128
+geographic CRS: WGS 84
+  name                  geometry
+1  NYC   POINT (-74.006 40.7128)
+2   SB POINT (-119.6982 34.4208)
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 4050406
+[2,] 4050406       0
+```
+
+```
+Units: [°]
+         [,1]     [,2]
+[1,]  0.00000 46.12338
+[2,] 46.12338  0.00000
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 4017987
+[2,] 4017987       0
+```
+]
+
+---
+count: false
+ 
+###Distance Example
+.left-panel-dist1-auto[
+
+```r
+(pts = data.frame(y = c(40.7128, 34.4208), x = c(-74.0060, -119.6982 ), name = c("NYC","SB")))  
+(pts = st_as_sf(pts, coords = c("x", "y"), crs = 4326))  
+
+eqds = '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'  
+
+# Greeat Circle Distance
+st_distance(pts)  
+
+# Euclidean Distance
+st_distance(pts, which = "Euclidean")  
+
+# Equal Area PCS
+st_distance(st_transform(pts, 5070))  
+
+# Equal Distance
+*st_distance(st_transform(pts, eqds))
+```
+]
+ 
+.right-panel-dist1-auto[
+
+```
+        y         x name
+1 40.7128  -74.0060  NYC
+2 34.4208 -119.6982   SB
+```
+
+```
+Simple feature collection with 2 features and 1 field
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -119.6982 ymin: 34.4208 xmax: -74.006 ymax: 40.7128
+geographic CRS: WGS 84
+  name                  geometry
+1  NYC   POINT (-74.006 40.7128)
+2   SB POINT (-119.6982 34.4208)
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 4050406
+[2,] 4050406       0
+```
+
+```
+Units: [°]
+         [,1]     [,2]
+[1,]  0.00000 46.12338
+[2,] 46.12338  0.00000
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 4017987
+[2,] 4017987       0
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 3823549
+[2,] 3823549       0
+```
+]
+
+---
+count: false
+ 
+###Distance Example
+.left-panel-dist1-auto[
+
+```r
+(pts = data.frame(y = c(40.7128, 34.4208), x = c(-74.0060, -119.6982 ), name = c("NYC","SB")))  
+(pts = st_as_sf(pts, coords = c("x", "y"), crs = 4326))  
+
+eqds = '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'  
+
+# Greeat Circle Distance
+st_distance(pts)  
+
+# Euclidean Distance
+st_distance(pts, which = "Euclidean")  
+
+# Equal Area PCS
+st_distance(st_transform(pts, 5070))  
+
+# Equal Distance
+st_distance(st_transform(pts, eqds))  
+```
+]
+ 
+.right-panel-dist1-auto[
+
+```
+        y         x name
+1 40.7128  -74.0060  NYC
+2 34.4208 -119.6982   SB
+```
+
+```
+Simple feature collection with 2 features and 1 field
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -119.6982 ymin: 34.4208 xmax: -74.006 ymax: 40.7128
+geographic CRS: WGS 84
+  name                  geometry
+1  NYC   POINT (-74.006 40.7128)
+2   SB POINT (-119.6982 34.4208)
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 4050406
+[2,] 4050406       0
+```
+
+```
+Units: [°]
+         [,1]     [,2]
+[1,]  0.00000 46.12338
+[2,] 46.12338  0.00000
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 4017987
+[2,] 4017987       0
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 3823549
+[2,] 3823549       0
+```
+]
+
+&lt;style&gt;
+.left-panel-dist1-auto {
+  color: #777;
+  width: 39.2156862745098%;
+  height: 92%;
+  float: left;
+  font-size: 80%
+}
+.right-panel-dist1-auto {
+  width: 58.8235294117647%;
+  float: right;
+  padding-left: 1%;
+  font-size: 80%
+}
+.middle-panel-dist1-auto {
+  width: 0%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# Area Example: CONUS
+
+
+```r
+us_u_mp = st_cast(us_u_ml, "MULTIPOLYGON")
+
+df = data.frame(name = c("WGS84", "AEA", "EPDS"),
+           area = c(sum(st_area(conus)), 
+            sum(st_area(st_transform(conus, 5070))),
+            sum(st_area(st_transform(conus, eqds)))))
+```
+
+&lt;img src="lecture-11_files/figure-html/unnamed-chunk-37-1.png" width="50%" /&gt;
+
+---
+
+# Units in `sf`
+
+- The CRS in `sf` encodes the units of measurement relating to spatial features
+
+--
+
+- Where possible geometric operations such as `st_distance()`, `st_length()` and `st_area()` report results with a units attribute appropriate for the CRS:
+
+--
+
+- This can be both handy and very confusing for those new to it. Consider the following:
+
+
+```r
+(l = sum(st_length(conus)))
+```
+
+```
+94982205 [m]
+```
+
+```r
+(a = sum(st_area(conus)))
+```
+
+```
+7.837597e+12 [m^2]
+```
+
+---
+
+We can set units if we do manipulations as well using the units package
+
+```r
+units::set_units(l, "km")
+```
+
+```
+94982.21 [km]
+```
+
+```r
+units::set_units(l, "mile")
+```
+
+```
+59019.21 [mile]
+```
+
+```r
+units::set_units(a, "ha")
+```
+
+```
+783759699 [ha]
+```
+
+```r
+units::set_units(a, "km2")
+```
+
+```
+7837597 [km^2]
+```
+
+```r
+units::set_units(a, "in2")
+```
+
+```
+1.21483e+16 [in^2]
+```
+---
+
+# Units are a class 
+
+- units are an S3 data object with attribute information and "rules of engagement"
+
+
+```r
+class(st_length(conus)) 
+```
+
+```
+[1] "units"
+```
+
+```r
+attributes(st_length(conus)) %&gt;% unlist()
+```
+
+```
+units.numerator           class 
+            "m"         "units" 
+```
+
+```r
+st_length(conus) + 100
+```
+
+```
+Error in Ops.units(st_length(conus), 100): both operands of the expression should be "units" objects
+```
+
+```r
+conus %&gt;% 
+  mutate(area = st_area(.)) %&gt;% 
+  ggplot(aes(x = name, y = area)) + 
+  geom_col()
+```
+
+```
+Don't know how to automatically pick scale for object of type units. Defaulting to continuous.
+```
+
+```
+Error in Ops.units(x, range[1]): both operands of the expression should be "units" objects
+```
+
+&lt;img src="lecture-11_files/figure-html/unnamed-chunk-40-1.png" width="504" /&gt;
+---
+
+### Unit values can be stripped of their attributes if need be:
+
+
+```r
+# Via drop_units
+(units::drop_units(sum(st_length(conus))))
+```
+
+```
+[1] 94982205
+```
+
+```r
+# Via casting
+(as.numeric(sum(st_length(conus))))
+```
+
+```
+[1] 94982205
+```
+
+---
+class: center, middle, inverse
+#Lightning Re-cap
+---
+
+## Geographic Coordinate Systems
+
+- Geographic coordinate systems identify a location on the Earth’s surface using longitude and latitude. 
+
+--
+
+  - Longitude is the angular distance East or West of the Prime Meridian plane. 
+
+--
+
+  - Latitude is angular distance North or South of the equatorial plane. 
+
+--
+
+- Distances in GRSs are therefore **not** measured in meters
+
+--
+
+- The surface of the Earth in GCS is represented by ellipsoidal surface.
+
+--
+
+- Spherical models assume the Earth is a perfect sphere of a given radius. 
+
+--
+
+- Spherical models are rarely used because the Earth is **not** a sphere! 
+
+--
+
+- Ellipsoidal models are defined by two parameters: the semi major and semi minor axis 
+
+--
+
+- These are suitable because the Earth is compressed: the equatorial radius is around 11.5 km longer than the polar radius
+
+---
+
+- Ellipsoids are part of a wider component of CRSs: **the datum** 
+
+--
+
+- Datums describe the irrigeularities in a earths surface (geoid) compared to a smooth ellipsoid
+
+--
+
+In a local datums such as NAD27 the ellipsoidal surface is shifted to align with the surface at a particular location.
+
+In a geocentric datum such as `WGS84` the center is the Earth’s center of gravity 
+
+---
+
+# Projected coordinate reference systems
+
+- PCSs are based on Cartesian (XY) coordinates on an implicitly flat surface. 
+
+--
+
+- They have an origin, axes, and a unit of measurement (e.g. meters). 
+
+--
+
+- **All** PCSs are based on a GCSs and rely on projections to convert the 3D surface in XY values related to a false origin
+
+--
+
+This transition cannot be done without adding **distortion** 
+
+--
+
+A projected coordinate system can preserve only one or two spatial properties. 
+
+Projections are often named based on a property they preserve: 
+ - equal-area preserves *area* 
+ - azimuthal preserve *direction*
+ - equidistant preserve *distance* 
+ - conformal preserve *local shape*
+ 
+---
+
+# Gedesic Area and Length Measurements are often superior
+
+- Calcuated distance and area on the ellipsoid
+
+--
+
+- Not all algorthimns are equal (in terms of speed or accuracy)
+
+--
+
+- Some reduce precision to speed up calculations
+
+--
+
+- Some of ArcMap’s functions offer the option to compute geodesic distances and areas however ArcMap does not clearly indicate _how_ its geodesic calculations are implemented ([cite](https://mgimond.github.io/Spatial/coordinate-systems.html#geodesic-geometries) 
+
+--
+
+- R is well documented, and is efficient! (still less so then PCS ... for now)
+
+--
+
+- base `sf` implements "Greater Circle" distances is st_distance
+
+- `sf` binds to the libwgeom libray for geoid calcuations (geoid vs ellipoid)
+
+---
+
+
+## Assignment
+
+1. Read in the `uscites.csv` data (lab 1 material) or from lab 03 and make it spatial (CRS = 4326)
+
+2. Filter to include only Santa Barbara and your home town. (Should only have 2 points!)
+  - If your home town is Santa Barbara, pick another one :)
+  
+3. Transform your filter object locations to:
+
+  - An equal area projection (EPSG: 5070) and,
+  - And eqidistance projection: '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'
+  
+4. Calculate the distance between the cites in all three projections using st_distance()
+
+5. For one of the results, set the units to kilometers (km), and drop the units using the `units` package.
+
+---
+
+class: middle, center
+
+# Submission:
+
+Submit your R script to Gauchospace and push to GitHub
+
+---
+
+class: middle, center, inverse
+# END
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
