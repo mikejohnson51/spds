@@ -1549,9 +1549,6 @@ div.tocify {
 <div id="set-up" class="section level1">
 <h1>Set-up</h1>
 <ol style="list-style-type: decimal">
-<li>Create a <code>geog-176A-labs</code> GitHub repository</li>
-<li>Clone it to your machine</li>
-<li>Create a <code>data</code>, <code>docs</code>, and <code>img</code> directory</li>
 <li>In the docs directory of <code>geog-176A-labs</code>, create a new .Rmd file called <code>lab-03.Rmd</code></li>
 <li>Populate its YML with a title, author, subtitle, output type and theme. For example:</li>
 </ol>
@@ -1602,8 +1599,14 @@ library(knitr)</code></pre>
 <li>Boundaries of Canada, Mexico and the United States (1.2)</li>
 <li>All USA cites (1.3)</li>
 </ol>
+<div id="define-a-projection" class="section level3">
+<h3><em>1.1</em> Define a Projection</h3>
+<p>For this lab we want to calculate distances between features, therefore we need a projection that preserves distance at the scale of CONUS. For this, we will use the North America Equidistant Conic:</p>
+<pre class="r"><code>eqdc = &#39;+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs&#39;</code></pre>
+<p>Unfortunately, this projection does not have a EPSG code to reference so we must use the PROJ4 string above. Take a moment and describe this proection based on the parameters:</p>
+</div>
 <div id="get-usa-state-boundaries" class="section level3">
-<h3><em>1.1</em> - Get USA state boundaries</h3>
+<h3><em>1.2</em> - Get USA state boundaries</h3>
 <p>In R, USA boundaries are stored in the <code>USAboundaries</code> package. In case this package and data are <strong>not</strong> installed:</p>
 <pre class="r"><code>remotes::install_github(&quot;ropensci/USAboundaries&quot;)
 remotes::install_github(&quot;ropensci/USAboundariesData&quot;)</code></pre>
@@ -1611,12 +1614,12 @@ remotes::install_github(&quot;ropensci/USAboundariesData&quot;)</code></pre>
 <ul>
 <li>USA state boundaries can be accessed with <code>USAboundaries::us_states(resolution = &quot;low&quot;)</code>. Given the precision needed for this analysis we are ok with the low resolution.</li>
 <li>Make sure you only have the states in the continental United States (CONUS) (<strong>Hint</strong> use <code>filter</code>)</li>
-<li>Make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (<code>EPSG:5070</code>).</li>
+<li>Make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (<code>eqdc</code>).</li>
 </ul>
 <hr />
 </div>
 <div id="get-country-boundaries-for-mexico-the-united-states-of-america-and-canada" class="section level3">
-<h3><em>1.2</em> - Get country boundaries for Mexico, the United States of America, and Canada</h3>
+<h3><em>1.3</em> - Get country boundaries for Mexico, the United States of America, and Canada</h3>
 <p>In R, country boundaries are stored in the <code>rnaturalearth</code> package. In case this package is not installed:</p>
 <pre class="r"><code>remotes::install_github(&quot;ropenscilabs/rnaturalearthdata&quot;)</code></pre>
 <p>Once installed:</p>
@@ -1624,17 +1627,17 @@ remotes::install_github(&quot;ropensci/USAboundariesData&quot;)</code></pre>
 <li>World boundaries can be accessed with <code>rnaturalearth::countries110</code>.</li>
 <li>Make sure the data is in simple features (<code>sf</code>) format (<strong>Hint</strong> use the <code>st_as_sf</code> variable).</li>
 <li>Make sure you only have the countries you want (<strong>Hint</strong> <code>filter</code> on the <code>admin</code> variable)</li>
-<li>Make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (<code>EPSG:5070</code>).</li>
+<li>Make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (<code>eqdc</code>).</li>
 </ul>
 <hr />
 </div>
 <div id="get-city-locations-from-the-csv-file" class="section level3">
-<h3><em>1.3</em> - Get city locations from the CSV file</h3>
+<h3><em>1.4</em> - Get city locations from the CSV file</h3>
 <p>The process of finding, downloading and accessing data is the first step of every analysis. Here we will go through these steps (minus finding the data).</p>
 <p>First go to this <a href="https://simplemaps.com/data/us-cities">site</a> and download the appropriate (free) dataset into the data directory of this project.</p>
 <p>Once downloaded, read it into your working session using <code>read_csv</code> and explore the dataset until you are comfortable with the information it contains.</p>
 <p>While this data has everything we want, it is not yet spatial. Convert the <code>data.frame</code> to a spatial object using <code>st_as_sf</code> and prescribing the coordinate variables and CRS (<strong>Hint</strong> what projection are the raw coordinates in?)</p>
-<p>Finally, remove cities in states not wanted and make sure the data is in a projected coordinate system suitable for distance measurements at the national scale (<code>EPSG:5070</code>).</p>
+<p>Finally, remove cities in states not wanted and make sure the data is in a projected coordinate system suitable for distance measurements at the national scale:</p>
 <p>Congratulations! You now have three real-world, large datasets ready for analysis.</p>
 </div>
 </div>
