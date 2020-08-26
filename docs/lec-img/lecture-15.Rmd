@@ -1,0 +1,557 @@
+---
+title: "Geography 176A"
+subtitle: "Lecture 15: Coverages/Tesselations"
+author: "Mike Johnson"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ucsb.css
+    nature:
+      ratio: 16:10
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{css, eval = TRUE, echo = FALSE}
+.remark-code{line-height: 2; font-size: 80%}
+```
+
+```{r, include = F}
+knitr::opts_chunk$set(fig.width = 6, message = FALSE, warning = FALSE, comment = "", cache = FALSE, fig.retina = 3)
+library(sf)
+library(tidyverse)
+library(USAboundaries)
+library(units)
+library(rmapshaper)
+library(leaflet)
+
+get_conus = function(data, var = "name"){
+  filter(data, !get(var) %in% 
+           c("Hawaii", "Puerto Rico", "Alaska",
+             "Guam", "District of Columbia"))
+}
+```
+
+# Yesterdays Data...
+
+```{r, message = FALSE}
+cities = read_csv("../labs/lab-01/data/uscities.csv") %>%
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) %>% 
+  get_conus("state_name")
+
+polygon = get_conus(us_states())
+```
+---
+
+# Building a PIP Analysis: Join Data
+
+```{r}
+(st_join(polygon, cities))
+```
+
+---
+# Building a PIP Analysis: Getting a table
+
+```{r}
+(st_join(polygon, cities) %>% 
+    st_drop_geometry()) 
+```
+
+---
+
+# Building a PIP Analysis: Counting over a group
+
+```{r}
+ (st_join(polygon, cities) %>% 
+    st_drop_geometry() %>% 
+    count(name))
+```
+
+---
+# Building a PIP Analysis: Re-join the geometries
+
+```{r}
+ (st_join(polygon, cities) %>% 
+    st_drop_geometry() %>% 
+    count(name) %>% 
+    left_join(polygon, by = 'name')) 
+```
+
+---
+
+# Building a PIP Analysis: create `sf` object
+```{r}
+ (st_join(polygon, cities) %>% 
+    st_drop_geometry() %>% 
+    count(name) %>% 
+    left_join(polygon, by = 'name')) 
+```
+
+---
+
+# A note of yesterday...
+```{r}
+point_in_polygon3 = function(points, polygon, group){
+      st_join(polygon, points) %>%
+        st_drop_geometry() %>%
+        count(get(group)) %>% #<<
+        setNames(c(group, "n")) %>%
+        left_join(polygon, by = group) %>%
+        st_as_sf()
+    }
+```
+
+---
+# id()
+
+```{r}
+dplyr::id()
+```
+
+---
+
+# Applying our function:
+
+**Goal**: Count cities in each US county
+
+```{r}
+counties = get_conus(us_counties(), "state_name") %>% 
+  st_transform(st_crs(cities))
+
+city_pip = point_in_polygon3(cities, counties, "geoid")
+
+plot(city_pip['n'], border = NA)
+```
+
+---
+
+# Core Concepts of Spatial Data: (Kuhn 2012)
+
+```{r, fig.align='center', fig.height = 5, echo = FALSE}
+knitr::include_graphics('lec-img/15-cc.png')
+```
+
+---
+
+# Core Concepts of Spatial Data: (Kuhn 2012)
+
+– **One Base Concept**: Location
+– **Four Content Concepts**: Field, Object, Network, Event
+– **Two Quality Concepts**: Granularity, Accuracy
+
+---
+
+# Core Concepts of Spatial Data: (Kuhn 2012)
+
+– **One Base Concept**: Location (*coordinates*)
+– **Four Content Concepts**: Field (*raster*), Object (*simple feature*)
+– **Two Quality Concepts**: Granularity (*simplification*), Accuracy (*taken for granted*)
+
+---
+
+# Object View
+
+- Objects describe *individuals* that have an identity (id) as well as spatial, temporal, and thematic properties. 
+
+- Answers questions about _properties_ and _relations_ of objects. 
+
+- Results from fixing theme, controlling time, and measuring space. 
+
+- Features, such as surfaces, depend on objects (but are also objects)
+
+---
+
+# Objects 
+
+- Object implies boundedness
+    - boundaries may not be known or even knowable, but have limits. 
+
+--
+
+- Crude examples of such limits are the minimal bounding boxes used for indexing and querying objects in databases. 
+
+--
+
+- Many objects (particularly natural ones) do not have crisp boundaries (watersheds) 
+
+- Differences between spatial information from multiple sources are often caused by more or less arbitrary deliniations through context-dependent boundaries. 
+
+- Many questions about objects and features can be answered without boundaries, using simple point representations (centroids) with thematic _attributes_.
+
+---
+
+# Fields 
+
+Fields describe phenomena that have a scalar or vector attribute everywhere in a space of interest, 
+
+  - for example, air temperatures. 
+  
+Field information answers the question what is here?, where here can be anywhere in the space considered. 
+
+Generalizing the field notion from physics, field-based spatial information can also represent attributes that are computed rather than measured, such as probabilities or densities.
+
+Together, fields and objects are  the two fundamental ways of structuring spatial information. 
+
+---
+
+# Objects that provide coverage:
+
+Both objects and field can cover space continuously - The primary difference is that bjects prescribe bounds.
+
+Often, we need object generalizations to describe space
+
+Creating objects that cover contious space
+
+---
+
+# LANDSAT Path Row
+
+https://www.usgs.gov/media/files/conterminous-united-states-conus-analysis-ready-data-ard-shapefile
+
+```{r}
+ls = read_sf('/Users/mikejohnson/github/spds/lectures/data/CONUS_ARD_grid/conus_ard_grid.shp')
+
+states = get_conus(us_states(), "name") %>% st_transform(st_crs(ls))
+
+sb = AOI::geocode("UCSB", pt = TRUE) %>% st_transform(st_crs(ls))
+
+ggplot() + 
+  geom_sf(data = states, col = NA, alpha = .95) + 
+  geom_sf(data = ls, fill = NA) + 
+  geom_sf(data = sb, col = "darkred", aes(label = request)) + 
+  ggrepel::geom_label_repel(
+    data = sb,
+    aes(label = request, geometry = geometry),
+    stat = "sf_coordinates"
+  ) +
+  theme_void()+ 
+  labs(title = "LANDSAT Path/row")
+```
+
+---
+
+# MODIS Sinisoial Grid
+
+```{r}
+ls = read_sf('/Users/mikejohnson/github/spds/lectures/data/modis_grid/modis_sinusoidal_grid_world.shp') %>% st_set_crs('+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
+
+states = rnaturalearth::ne_countries(returnclass = "sf") %>% st_transform(st_crs(ls))
+
+sb = AOI::geocode("UCSB", pt = TRUE) %>% st_transform(st_crs(ls))
+
+ggplot() + 
+  geom_sf(data = states, col = NA, fill = "black",alpha = 1) + 
+  geom_sf(data = ls, fill = NA) + 
+  geom_sf(data = sb, col = "darkred", aes(label = request)) + 
+  ggrepel::geom_label_repel(
+    data = sb,
+    aes(label = request, geometry = geometry),
+    stat = "sf_coordinates"
+  ) +
+  theme_void()+ 
+  labs(title = "MODIS Path/row")
+```
+
+---
+
+# [Uber Hex Addressing](https://eng.uber.com/h3/)
+
+```{r, fig.height = 5, echo = FALSE}
+knitr::include_graphics('lec-img/15-uber-h3.jpeg')
+knitr::include_graphics('lec-img/15-uber-h3-zoom.jpeg')
+```
+---
+
+# [what3word](https://what3words.com/switched.mandates.apple)
+
+```{r, fig.align='center', fig.height = 8, echo = FALSE}
+knitr::include_graphics('lec-img/15-what3words.png')
+```
+---
+
+#[Map Tiles / slippy maps](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)
+
+```{r, fig.align='center', fig.height = 8, echo = FALSE}
+knitr::include_graphics('lec-img/15-pyramid.jpg')
+```
+
+---
+
+```{r}
+regions = data.frame(region = state.region, state_name = state.name)
+
+south_counties = left_join(us_counties(), regions) %>% 
+  filter(region == "South") %>% 
+  st_transform(st_crs(cities))
+
+south_states = south_counties %>% 
+  group_by(state_name) %>% summarise()
+
+south_cent = st_centroid(south_counties)
+```
+---
+
+```{r, fig.width = 10}
+ggplot() + 
+  geom_sf(data = south_counties, lty = 2, size = .2) + 
+  geom_sf(data = south_states, fill = NA) + 
+  geom_sf(data = south_cent, col = 'darkred', size = .2) +
+  theme_void()
+```
+
+---
+
+```{r}
+plot_tess = function(data, title){
+  ggplot() + 
+    geom_sf(data = data, fill = "white", col = "navy", size = .2) +   
+    theme_void() +
+    labs(title = title, caption = paste("This tesselation has:", nrow(data), "tiles" )) +
+    theme(plot.title = element_text(hjust = .5, color =  "navy", face = "bold"))
+}
+```
+
+---
+
+```{r}
+plot_tess(south_counties, "Counties")
+```
+
+---
+
+# Regular Tiles
+
+- One way to tile a surface in into regions of each area
+
+--
+
+- Tiles can be either _square_ (rectilinear) or _hexagonal_
+
+--
+
+- `st_make_grid` generates a square or hexagonal grid covering the geometry of an `sf` or `sfc` object
+
+--
+
+- The return object of st_make_grid is a new `sfc` object 
+
+--
+
+- Grids can be specified by _cellsize_ or number of grid cells (*n*) in the X and Y direction
+
+
+```{r}
+# Create a grid over the south with 70 rows and 50 columns
+sq_grid = st_make_grid(south_counties, n = c(70, 50)) %>% 
+  st_as_sf() %>% 
+  mutate(id = 1:n())
+```
+
+---
+
+```{r}
+plot_tess(sq_grid, "Square Coverage")
+```
+
+---
+
+# Hexagonal Grid
+
+Hexagonal tessellations offer an alternative to square grids
+They are created in the same way but by setting `square = FALSE`
+
+```{r}
+hex_grid = st_make_grid(south_counties, n = c(70, 50), square = FALSE) %>% 
+  st_as_sf() %>% 
+  mutate(id = 1:n())
+```
+
+---
+
+```{r}
+plot_tess(hex_grid, "Hexegonal Coverage")
+```
+
+---
+
+# Advantages Square Grids
+ - Simple definition and data storage
+    - Only need the origin (lower left), cell size (XY) and grid dimensions
+ - Easy to aggragate and dissaggregate (resample)
+ - Analogous to raster data
+ - Relationship between cells is given 
+ - Combining layers is easy with traditional matrix algebra
+ 
+# Advantages Square Grids
+ - Reduced Edge Effects
+    - Lower perimeter to area ratio
+    - minimizes the amount line length needed to create a lattice of cells with a given area
+ - All neighbors are identical
+    - No knight vs queen neighbors
+ - Better fit to curve surfaces (e.g. the earth)
+
+---
+
+```{r, fig.align='center', fig.height = 8, echo = FALSE}
+knitr::include_graphics('lec-img/15-hex-vs-others.png')
+```
+---
+
+# Triangulations
+
+An alternative to creating equal area tiles is to create triangulation from known anchor points
+
+Triangulation requires a set of input points and seeks to partition the interior into a partition of triangles.
+
+In GIS contexts you'll hear:
+  - Thessian Polygon 
+  - Voronoi Regions
+  - Delunay Triangulation
+  - ect.
+
+---
+
+# Voronoi 
+
+- Thiessen polygons are polygons whose boundaries define the area closest to each point relative to all other points. They are mathematically defined by the perpendicular bisectors of the lines between all points.
+
+```{r, fig.align='center', fig.height = 8, echo = FALSE}
+knitr::include_graphics('lec-img/15-voronoi-animation.gif')
+```
+
+---
+
+- [Usefull is tasks](https://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK4/NO) such as: nearest neighbor search, facility location (optimization), largest empty areas, path planning...
+
+
+Also useful for simple interpolation
+
+```{r, fig.align='center', fig.height = 8, echo = FALSE}
+knitr::include_graphics('lec-img/15-gage-rainfall.png')
+knitr::include_graphics('lec-img/15-triangle-rainfall.png')
+```
+
+---
+
+```{r, fig.align='center', fig.height = 8, echo = FALSE}
+knitr::include_graphics('lec-img/15-Voronoi_growth_euclidean.gif')
+```
+
+
+---
+
+# st_voronoi
+
+- st_voronoi creates voronoi tesselation in `sf`
+- It works over a MULTIPOINT collection
+- Should always be simplifified after creation (st_cast())
+- If to be treated as an object for analysis, should be id'd
+
+```{r}
+south_cent_u = st_union(south_cent)
+
+v_grid = st_voronoi(south_cent_u) %>% 
+  st_cast() %>% 
+  st_as_sf() %>% 
+  mutate(id = 1:n())
+```
+
+---
+
+```{r, fig.height=10}
+plot_tess(v_grid, "Voronoi Coverage")
+```
+
+---
+
+```{r, fig.height=10}
+v_grid = st_intersection(v_grid, st_union(south_states))
+plot_tess(v_grid, "Voroni Coverage") + 
+  geom_sf(data = south_cent, col = "darkred", size = .2)
+```
+---
+
+# Delaunay triangulation
+
+In mathematics and computational geometry, a Delaunay triangulation (also known as a Delone triangulation) for a given set P of discrete points in a plane is a triangulation DT(P) such that no point in P is inside the circumcircle of any triangle in DT(P). 
+
+---
+
+The Delaunay triangulation of a discrete point set P in general position corresponds to the dual graph of the Voronoi diagram for P. The circumcenters of Delaunay triangles are the vertices of the Voronoi diagram. In the 2D case, the Voronoi vertices are connected via edges, that can be derived from adjacency-relationships of the Delaunay triangles: If two triangles share an edge in the Delaunay triangulation, their circumcenters are to be connected with an edge in the Voronoi tesselation.
+
+
+```{r}
+t_grid = st_triangulate(south_cent_u) %>% 
+  st_cast() %>% 
+  st_as_sf() %>% 
+  mutate(id = 1:n())
+```
+
+---
+
+```{r}
+plot_tess(t_grid, "Square Coverage")
+```
+---
+
+```{r}
+t_grid = st_intersection(t_grid, st_union(south_states))
+plot_tess(t_grid, "Voroni Coverage") + 
+  geom_sf(data = south_cent, col = "darkred", size = .3)
+```
+
+---
+
+# Modifiable areal unit problem (MAUP)
+
+The modifiable areal unit problem (MAUP) is a source of statistical bias that can significantly impact the results of statistical hypothesis tests. 
+
+MAUP affects results when point-based measures are aggregated into districts. 
+
+The resulting summary values (e.g., totals or proportions) are influenced by both the shape and scale of the aggregation unit.
+
+```{r, fig.align='center', fig.height = 8, echo = FALSE}
+knitr::include_graphics('lec-img/15-maup.gif')
+```
+
+
+
+---
+```{r}
+county_pip = point_in_polygon3(cities, south_counties, "geoid")
+plot(county_pip['n'], border = NA)
+```
+
+---
+
+.pull-left[
+```{r}
+sq_pip = point_in_polygon3(cities, sq_grid, "id")
+plot(sq_pip['n'])
+```
+]
+
+.pull-right[
+```{r}
+hex_pip = point_in_polygon3(cities, hex_grid, "id")
+plot(hex_pip['n'], border = NA)
+```
+]
+
+---
+
+
+.pull-left[
+```{r}
+v_pip = point_in_polygon3(cities, v_grid, "id")
+plot(v_pip['n'], border = NA)
+```
+]
+
+.pull-right[
+```{r}
+t_pip = point_in_polygon3(cities, t_grid, "id")
+plot(t_pip['n'], border = NA)
+```
+]
