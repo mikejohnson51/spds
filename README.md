@@ -1,4 +1,4 @@
-# Course Website for Geography 17A <img src="docs/ucsb_logo.png" width=160 height = 120 align="right" />
+# Course Website for Geography 176A <img src="docs/ucsb_logo.png" width=160 height = 120 align="right" />
 
 ### Summer 2020 *(August 3rd - September 12th)*
 

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 176A</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 176A
+## Lecture 16: Interactive Mapping
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+# Yesterday
+
+- Talked about the object/field view of spatial data
+
+--
+
+- Looked at object coverages
+
+--
+
+- Specifically grid, hexagon, triangulation, and voronoi polygon ...
+
+--
+  - **grid** = standard, raster view
+  - **hexagon** = more efficient and better curvature (more complex matrix algebra)
+  - **Voronoi** = polygons presenting the area closest to a point
+  - **Triangulation** = all points treated as coverage vertices
+
+---
+
+# Coding is hard
+
+- Just this week I have made mistakes with the name `id` in the PIP function
+
+--
+
+- yesterday in lab, we needed a hexagon rather then square grid to implement a generalized voronoi
+
+--
+
+- The advantages:
+--
+
+  - we solve a problem once and wrap it as a function for latter re-use...
+
+--
+
+  - We are closer to the data...
+
+--
+
+  - have flexibility to work beyond existing toolboxes ...
+
+--
+
+  - access to both data and geographic data science methods (attributes and geometry are equal players)
+
+---
+
+.pull-left[
+
+## Voronoi Polygons
+
+![](lec-img/15-Voronoi_growth_euclidean.gif)&lt;!-- --&gt;
+]
+
+.pull-right[
+
+## Delaunay Triangles
+
+![](lec-img/15-Delaunay_triangles.gif)&lt;!-- --&gt;
+]
+---
+
+# Leaflet
+
+- Leaflet is a very popular, open-source, java-script library for interactive maps
+
+--
+
+- Used by the New York Times, Washington Post, and GitHub, OpenStreetMap, Mapbox and CartoDB
+
+---
+
+# Features
+
+- Interactive panning/ zooming
+
+--
+
+- Like ggplot, maps are built though combinations of map tiles, markers, polygons, lines, popups 
+
+---
+
+# Map Tiles
+
+A tiled web map, or slippy map, is a map displayed in a browser by seamlessly joining dozens of individually streamed over the Internet. 
+
+--
+
+- Most tiled web maps follow certain Google Maps conventions:
+
+--
+  
+  - Tiles are 256x256 pixels
+  
+--
+  
+  - At the outer most zoom level, 0, the entire world can be rendered in a single map tile.
+  
+--
+
+  - Each zoom level _doubles_ in both dimensions, so a single tile is replaced by 4 tiles when zooming in. 
+  
+--
+
+ - This means that about 22 zoom levels are sufficient for most practical purposes.
+ 
+--
+
+ - The Web Mercator projection (EPSG:3857) is used, with latitude limits of around 85 (-85) degrees.
+ 
+ 
+---
+ 
+The OpenStreetMap **standard**, known as Slippy Map Tilenames or XYZ, follows these and adds more:
+
+--
+
+  - An X and Y numbering scheme
+
+--
+  
+  - PNG images for tiles
+
+--
+  
+  - Images are served through a Web server, with a URL like http://.../Z/X/Y.png, where Z is the zoom level, and X and Y identify the tile.
+
+---
+
+# Zoom Levels
+
+- Zoom Levels define the scale of the map. 
+
+--
+
+- At zoom level 0, an entire mercator projection of the earth is contained in one 256px by 256px tile:
+
+--
+
+&lt;img src="lec-img/16-zoom-0.png" width="114" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="lec-img/16-zoom-res.png" width="65%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Projection Distorition
+
+&lt;img src="lec-img/16-zoom-tissots.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Zoom Factor 1
+
+At increasing zoom levels the number of tiles increases by a factor of four and the spatial resolution (ground meters per pixel) of each tile roughly doubles.
+
+&lt;img src="lec-img/16-zoom-2.png" width="474" style="display: block; margin: auto;" /&gt;
+
+---
+
+At any given zoom level, a specific tile can be identified by cartesian coordinates with 0,0 starting in the top left of the map.
+
+&lt;img src="lec-img/16-zoom-coords.png" width="468" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Request Format
+
+Tiles are requested from a standard URL format:
+
+`url/Z/X/Y.png`
+
+--
+
+For UCSB the URL:  https://a.tile.openstreetmap.org/18/43803/104352.png
+
+Would return the following image:
+
+--
+
+&lt;img src="lec-img/16-zoom-18.png" width="114" style="display: block; margin: auto;" /&gt;
+
+---
+
+The horizontal distance represented by each 256x256 pixel tile, measured along the parallel at a given latitude, is given by:
+
+`$$Stile = C ∙ cos(latitude) / 2^{zoomlevel}$$`
+--
+
+****
+
+where `\(C\)` is the equatorial circumference of the Earth for the reference geoid
+
+`$$OSM =  2pi * 6,378,137.00$$`
+--
+
+****
+
+As tiles are 256-pixels wide, the horizontal distance represented by one pixel is:
+
+`$$Spixel = Stile / 256$$`
+
+--
+
+****
+
+For UCSB the URL:  https://a.tile.openstreetmap.org/18/43803/104352.png
+
+
+```r
+C = 2*pi*6378137.00
+(Stile = C * cos(34.4140 *pi/180) / 2^18)
+```
+
+```
+[1] 126.1173
+```
+
+```r
+Stile / 256
+```
+
+```
+[1] 0.4926459
+```
+
+---
+
+# User Zooming
+
+&lt;img src="lec-img/15-pyramid.jpg" width="341" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle
+
+### Interactive Document [here](https://mikejohnson51.github.io/lecture-16/index.html)
+
+You can also fork the [repo](https://github.com/mikejohnson51/lecture-16), clone it in RStudio, and use interactively...
+
+All data is in the `data` folder
+
+The examples are in the `index.Rmd` file
+
+---
+
+# Summary
+
+- Interactivity is a great way to highlight and represent data
+
+--
+
+- Leaflet maps are rendered as HTML objects that can be placed directly in your Rmd files
+
+--
+
+- You can add markers and shapes to basemaps and annotate them with color ramps, popups and labels
+
+--
+
+- There is a ton of ability to control and refine your maps in R 
+
+    - These are extended by libraries like leafem, leafpop and mapview
+
+---
+
+# Daily Assignment
+
+- In an Rmd file, make a leaflet map of data of your choosing
+
+- You are free to double dip on the extra credit in lab 4
+
+- Add at least one feature (table, inset map, custom marker/popup)
+
+- Render it as HTML
+
+- Submit the HTML file to the gauchospace dropbox
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
