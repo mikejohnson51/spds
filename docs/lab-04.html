@@ -1674,7 +1674,7 @@ div.tocify {
 </div>
 <div id="question-2" class="section level1">
 <h1>Question 2:</h1>
-<p>In this question, we will write out a function to summarize our tessellated surfaces. Most of this should have been done in your daily assignments.</p>
+<p>In this question, we will write out a function to summarize our tessellated surfaces.</p>
 <div id="step-2.1" class="section level3">
 <h3>Step 2.1</h3>
 <p>First, we need a function that takes a <code>sf</code> object and a <code>character</code> string and returns a <code>data.frame</code>.</p>
@@ -1910,7 +1910,7 @@ Other
 <li><p>A standard summary indicates there are over 400 unique combinations of dam purposes:</p></li>
 </ul>
 <pre class="r"><code>unique(dams2$PURPOSES) %&gt;% length</code></pre>
-<pre><code>[1] 493</code></pre>
+<pre><code>#&gt; [1] 493</code></pre>
 <ul>
 <li>By storing dam codes as a concatenated string, there is no easy way to identify how many dams serve any one purpose… for example where are the hydro electric dams?</li>
 </ul>
@@ -1938,9 +1938,9 @@ dam_freq &lt;- strsplit(dams2$PURPOSES, split = &quot;&quot;) %&gt;%
 <p>For example:</p>
 <pre class="r"><code># Find flood control dams in the first 5 records:
 dams2$PURPOSES[1:5]</code></pre>
-<pre><code>[1] &quot;FR&quot; &quot;R&quot;  &quot;C&quot;  &quot;FR&quot; &quot;R&quot; </code></pre>
+<pre><code>#&gt; [1] &quot;FR&quot; &quot;R&quot;  &quot;C&quot;  &quot;FR&quot; &quot;R&quot;</code></pre>
 <pre class="r"><code>grepl(&quot;F&quot;, dams2$PURPOSES[1:5])</code></pre>
-<pre><code>[1]  TRUE FALSE FALSE  TRUE FALSE</code></pre>
+<pre><code>#&gt; [1]  TRUE FALSE FALSE  TRUE FALSE</code></pre>
 <hr />
 <p>For your analysis, choose <em>at least</em> four of the above codes, and describe why you chose them. Then for each of them, create a subset of dams that serve that purpose using <code>dplyr::filter</code> and <code>grepl</code></p>
 <p>Finally, use your <code>point-in-polygon</code> function to count each subset across your elected tessellation</p>
