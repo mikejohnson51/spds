@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 176A</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 176A
+## Lecture 19: Map Algebra
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+### The end is in sight:
+
+- **Today**: Map Algebra and raster/object interaction
+
+- **Tomorrow**: Kmeans clustering 
+
+--
+****
+- **Monday**: Holiday!
+
+- **Tuesday**: Terrain Analysis (last Daily Assignment)
+
+- **Wednesday**: Google Earth Engine Guest Lecture ([Jim Coll](https://jimcoll.github.io/))
+
+- **Thursday**: Wrap up
+
+--
+***
+- **Lab 05**: Flood Detection (due 09-07 @ midnight)
+
+  - In class we will do question 1 through ~3
+  
+- **Lab 06**: Will be short (1/2 of current) (assigned 09-07, due 09-14 @ midnight)
+
+  - This is the "practical" final, limited help will be offered
+  
+  - Lab next week will be a "crash-course" in ArcMap (Ryan Erikson)
+  
+- **Final**: due 09-14 at midnight this is your complete personal web page
+
+---
+class: center, middle
+
+**No** work will be accepted after  **09-14 at midnight**
+
+Grades due on the 17th
+
+
+---
+
+# Recap
+
+
+
+---
+# Yesterdays Assignment
+
+### Read in the saved raster file
+
+
+---
+
+### Create a conditional (threshold) mask
+
+
+
+--
+
+
+
+--
+
+
+
+---
+
+.pull-left[
+
+]
+
+.pull-left[
+
+]
+
+---
+
+## Multiply cell-wise
+
+- algebraic, logical, and functional operations act on a raster cell-wise
+
+
+---
+
+# Reclassify
+
+
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+# Object/Raster Interaction
+
+- Objects can be used to extract values from a raster!
+
+--
+
+- Lets get some objects from OpenStreetMap
+
+--
+
+- OSM provides the largest, most up to date digital representation of the earths features
+
+--
+
+- Learning to identify and extract OSM data will provide you with more data to anwser questions then you weill ever need!
+
+--
+
+- Lets say we want the river channels in the Goleta Area...
+
+---
+
+# OpenStreetMap (OSM) tags
+
+- A OSM tag consists of two items:
+  
+  - a "key" and a "value." 
+
+--
+
+  - Tags describe _specific_ features of map elements (*nodes*, _ways_, or _relations_). 
+
+--
+
+  - Tags are presented "for humans" as key=value: separated by an equals sign. 
+
+--
+
+- The **key** is used to describe a topic, category, or type of feature (e.g., highway or name). 
+
+--
+
+- Keys can be qualified with prefixes, infixes, or suffixes (usually, separated with a colon, :), forming super- or sub-categories 
+
+--
+
+- The _value_ provides detail about a _key-specified_ feature. Commonly, values are: 
+  - free form text: name="Hollistor Road"
+  - one of a set of distinct values: highway=motorway, 
+  - multiple values (separated by a semicolon) (e.g. motorcycle:rental=yes)
+ 
+--
+
+- So for a *river*, if we [google OSM river](https://www.google.com/search?q=osm+rivers) ...
+  
+---
+  
+
+---
+
+# Lets get the waterway data in R!
+
+- OSM has global coverage, we need to limit the results to Goleta
+
+--
+
+- Goltea is our 'AOI', and can be defined by its bbox or extent.
+
+--
+
+- Since OSM is global, all data is in the WGS84 Geographic CRS (`EPSG:4326`)
+
+--
+
+
+
+---
+
+With a bounding box, we can use the `osmdata` library to format OSM (overpass API) queries:
+
+
+
+---
+### But... we want features!
+
+--
+
+Specifically features that match the tag `waterway=stream`
+
+--
+
+
+---
+
+With a formatted query, we can extract the web-based data as `sf` objects
+
+--
+
+
+  
+---
+
+### So what did we get?
+
+
+---
+
+## Lets find the longest river segment *IN* our extent
+
+
+
+--
+
+
+
+---
+
+# Value Extraction
+
+- Often, we want to know the profile and sinousity of a river
+
+- To do this, we need to know the inlet and outlet as well as the straight line connector
+
+
+
+---
+
+
+---
+## Sinuosity
+
+Channel **sinuosity** is calculated by dividing the length of the stream channel by the straight line distance between the end points of the selected channel reach.
+
+
+
+
+---
+
+## River Slope:
+
+The change in elevation between the inlet/outlet divided by the length (rise/run) give us the slope of the river:
+
+--
+
+To calculate this, we must extract elevation values at the inlet and outlet:
+
+--
+
+
+
+--
+
+
+
+---
+
+## River profile
+
+What does the elevation profile of the river look like?
+
+
+
+--
+
+
+
+---
+class: center, middle, inverse
+# Map Algebra
+---
+
+# Map Algebra
+
+- Dana Tomlin (Tomlin 1990) defined a framework for the analyizing field data stored as grided values.
+
+--
+
+- He called this framework map algebra. 
+
+--
+
+- Map algebra operations and functions are broken down into four types: 
+
+--
+
+  - local
+
+--
+
+  - focal
+
+--
+
+  - zonal 
+
+--
+
+  - global
+
+---
+
+# Yesterdays Rainfall data:
+
+
+
+---
+
+# Local
+
+- Local operations and functions are applied to **each** individual cell and only involve those cells sharing the same location.
+
+--
+
+- More than one raster can be involved in a local operation. 
+
+--
+
+- For example, rasters can be **summed** ( each overlapping pixels is added) 
+
+--
+
+- Local operations also include **reclassification** of values. 
+
+---
+
+
+
+---
+
+# Focal
+
+- Also referred to as "neighborhood" operations.
+
+--
+
+- Assigns summary values to the output cells based on the neighboring cells in the input raster. 
+
+--
+
+- For example, a cell output value can be the average of 9 neighboring input cells (including the center cell) - this acts as a smoothing function.
+
+---
+
+# Focal
+
+- Focal operations require a window (also known as a kernel) to work over
+
+--
+
+- Additionally a kernel also defines the weight each neighboring cell contributes to the summary statistic. 
+
+--
+
+- For example, all cells in a 3x3 neighbor could each contribute 1/9th of their value to the summarized value (i.e. equal weight). 
+
+- The weight can take on a more complex form defined by a function; such weights are defined by a kernel function. 
+
+- One popular function is a Gaussian weighted function which assigns greater weight to nearby cells than those further away ([Toblers first law](https://en.wikipedia.org/wiki/Tobler%27s_first_law_of_geography))
+
+---
+
+# Example: Focal
+
+Lets apply a smoothing kernel to our UCSB elevation data over an 11x11 window, using the mean operator
+  
+
+---
+
+# Results 
+.pull-left[
+
+]
+
+.pull-right[
+
+]
+
+---
+
+## What did we do?
+
+.pull-left[
+
+]
+
+.pull-right[
+
+]
+---
+
+# Zonal 
+
+- Zonal operations compute a summary values (such as the mean) from cells aggregated to some zonal unit. 
+
+--
+
+- Like focal operations, a zone and a mediating function must be defined
+
+--
+
+- The most basis example of a zonal function is aggregation!
+
+--
+
+
+
+---
+
+# Zonal Statisics (More advanced)
+
+- For more complicated object zones, [exactextractr](https://github.com/isciences/exactextractr) is a fast and effiecient R utility that binds the C++ `exactextract` tool. 
+
+--
+
+- What is the county level mean January rainfall in California?
+
+--
+
+
+
+---
+
+# What about the US?
+
+
+
+
+
+
+---
+
+# Global
+
+- Global operations make use of _some_ or _all_ input cells when computing an output cell value. 
+
+- They are a special case of zonal operations with the _entire_ raster represents a single zone. 
+
+- Examples include generating descriptive statistics for the entire raster dataset
+
+---
+
+### Mean Monthly Rainfall for California
+
+
+
+---
+
+### One potential limit to the raster package in R is speed
+
+- If dealing with bigger data, the raster package is a bit antiquated
+
+--
+
+- rasterize polygons: `fasterize`
+
+- Extract cell values by feature: `velox`
+
+- Zonal Statistics: `exactextractr`
+
+- Proxy objects: `stars`
+
+--
+
+- If you really want to work with _BIG_ data (e.g. Terabytes or Petabytes) your limit is both hardware and software...
+
+--
+
+- Cloud platforms like Google Earth Engine are valuable
+
+- GEE is a javascript library with some python bindings build by Google, but as with most great spatial libraries it has an R [wrapper](https://github.com/r-spatial/rgee):
+
+
+---
+class: center, middle
+
+All said, there are many valid reason to **not** use R, but speed is not one of them even though is is commonly the most cited...
+
+---
+
+# Extra! Animating Rasters...
+
+Install and load the `gifski` package
+
+- **save_gif**: combines many individual plots
+
+- A **for loop** build the plots
+
+- The **plot** is what we have been doing all along (if you want a ggplot you must print the object!)
+
+- **gif_file**: the path to save the image
+
+- **width/height**: the image dimensions
+
+- **delay**: the pause between frames
+
+- **loop**: should the gif play over and over?
+
+
+
+---
+# Result
+
+![](lec-img/ppt.gif) 
+
+---
+
+# Daily Assignment:
+
+Keep working in your elevation Rmd...
+
+- install `osmdata` from CRAN
+
+- For the Goleta area, extract all OSM point data for restaurants. See [here](https://wiki.openstreetmap.org/wiki/Tag:amenity%3Drestaurant) for the OSM tag.
+
+- Keep only those that have a name in the name attribute (remove NAs)
+
+- `extract` the elevation of these restaurants from your elevation raster
+  - add this information as a new column to the OSM points 
+
+- Create a leaflet map to show these locations as `Markers`.
+  - The `label` should be the name
+  - The `popup` should be the elevation cast to a character.
+
+---
+
+
+
+---
+
+# Submission
+
+Submit your knit HTML file to Guachospace
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
