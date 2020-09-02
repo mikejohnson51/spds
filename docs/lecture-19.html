@@ -5,6 +5,17 @@
     <meta charset="utf-8" />
     <meta name="author" content="Mike Johnson" />
     <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+    <script src="libs/jquery-1.12.4/jquery.min.js"></script>
+    <link href="libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet-1.3.1/leaflet.js"></script>
+    <link href="libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+    <script src="libs/Proj4Leaflet-1.0.1/proj4-compressed.js"></script>
+    <script src="libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+    <link href="libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet-binding-2.0.3/leaflet.js"></script>
+    <script src="libs/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js"></script>
+    <script src="libs/leaflet-providers-plugin-2.0.3/leaflet-providers-plugin.js"></script>
     <link rel="stylesheet" href="ucsb.css" type="text/css" />
   </head>
   <body>
@@ -66,7 +77,7 @@ Grades due on the 17th
 
 # Recap
 
-
+&lt;img src="lec-img/18-raster.png" width="474" style="display: block; margin: auto;" /&gt;
 
 ---
 # Yesterdays Assignment
@@ -74,28 +85,84 @@ Grades due on the 17th
 ### Read in the saved raster file
 
 
+```r
+(r = raster("data/goleta-elev.tif"))
+```
+
+```
+class      : RasterLayer 
+dimensions : 318, 318, 101124  (nrow, ncol, ncell)
+resolution : 31.45065, 31.45065  (x, y)
+extent     : -2157752, -2147751, 1530395, 1540396  (xmin, xmax, ymin, ymax)
+crs        : +proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+source     : /Users/mikejohnson/github/spds/lectures/data/goleta-elev.tif 
+names      : goleta.elev 
+values     : -70, 501  (min, max)
+```
 ---
 
 ### Create a conditional (threshold) mask
 
 
+```r
+threshold = function(x) {ifelse(x &lt;= 0 , NA, 1)}
+```
 
 --
 
 
+```r
+threshold(100)
+```
+
+```
+[1] 1
+```
+
+```r
+threshold(-100)
+```
+
+```
+[1] NA
+```
 
 --
 
 
+```r
+(m = calc(r, threshold))
+```
+
+```
+class      : RasterLayer 
+dimensions : 318, 318, 101124  (nrow, ncol, ncell)
+resolution : 31.45065, 31.45065  (x, y)
+extent     : -2157752, -2147751, 1530395, 1540396  (xmin, xmax, ymin, ymax)
+crs        : +proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+source     : memory
+names      : layer 
+values     : 1, 1  (min, max)
+```
 
 ---
 
 .pull-left[
 
+```r
+plot(r)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-8-1.png" width="432" /&gt;
 ]
 
 .pull-left[
 
+```r
+plot(m, col = "black")
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-9-1.png" width="432" /&gt;
 ]
 
 ---
@@ -105,21 +172,74 @@ Grades due on the 17th
 - algebraic, logical, and functional operations act on a raster cell-wise
 
 
+```r
+ocean_cut = m * r
+plot(ocean_cut, col = viridis::viridis(256))
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-10-1.png" width="432" style="display: block; margin: auto;" /&gt;
 ---
 
 # Reclassify
 
 
+```r
+(rcl = data.frame(min = seq(0,500,100),max =  seq(100,600, 100), lab = c(0:5)))
+```
+
+```
+  min max lab
+1   0 100   0
+2 100 200   1
+3 200 300   2
+4 300 400   3
+5 400 500   4
+6 500 600   5
+```
 
 
+```r
+(rc = reclassify(ocean_cut, rcl, lowerTRUE = TRUE))
+```
+
+```
+class      : RasterLayer 
+dimensions : 318, 318, 101124  (nrow, ncol, ncell)
+resolution : 31.45065, 31.45065  (x, y)
+extent     : -2157752, -2147751, 1530395, 1540396  (xmin, xmax, ymin, ymax)
+crs        : +proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+source     : memory
+names      : layer 
+values     : 0, 5  (min, max)
+```
 
 ---
 
 
+```r
+(s = stack(r, m, ocean_cut, rc) %&gt;% 
+  setNames(c("elevation", "land-mask", "terrain", "topography")))
+```
+
+```
+class      : RasterStack 
+dimensions : 318, 318, 101124, 4  (nrow, ncol, ncell, nlayers)
+resolution : 31.45065, 31.45065  (x, y)
+extent     : -2157752, -2147751, 1530395, 1540396  (xmin, xmax, ymin, ymax)
+crs        : +proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+names      : elevation, land.mask, terrain, topography 
+min values :       -70,         1,       1,          0 
+max values :       501,         1,     501,          5 
+```
 
 ---
 
 
+```r
+plot(s, col = viridis::viridis(256))
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-14-1.png" width="432" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -180,7 +300,7 @@ Grades due on the 17th
   
 ---
   
-
+&lt;img src="lec-img/19-osm.png" width="1137" style="display: block; margin: auto;" /&gt;
 ---
 
 # Lets get the waterway data in R!
@@ -198,12 +318,43 @@ Grades due on the 17th
 --
 
 
+```r
+(bb  = st_bbox(s) %&gt;% st_as_sfc() %&gt;% st_transform(4326))
+```
+
+```
+Geometry set for 1 feature 
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: -119.9263 ymin: 34.38165 xmax: -119.7928 ymax: 34.49051
+geographic CRS: WGS 84
+```
 
 ---
 
 With a bounding box, we can use the `osmdata` library to format OSM (overpass API) queries:
 
 
+```r
+(osm = osmdata::opq(bb))
+```
+
+```
+$bbox
+[1] "34.3816492088834,-119.926331041619,34.490509206584,-119.792833373424"
+
+$prefix
+[1] "[out:xml][timeout:25];\n(\n"
+
+$suffix
+[1] ");\n(._;&gt;;);\nout body;"
+
+$features
+NULL
+
+attr(,"class")
+[1] "list"           "overpass_query"
+```
 
 ---
 ### But... we want features!
@@ -215,6 +366,27 @@ Specifically features that match the tag `waterway=stream`
 --
 
 
+```r
+(osm = osmdata::opq(bb) %&gt;% 
+  add_osm_feature(key = 'waterway', value = "stream") )
+```
+
+```
+$bbox
+[1] "34.3816492088834,-119.926331041619,34.490509206584,-119.792833373424"
+
+$prefix
+[1] "[out:xml][timeout:25];\n(\n"
+
+$suffix
+[1] ");\n(._;&gt;;);\nout body;"
+
+$features
+[1] " [\"waterway\"=\"stream\"]"
+
+attr(,"class")
+[1] "list"           "overpass_query"
+```
 ---
 
 With a formatted query, we can extract the web-based data as `sf` objects
@@ -222,21 +394,65 @@ With a formatted query, we can extract the web-based data as `sf` objects
 --
 
 
+```r
+(osm = osmdata::opq(bb) %&gt;% 
+  add_osm_feature(key = 'waterway', value = "stream") %&gt;% 
+  osmdata_sf())
+
+print(osm)
+```
   
 ---
 
 ### So what did we get?
 
 
+```r
+(river = osm$osm_lines %&gt;% 
+   dplyr::select(osm_id, name, waterway))
+```
+
+```
+Simple feature collection with 206 features and 3 fields
+geometry type:  LINESTRING
+dimension:      XY
+bbox:           xmin: -119.931 ymin: 34.41211 xmax: -119.7606 ymax: 34.50882
+geographic CRS: WGS 84
+First 10 features:
+           osm_id                name waterway                       geometry
+23144196 23144196                &lt;NA&gt;   stream LINESTRING (-119.8703 34.42...
+23144200 23144200                &lt;NA&gt;   stream LINESTRING (-119.8424 34.42...
+23144203 23144203 Maria Ygnacio Creek   stream LINESTRING (-119.7945 34.45...
+23144204 23144204                &lt;NA&gt;   stream LINESTRING (-119.8815 34.48...
+23144206 23144206     Las Vegas Creek   stream LINESTRING (-119.8331 34.45...
+23144210 23144210                &lt;NA&gt;   stream LINESTRING (-119.7994 34.46...
+23144219 23144219           Dry Creek   stream LINESTRING (-119.8664 34.48...
+23144220 23144220      Devereux Creek   stream LINESTRING (-119.8896 34.42...
+23144223 23144223                &lt;NA&gt;   stream LINESTRING (-119.8699 34.45...
+23144236 23144236     San Pedro Creek   stream LINESTRING (-119.8311 34.49...
+```
 ---
 
 ## Lets find the longest river segment *IN* our extent
 
 
+```r
+river = river %&gt;% 
+  st_transform(crs(s)) %&gt;% 
+  st_intersection(st_as_sfc(st_bbox(r))) %&gt;% 
+  mutate(length = st_length(.)) %&gt;% 
+  slice_max(length, n = 1)
+```
 
 --
 
 
+```r
+plot(r)
+plot(river, add = TRUE, col = "blue", lwd = 2)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-22-1.png" width="432" /&gt;
 
 ---
 
@@ -247,18 +463,41 @@ With a formatted query, we can extract the web-based data as `sf` objects
 - To do this, we need to know the inlet and outlet as well as the straight line connector
 
 
+```r
+inlet  = head(st_cast(river, "POINT"), 1)
+outlet = tail(st_cast(river, "POINT"), 1) 
+pts = bind_rows(inlet, outlet) 
+
+line = st_cast(st_union(pts), "LINESTRING")
+```
 
 ---
 
 
+```r
+plot(r)
+plot(river, add = TRUE, col = "blue", lwd = 2)
+plot(line, add = TRUE, col = "black", lwd = 2)
+plot(outlet$geometry, add = TRUE, pch = 16, col = "red")
+plot(inlet$geometry, add = TRUE, pch = 16, col = "green")
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-24-1.png" width="432" /&gt;
 ---
 ## Sinuosity
 
 Channel **sinuosity** is calculated by dividing the length of the stream channel by the straight line distance between the end points of the selected channel reach.
 
 
+```r
+(sin = st_length(river) / st_length(line))
+```
 
+```
+1.149436 [1]
+```
 
+&lt;img src="lec-img/19-sinuosity.png" width="942" style="display: block; margin: auto;" /&gt;
 ---
 
 ## River Slope:
@@ -272,10 +511,24 @@ To calculate this, we must extract elevation values at the inlet and outlet:
 --
 
 
+```r
+(elev = raster::extract(r, pts))
+```
+
+```
+[1] 56  4
+```
 
 --
 
 
+```r
+100 * (elev[1] - elev[2]) / units::drop_units(st_length(river))
+```
+
+```
+[1] 1.111
+```
 
 ---
 
@@ -284,10 +537,19 @@ To calculate this, we must extract elevation values at the inlet and outlet:
 What does the elevation profile of the river look like?
 
 
+```r
+profile = raster::extract(r, river)[[1]]
+```
 
 --
 
 
+```r
+plot(profile, type = "l")
+lines(zoo::rollmean(profile,k = 6), col = "darkred", lwd = 3)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-30-1.png" width="432" style="display: block; margin: auto;" /&gt;
 
 ---
 class: center, middle, inverse
@@ -327,6 +589,34 @@ class: center, middle, inverse
 # Yesterdays Rainfall data:
 
 
+```r
+library(climateR)
+AOI = USAboundaries::us_counties() %&gt;% filter(state_name == "California")
+
+system.time({ 
+  ca = climateR::getTerraClim(AOI, "prcp", startDate = "2000-01-01", endDate = '2000-12-31') 
+})
+```
+
+```
+   user  system elapsed 
+  2.054   0.184   4.788 
+```
+
+```r
+(prcp = ca$prcp)
+```
+
+```
+class      : RasterStack 
+dimensions : 229, 247, 56563, 12  (nrow, ncol, ncell, nlayers)
+resolution : 0.04149798, 0.04148472  (x, y)
+extent     : -124.3958, -114.1458, 32.52083, 42.02083  (xmin, xmax, ymin, ymax)
+crs        : +proj=longlat +a=6378137 +f=0.00335281066474748 +pm=0 +no_defs 
+names      : X2000.01, X2000.02, X2000.03, X2000.04, X2000.05, X2000.06, X2000.07, X2000.08, X2000.09, X2000.10, X2000.11, X2000.12 
+min values :        0,        2,        4,        0,        0,        0,        0,        0,        0,        3,        0,        0 
+max values :      605,      598,      165,      291,      124,       59,       66,       99,       60,      235,      151,      158 
+```
 
 ---
 
@@ -349,6 +639,14 @@ class: center, middle, inverse
 ---
 
 
+```r
+s = stack(mean(prcp), calc(prcp, sd), min(prcp), max(prcp)) %&gt;% 
+  setNames(c("Mean", "StDev", "Min", "Max"))
+
+rasterVis::levelplot(s)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-32-1.png" width="432" /&gt;
 
 ---
 
@@ -389,15 +687,30 @@ class: center, middle, inverse
 Lets apply a smoothing kernel to our UCSB elevation data over an 11x11 window, using the mean operator
   
 
+```r
+ucsb = AOI::aoi_get("UCSB") %&gt;% st_transform(crs(r))
+ucsb_elev = crop(r, ucsb)
+f1 &lt;- focal(ucsb_elev, w= matrix(1,nrow=11,ncol=11), fun=mean)
+```
 ---
 
 # Results 
 .pull-left[
 
+```r
+plot(ucsb_elev)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-34-1.png" width="432" /&gt;
 ]
 
 .pull-right[
 
+```r
+plot(f1)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-35-1.png" width="432" /&gt;
 ]
 
 ---
@@ -406,10 +719,43 @@ Lets apply a smoothing kernel to our UCSB elevation data over an 11x11 window, u
 
 .pull-left[
 
+```r
+matrix(1,nrow=11,ncol=11)
+```
+
+```
+      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11]
+ [1,]    1    1    1    1    1    1    1    1    1     1     1
+ [2,]    1    1    1    1    1    1    1    1    1     1     1
+ [3,]    1    1    1    1    1    1    1    1    1     1     1
+ [4,]    1    1    1    1    1    1    1    1    1     1     1
+ [5,]    1    1    1    1    1    1    1    1    1     1     1
+ [6,]    1    1    1    1    1    1    1    1    1     1     1
+ [7,]    1    1    1    1    1    1    1    1    1     1     1
+ [8,]    1    1    1    1    1    1    1    1    1     1     1
+ [9,]    1    1    1    1    1    1    1    1    1     1     1
+[10,]    1    1    1    1    1    1    1    1    1     1     1
+[11,]    1    1    1    1    1    1    1    1    1     1     1
+```
 ]
 
 .pull-right[
 
+```r
+mean(ucsb_elev[1:11, 1:11])
+```
+
+```
+[1] 16.20661
+```
+
+```r
+na.omit(values(f1))[1]
+```
+
+```
+[1] 16.20661
+```
 ]
 ---
 
@@ -428,6 +774,11 @@ Lets apply a smoothing kernel to our UCSB elevation data over an 11x11 window, u
 --
 
 
+```r
+aggregate(ucsb_elev, 10) %&gt;% plot()
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-38-1.png" width="432" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -442,16 +793,34 @@ Lets apply a smoothing kernel to our UCSB elevation data over an 11x11 window, u
 --
 
 
+```r
+AOI$janPTT = exactextractr::exact_extract(prcp$X2000.01, AOI, "mean", progress = FALSE)
+plot(AOI['janPTT'])
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-39-1.png" width="432" /&gt;
 
 ---
 
 # What about the US?
 
 
+```r
+counties =  filter(us_counties(), !usps %in% c("AK", "HI", "PR"))
+  
+jan = getTerraClim(counties, "prcp", startDate = "2000-01-01") 
+  
+counties$janPTT = exact_extract(jan$prcp, counties, "mean", progress = FALSE)
+```
 
 
 
 
+```r
+plot(counties['janPTT'], border = NA, key.pos = 4)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-42-1.png" width="432" style="display: block; margin: auto;" /&gt;
 ---
 
 # Global
@@ -467,6 +836,12 @@ Lets apply a smoothing kernel to our UCSB elevation data over an 11x11 window, u
 ### Mean Monthly Rainfall for California
 
 
+```r
+v = cellStats(prcp, mean)
+plot(x = 1:12, y = v, type  = "l", main = "Rainfall Monthly Mean")
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-43-1.png" width="432" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -521,6 +896,16 @@ Install and load the `gifski` package
 - **loop**: should the gif play over and over?
 
 
+```r
+library(gifski)
+
+save_gif(
+  {for(i in 1:nlayers(prcp)) {
+      plot(prcp[[i]], col = blues9, legend = FALSE, main = month.name[i])}
+  }, 
+  gif_file = "lec-img/ppt.gif", 
+  width = 800, height = 600, delay = .33, loop = TRUE)
+```
 
 ---
 # Result
@@ -548,7 +933,8 @@ Keep working in your elevation Rmd...
 
 ---
 
-
+<div id="htmlwidget-4ca27e819b7fefa4f4f1" style="width:432px;height:504px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4ca27e819b7fefa4f4f1">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addProviderTiles","args":["CartoDB",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addMarkers","args":[[34.4430236,34.4303938,34.4311699,34.4311362,34.4118967,34.4305277,34.4304664,34.4304556,34.436135,34.4417243,34.4298894,34.4295883,34.4298105,34.4409167,34.4416203],[-119.8801197,-119.882268,-119.8739299,-119.8738376,-119.8548208,-119.8723609,-119.8724644,-119.8722312,-119.8158627,-119.8256961,-119.8670623,-119.8722792,-119.8670706,-119.8240939,-119.824618],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},["46","17","16","16","15","15","14","14","14","13","13","13","13","13","13"],null,null,null,["Frog Bar and Grill","Cal Taco","Jeannine's","Sharky's Woodfired Mexican Grill","PokiRito","Choppa Poke","Pieology Pizzeria","Kyle's Kitchen","Breakfast Café","Masala Spice Indian Cuisine","Sam's To Go","Los Agaves","Lucky Dragon","Kyle's Kitchen","Sushi Teri"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[34.4118967,34.4430236],"lng":[-119.882268,-119.8158627]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
