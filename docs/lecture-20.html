@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 176A</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 176A
+## Lecture 20: K-means Clustering
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+# Raster Data Model
+
+&lt;img src="lec-img/18-raster.png" width="474" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Raster Data (Values)
+
+
+```r
+(v = c(1:8))
+```
+
+```
+[1] 1 2 3 4 5 6 7 8
+```
+
+--
+
+
+```r
+dim(v) = c(2,4)
+v
+```
+
+```
+     [,1] [,2] [,3] [,4]
+[1,]    1    3    5    7
+[2,]    2    4    6    8
+```
+
+---
+
+
+```r
+dim(v) = c(2,2,2)
+v
+```
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+, , 2
+
+     [,1] [,2]
+[1,]    5    7
+[2,]    6    8
+```
+
+---
+
+# Map Algebra: 2 maps
+
+
+```r
+AOI = USAboundaries::us_states() %&gt;% filter(name == "California")
+ca = getTerraClim(AOI, c("tmax", "srad"), startDate = "2018-08-01") 
+s = stack(ca) %&gt;% setNames(c("tmax", "srad"))
+plot(s)
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-7-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+# Local 
+
+
+```r
+tmax = s$tmax / 10
+plot(tmax)
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-8-1.png" width="432" style="display: block; margin: auto;" /&gt;
+---
+
+# Focal 
+
+
+```r
+tmax_smooth = focal(tmax, w = matrix(1, 11,11), mean)
+plot(tmax_smooth)
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-9-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+# Zonal
+
+
+```r
+tmax_agg = aggregate(tmax, 10)
+plot(tmax_agg)
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-10-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+# Global
+
+
+```r
+cellStats(tmax, fivenum)
+```
+
+```
+[1] 23.7 28.0 28.8 29.3 30.0
+```
+
+---
+
+# Reclassification: Local operation via global persepctive
+
+
+```r
+#global
+f = cellStats(s$srad, fivenum)
+# matrix
+rcl = data.frame(f[1:4], f[2:5], 1:4)
+#local
+out = reclassify(s$srad, rcl,include.lowest = TRUE)
+plot(out, col = RColorBrewer::brewer.pal(4, "Spectral"))
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-12-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+### Apply map algrbras over layers of a stack
+
+
+```r
+reclassQuarts = function(x){
+  f = cellStats(x, fivenum)
+  rcl = data.frame(f[1:4], f[2:5], 1:4)
+  reclassify(x, rcl,include.lowest = TRUE)
+}
+
+out = stack(lapply(ca, reclassQuarts))
+plot(stack(out), col = viridis::viridis(4))
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-13-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Naive Interaction between Classifications: Multiplicative
+
+- Relationship between tmax and solar radiation 
+
+
+```r
+out2 = out$srad * out$tmax
+plot(out2, col = viridis::viridis(16))
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-14-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Naive Interaction between Classifications: Bivariate
+
+- Geography 183 stype cartography
+
+
+```r
+plot(out$srad, col = viridis::viridis(4, alpha = .5), legend = FALSE)
+plot(out$tmax, col = viridis::inferno(4, alpha = .25), add = TRUE, legend = FALSE)
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-15-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle
+# Moving beyond "additive" associations
+---
+
+# Clustering
+
+- Clustering is a broad set of techniques for finding subgroups of observations within a data set. 
+
+  - K-means
+  - Decision-tree
+  - Random Forest
+  - Hierarchical
+
+--
+
+- When we cluster observations, we want to place simular observations in the same category, and dissimular observations in others.
+
+
+--
+
+- The amount of variance allowed in each group depends on how many categories you select
+
+--
+
+- Clustering is an **unsupervised** method, which implies that it seeks to find relationships between "n" observations without being trained by a response variable or a "truth"
+
+---
+
+# K-means
+
+K-means clustering is the simplest and the most commonly used clustering method for splitting a dataset into "k" groups.
+
+
+---
+
+# K-means
+
+- Valuable, particularly for geodata
+
+--
+
+- Basis of clustering and a lot of "machine learning"
+
+--
+
+- Can be abused...
+
+--
+
+&lt;img src="lec-img/20-ml-really.png" width="432" style="display: block; margin: auto;" /&gt;
+
+^this study is without a doubt morally questionable and even methodologically questionable as it supporting a positive feedback loop. It is also based on the idea that arrests are a good proxy for crime...
+
+---
+
+# Data Preparation
+
+To perform a cluster analysis your data should be prepared as follows:
+
+ - **Rows** are observations and **columns** are variables (tidy data)
+ 
+--
+
+ - *All* missing values (`NA`, `NULL`) must be removed or estimated.
+
+--
+
+ - The data should be standardized (i.e., scaled) to make variables comparable. 
+ 
+--
+
+- standardization consists of transforming the variables such that they have mean zero and standard deviation one.
+
+--
+
+- In R, base `scale` does the following:
+
+`$$\frac{x - mean(x)}{sd(x)}$$`
+--
+
+
+scaling makes sense when you have multiple variables at different magnitudes (e.g. temperature and PRCP). 
+
+---
+
+# Toy Data
+
+We will use the wine dataset from the UCI Machine Learning Repository.
+
+The wine dataset contains the results of a chemical analysis of wines grown in a specific area of Italy. Three types of wine are represented in the 178 samples, with the results of 13 chemical analyses recorded for each sample. 
+
+
+
+```r
+library(rattle.data)
+data = dplyr::select(wine, "Alcohol", "Malic", "Ash")
+dim(data)
+```
+
+```
+[1] 178   3
+```
+
+```r
+head(data)
+```
+
+```
+  Alcohol Malic  Ash
+1   14.23  1.71 2.43
+2   13.20  1.78 2.14
+3   13.16  2.36 2.67
+4   14.37  1.95 2.50
+5   13.24  2.59 2.87
+6   14.20  1.76 2.45
+```
+
+---
+
+# Preparing Data
+
+
+- We should always ensure there is no missing data (`NA` values are "infectious")
+
+
+```r
+data &lt;- na.omit(data)
+```
+
+--
+
+- The data should be standardized so that the clustering algorithm is not influenced by an arbitrary variable unit
+
+--
+
+- In our data we see Alcohol is a magnitude larger then Malic and Ash
+
+--
+
+
+```r
+(data &lt;- scale(data))
+```
+
+```
+        Alcohol       Malic         Ash
+1    1.51434077 -0.56066822  0.23139979
+2    0.24559683 -0.49800856 -0.82566722
+3    0.19632522  0.02117152  1.10621386
+4    1.68679140 -0.34583508  0.48655389
+5    0.29486844  0.22705328  1.83522559
+6    1.47738706 -0.51591132  0.30430096
+7    1.71142720 -0.41744613  0.30430096
+8    1.30493643 -0.16680747  0.88751034
+9    2.25341491 -0.62332789 -0.71631546
+10   1.05857838 -0.88291793 -0.35180959
+11   1.35420804 -0.15785609 -0.24245783
+12   1.37884384 -0.76654998 -0.16955666
+13   0.92308146 -0.54276546  0.15849862
+14   2.15487169 -0.54276546  0.08559744
+15   1.69910930 -0.41744613  0.04914686
+16   0.77526663 -0.47115441  1.21556562
+17   1.60056608 -0.37268923  1.28846679
+18   1.02162467 -0.68598755  0.92396093
+19   1.46506916 -0.66808479  0.41365272
+20   0.78758453  0.68357369  0.70525741
+21   1.30493643 -0.63227927 -0.31535901
+22  -0.08698653  1.31017034  1.03331269
+23   0.87380985 -0.42639751 -0.02375431
+24  -0.18552975 -0.65913341  0.55945507
+25   0.61513390 -0.47115441  0.88751034
+26   0.06082829 -0.25632128  3.11099611
+27   0.47963697 -0.50695994  0.92396093
+28   0.36877585 -0.55171684 -0.82566722
+29   1.07089628 -0.39059199  1.58007149
+30   1.25566482 -0.58752236 -0.57051311
+31   0.89844565 -0.74864721  1.21556562
+32   0.71367712 -0.60542512 -0.02375431
+33   0.83685614 -0.45325165 -0.02375431
+34   0.93539936 -0.72179307  1.21556562
+35   0.62745180 -0.48010579  1.03331269
+36   0.59049809 -0.47115441  0.15849862
+37   0.34414005 -0.62332789  1.72587383
+38   0.06082829 -0.61437650  0.66880683
+39   0.08546410 -0.74864721 -0.97146956
+40   1.50202286  1.48024658  0.52300448
+41   0.68904131 -0.56066822 -0.20600725
+42   0.50427278  1.34597587 -0.89856839
+43   1.08321419 -0.39954337  0.81460917
+44   0.29486844  1.47129519 -0.27890842
+45   0.06082829 -0.50695994 -0.97146956
+46   1.48970496  1.52500348  0.26785038
+47   1.69910930  1.12219135 -0.31535901
+48   1.10784999 -0.58752236 -0.89856839
+49   1.35420804 -0.28317542  0.12204803
+50   1.15712160 -0.54276546 -0.35180959
+51   0.06082829 -0.54276546 -1.19017308
+52   1.02162467 -0.61437650  0.85105976
+53   1.00930677 -0.52486270  0.19494920
+54   0.94771726 -0.39059199  1.14266445
+55   0.91076355 -0.59647374 -0.42471076
+56   0.68904131 -0.54276546  0.34075155
+57   1.50202286 -0.56961960 -0.24245783
+58   0.35645795 -0.32793232  1.14266445
+59   0.88612775 -0.81130688  0.48655389
+60  -0.77678907 -1.24992453 -3.66881295
+61  -0.82606067 -1.10670244 -0.31535901
+62  -0.44420570 -0.87396654 -1.26307425
+63   0.82453824 -0.97243173 -1.62758012
+64  -0.77678907 -1.07984830 -0.75276604
+65  -1.02314711 -0.79340412  0.59590565
+66  -0.77678907 -1.00823725  0.70525741
+67   0.13473571 -1.18726487 -2.42949302
+68  -0.77678907 -1.04404278 -1.62758012
+69   0.41804746 -1.24992453 -0.02375431
+70  -0.97387550 -1.02614002 -2.24724008
+71  -0.87533228 -0.65018203 -0.57051311
+72   1.05857838 -0.73969583  1.10621386
+73   0.60281600 -0.60542512 -0.46116135
+74  -0.01307912 -0.59647374  0.85105976
+75  -1.28182306 -1.11565382 -0.24245783
+76  -1.65136013 -0.40849475 -1.62758012
+77   0.03619249 -1.28573006 -2.39304243
+78  -1.42963789  0.49559470 -0.49761194
+79  -0.82606067 -1.20516763 -1.51822836
+80  -0.37029829  1.37283001  0.12204803
+81  -1.23255145 -1.26782729 -1.33597542
+82  -0.34566248 -0.47115441 -0.60696370
+83  -1.13400823 -1.07984830  0.52300448
+84   0.06082829  1.36387863 -0.16955666
+85  -1.42963789 -1.29468144  0.77815859
+86  -0.40725200 -1.21411901 -0.46116135
+87  -1.03546501 -0.65018203 -0.20600725
+88  -1.66367803 -0.59647374  0.92396093
+89  -1.67599593 -0.24736990  0.34075155
+90  -1.13400823 -0.90082069 -0.24245783
+91  -1.13400823 -0.45325165 -0.16955666
+92  -1.23255145 -0.73969583  0.19494920
+93  -0.38261619 -0.72179307 -0.38826018
+94  -0.87533228  0.44188642 -0.53406252
+95  -1.70063174 -0.31002956 -0.31535901
+96  -0.65361004 -0.73074445 -0.60696370
+97  -1.46659160 -0.19366161  1.36136797
+98  -0.87533228 -0.82920964 -1.40887660
+99  -0.77678907 -1.13355658 -0.97146956
+100 -0.87533228  0.74623336 -0.57051311
+101 -1.13400823 -0.22946714 -2.42949302
+102 -0.49347731 -0.89186931 -1.70048129
+103 -0.81374277  0.10173395  0.34075155
+104 -1.45427369 -0.55171684 -1.77338246
+105 -0.60433843 -0.54276546 -1.40887660
+106 -0.71519955  0.19124776 -0.35180959
+107 -0.92460389 -0.54276546 -0.89856839
+108 -0.34566248 -0.52486270 -0.31535901
+109 -0.96155760 -0.93662621 -1.55467894
+110 -1.71294964 -0.88291793  1.21556562
+111 -1.89771818  1.25646206 -1.99208598
+112 -0.59202053  0.08383119 -0.71631546
+113 -1.52818111  0.30761571  2.01747852
+114 -1.95930769 -1.42895215  0.48655389
+115 -1.13400823 -0.84711240  0.48655389
+116 -2.42738798 -0.73969583 -0.60696370
+117 -1.45427369 -0.77550136 -1.37242601
+118 -0.71519955 -0.65018203 -0.64341428
+119 -0.28407297  0.97896926 -1.40887660
+120 -1.23255145  0.97896926 -1.33597542
+121 -1.91003608  0.05697705  0.19494920
+122 -1.77453915 -0.25632128  3.14744670
+123 -0.71519955  1.87410733  1.32491738
+124  0.06082829  3.10044648 -0.86211780
+125 -1.39268418  1.76669076  0.08559744
+126 -1.14632613 -0.15785609 -0.71631546
+127 -0.70288165 -0.72179307 -0.27890842
+128 -1.49122740 -0.18471023  1.50717031
+129 -0.77678907 -0.63227927 -0.24245783
+130 -1.18327984  1.75773938  0.04914686
+131 -0.17321185 -0.88291793 -0.16955666
+132 -0.14857605  0.58510851  0.12204803
+133 -0.23480136 -0.02358538  0.12204803
+134 -0.37029829  1.08638583 -0.02375431
+135 -0.60433843 -0.98138311 -0.42471076
+136 -0.49347731  0.11068533 -0.60696370
+137 -0.92460389  2.13369737  0.63235624
+138 -0.57970263  2.84085644  0.99686210
+139  0.60281600  1.12219135 -0.64341428
+140 -0.19784766  0.55825437  0.88751034
+141 -0.08698653  0.42398365  1.21556562
+142  0.44268327  0.20019914 -0.06020490
+143  0.63976970  0.74623336  1.28846679
+144  0.76294873  2.33957912 -0.06020490
+145 -0.92460389  1.38178139 -0.60696370
+146  0.19632522  1.10428859 -0.78921663
+147  1.08321419  2.42014155 -0.49761194
+148 -0.16089395  2.03523218  0.41365272
+149  0.39341166  0.80889302  0.04914686
+150  0.09778200  1.39968415 -0.02375431
+151  0.61513390  0.70147646  0.92396093
+152 -0.25943717  0.29866433  0.41365272
+153  0.13473571 -0.39059199  1.39781855
+154  0.28255053  0.86260131 -0.31535901
+155 -0.51811312 -0.93662621 -0.97146956
+156  0.20864312  2.55441226 -0.16955666
+157  1.03394258  1.59661452  0.04914686
+158 -0.67824585  0.62091403  0.99686210
+159  1.64983769 -0.58752236  1.21556562
+160  0.59049809 -0.59647374  0.99686210
+161 -0.78910697  1.33702448  0.04914686
+162  0.84917404  0.82679579  0.63235624
+163 -0.18552975  0.83574717  0.77815859
+164 -0.05003283  0.99687202 -0.06020490
+165  0.96003516  0.37922675 -0.24245783
+166  0.89844565  1.81144766 -0.38826018
+167  0.55354439  1.22065654  0.85105976
+168 -0.22248346  0.92526097 -0.24245783
+169  0.71367712  0.21810190  1.17911504
+170  0.49195487  2.02628080  1.79877500
+171 -0.98619340  0.62091403 -0.16955666
+172 -0.28407297  0.04802567 -0.31535901
+173  1.42811545  0.15544223  0.41365272
+174  0.87380985  2.96617577  0.30430096
+175  0.49195487  1.40863553  0.41365272
+176  0.33182214  1.73983662 -0.38826018
+177  0.20864312  0.22705328  0.01269627
+178  1.39116174  1.57871176  1.36136797
+attr(,"scaled:center")
+  Alcohol     Malic       Ash 
+13.000618  2.336348  2.366517 
+attr(,"scaled:scale")
+  Alcohol     Malic       Ash 
+0.8118265 1.1171461 0.2743440 
+```
+
+---
+
+# Distance Measures
+
+- The classification of "n" observations requires some method for computing the distance between each pair of observations. 
+
+--
+
+- The result of this distance calculation is known as a  `distance` matrix. 
+
+--
+
+- There are **many** methods to calculate distance and the choice is a critical step in clustering. 
+
+---
+
+The classical methods for distance measures are Euclidean and Manhattan distances defined as follow:
+
+$$ euclid = \sqrt{\sum(x_i - y_i)^2} $$
+--
+
+
+$$ man = \sum |x_i - y_i| $$
+
+where `\(x\)` and `\(y\)` are two vectors of length `\(n\)`
+
+---
+
+- For most common clustering software, the default distance measure is the `Euclidean` method 
+
+--
+
+- Depending on the type of the data and the research questions, other dissimilarity measures might be preferred and you should be aware of the options.
+
+--
+
+- the `dist` function in the `stats` package is able to compute the distance matrix
+
+--
+
+- The default method is 'euclidean' with support for  "*euclidean*", "*maximum*", "*manhattan*", "*canberra*", "*binary*" or "*minkowski*" calcuations
+
+--
+
+- Within R it is simple to compute and visualize the distance matrix using the functions `get_dist` and `fviz_dist` from the `factoextra` package. 
+
+
+```r
+dist &lt;- dist(data)
+length(dist)
+```
+
+```
+[1] 15753
+```
+
+---
+
+- Visualization tools, like those found in `factoextra` can help visualize a distance matrix
+
+--
+
+
+```r
+library(factoextra)
+fviz_dist(dist)
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-21-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+--
+
+- This visualization begins to illustrate which wines have large dissimilarities (blue) and those that are fairly similar (red).
+
+-- 
+
+- The red diagonal across the middle is the comparison of each wine to itself, thus the perfect similarity!
+
+---
+
+# Categorizing your distance matrix
+
+- K-means clustering is the most common unsupervised machine learning algorithm for partitioning a given data set into a set of k groups (i.e. k clusters)
+
+--
+
+- k represents the number of groups pre-specified by the analyst. 
+
+--
+
+
+- It classifies objects in multiple groups (i.e., clusters), such that objects within the same cluster are as similar as possible (i.e., high intra-class similarity), and objects from different clusters are as dissimilar as possible (i.e., low inter-class similarity). 
+
+--
+
+- In k-means clustering, each cluster is represented by its `center` (i.e, centroid) which corresponds to the `mean` of values assigned to the cluster.
+
+---
+
+
+&lt;img src="lec-img/20-intra-inter.jpg" width="711" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Determining Cluster Variation
+
+- k-means clustering defines clusters so that the total `intra-cluster` variation (total within-cluster variation) is `minimized.` 
+
+--
+
+- There are several k-means algorithms available.
+
+--
+
+- The standard algorithm is the Hartigan-Wong algorithm (1979), which defines the total within-cluster variation as the sum of squared Euclidean distances between items and the corresponding centroid:
+
+$$ W(C_k) = \sum(x_i - \mu_k)^2$$
+
+where:
+
+`\(x_i\)` is a data point belonging to the cluster `\(C_k\)`
+
+`\(\mu_k\)` is the mean value of the points assigned to the cluster  `\(C_k\)`
+
+
+---
+
+Each observation ( `\(x_i\)` ) is assigned to a given cluster ( `\(k\)` ) such that the sum of squares (SS) distance of the observation to their assigned cluster centers ( `\(\mu_k\)` ) is minimized.
+
+--
+
+The **total** within-cluster variation of the clustering is defined as:
+
+$$ total.withiness = \sum_{k=1}^k W(C_k)$$
+--
+
+- The _total_, 
+
+--
+
+_within-cluster_, 
+
+--
+
+_sum of square_, measures the compactness of the clustering
+
+--
+
+- We want it to be as **small** as possible.
+
+---
+
+# Implementing the Algorithm
+
+K-means algorithm can be summarized as follows:
+
+ - Specify the number of clusters (k) to be created
+ - User choice .. say we pick 5
+ 
+&lt;img src="lec-img/20-kmeans-1.png" width="311" style="display: block; margin: auto;" /&gt;
+ 
+ 
+---
+
+ - Select randomly k objects from the data set as the initial cluster `centers` or `means`
+ 
+&lt;img src="lec-img/20-kmeans-2.png" width="311" style="display: block; margin: auto;" /&gt;
+
+---
+ - Assigns each observation to their closest centroid, based on the Euclidean distance between the object and the centroid
+ 
+&lt;img src="lec-img/20-kmeans-3.png" width="311" style="display: block; margin: auto;" /&gt;
+
+---
+
+- For each of the `k` clusters, the cluster centroid is updated by calculating the new mean of all the data points assigned to that cluster. 
+
+&lt;img src="lec-img/20-kmeans-4.png" width="311" style="display: block; margin: auto;" /&gt;
+
+---
+
+- Iteratively _minimize_ the total within sum of square. That is, iterate the assignment and centroid updating until the cluster assignments stop changing - or -  the maximum number of iterations is reached. 
+
+- Repeat until no observations change cluster
+
+&lt;img src="lec-img/20-kmeans-5.png" width="311" style="display: block; margin: auto;" /&gt;
+---
+
+# Making 2 clusters!
+
+
+```r
+set.seed(09032020) # random process becomes repeatable
+k2 &lt;- kmeans(data, centers = 2)
+str(k2)
+```
+
+```
+List of 9
+ $ cluster     : Named int [1:178] 1 2 1 1 1 1 1 1 1 1 ...
+  ..- attr(*, "names")= chr [1:178] "1" "2" "3" "4" ...
+ $ centers     : num [1:2, 1:3] 0.576 -0.849 0.363 -0.535 0.441 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : chr [1:2] "1" "2"
+  .. ..$ : chr [1:3] "Alcohol" "Malic" "Ash"
+ $ totss       : num 531
+ $ withinss    : num [1:2] 238 120
+ $ tot.withinss: num 358
+ $ betweenss   : num 173
+ $ size        : int [1:2] 106 72
+ $ iter        : int 1
+ $ ifault      : int 0
+ - attr(*, "class")= chr "kmeans"
+```
+
+---
+
+
+```r
+names(k2)
+```
+
+```
+[1] "cluster"      "centers"      "totss"        "withinss"     "tot.withinss"
+[6] "betweenss"    "size"         "iter"         "ifault"      
+```
+
+
+--
+
+The output of kmeans is a _list_ with several elements. The most important being:
+
+--
+
+**cluster**: A vector of integers (from 1:k) indicating the cluster to which each point is allocated.
+
+--
+
+**centers**: A matrix of cluster centers.
+
+--
+
+**totss**: The total sum of squares.
+
+--
+
+**withinss**: Vector of within-cluster sum of squares, one component per cluster.
+
+--
+
+**tot.withinss**: Total within-cluster sum of squares, i.e. sum(withinss).
+
+--
+
+**betweenss**: The between-cluster sum of squares, i.e. `\(totss-tot.withinss\)`.
+
+--
+
+**size**: The number of points in each cluster.
+
+---
+
+# Visualize
+
+`factoextra` provide a nice wrapper from visualizing clusetered data:
+
+If there are more than two dimensions (variables), `fviz_cluster`  performs a principal component analysis (PCA) and plots the data points according to the two principal components that explain the majority of the variance.
+
+
+```r
+fviz_cluster(k2, data = data)
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-30-1.png" width="432" style="display: block; margin: auto;" /&gt;
+---
+
+# Testing other K values
+
+
+```r
+k3 &lt;- kmeans(data, centers = 3, nstart = 25)
+k4 &lt;- kmeans(data, centers = 4, nstart = 25)
+k5 &lt;- kmeans(data, centers = 5, nstart = 25)
+
+# plots to compare
+p1 &lt;- fviz_cluster(k2, geom = "point",  data = data) + ggtitle("k = 2")
+p2 &lt;- fviz_cluster(k3, geom = "point",  data = data) + ggtitle("k = 3")
+p3 &lt;- fviz_cluster(k4, geom = "point",  data = data) + ggtitle("k = 4")
+p4 &lt;- fviz_cluster(k5, geom = "point",  data = data) + ggtitle("k = 5")
+```
+---
+
+
+```r
+library(patchwork)
+p1+p2+p3+p4
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-32-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Application to Raster Data!
+
+- each layer of a RasterStack is a layer
+- each layer is a vector of values
+
+
+```r
+library(climateR)
+params = c("prcp", "tmax", "tmin", "swe", "srad", "q")
+AOI = USAboundaries::us_states() %&gt;% filter(name == "Colorado")
+co = climateR::getTerraClim(AOI, params, startDate = "2018-10-01")  %&gt;% 
+  stack() %&gt;% 
+  setNames(params)
+```
+
+---
+# Colorado October 2018 climate
+
+
+```r
+plot(co)
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-34-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+# Raster layers are vectors!
+
+
+```r
+values = values(co)
+head(values)
+```
+
+```
+     prcp tmax tmin swe srad    q
+[1,]   40    2  125   0 11.7 -2.6
+[2,]   42    2  123   0 10.5 -2.7
+[3,]   41    2  124   0 11.1 -2.6
+[4,]   38    2  124   0 12.4 -2.3
+[5,]   37    2  125   0 12.5 -2.2
+[6,]   37    2  125   0 13.0 -2.0
+```
+---
+
+# Data Prep
+
+- Indetify NA indeces for latter reference
+- Remove NA values 
+- Scale
+
+
+
+```r
+idx = which(!is.na(values))
+v = na.omit(values)
+vs = scale(v)
+```
+
+---
+
+
+```r
+E = kmeans(vs, 5, iter.max = 100)
+
+E
+```
+
+```
+K-means clustering with 5 clusters of sizes 588, 6460, 5248, 3751, 515
+
+Cluster means:
+         prcp        tmax        tmin        swe       srad          q
+1  0.97836330 -0.03904582 -1.24528800  4.6000816 -2.4623693 -1.7861408
+2 -0.56332312 -0.23982798 -0.09022581 -0.2398735  0.7006490  0.7012246
+3  0.33232819 -0.06520388 -0.68737011 -0.1289148 -0.7879687 -0.9411265
+4 -0.08050804 -0.16107024  1.38096304 -0.2398735  0.5148674  0.5535750
+5  3.14896522  4.89050900 -0.50016685  0.8175625 -1.6977219 -1.1982284
+
+Clustering vector:
+    [1] 3 3 3 3 3 3 3 3 3 3 3 3 3 2 2 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3
+   [37] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+   [73] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [109] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [145] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 2 2 3 3 2
+  [181] 3 2 2 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+  [217] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+  [253] 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [289] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [325] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 3 2 2 2 2 2
+  [361] 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+  [397] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2
+  [433] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [469] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [505] 2 2 2 2 2 2 3 3 3 3 3 2 2 2 2 2 2 2 2 3 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 3
+  [541] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3 3 3 3 3 3 3 3
+  [577] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [613] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [649] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3
+  [685] 2 2 2 2 2 2 3 3 3 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3
+  [721] 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+  [757] 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [793] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [829] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [865] 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+  [901] 3 3 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 2 2 2
+  [937] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+  [973] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1009] 2 2 2 2 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2 3
+ [1045] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3 3 3 3
+ [1081] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1117] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1153] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 2 2 2
+ [1189] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [1225] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3
+ [1261] 3 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1297] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1333] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1369] 2 2 2 2 2 2 3 3 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [1405] 3 3 3 3 3 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 3 3 3 3 3 3 3 3 3 2
+ [1441] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1477] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1513] 2 2 2 2 2 2 2 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3
+ [1549] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 3 3 3 3
+ [1585] 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2
+ [1621] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1657] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3
+ [1693] 2 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 2 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [1729] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [1765] 3 1 1 3 3 3 3 1 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1801] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1837] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 2 2 2
+ [1873] 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [1909] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 1 1 3 3 3
+ [1945] 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [1981] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2017] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 2 2 2 2 2 2 2 3 3 3 3
+ [2053] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [2089] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 1 1 1 1 3 3 3 3 3 3 2 2 2 2 2 2
+ [2125] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2161] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2197] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [2233] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [2269] 3 3 3 3 1 1 1 1 1 1 1 1 1 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2305] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2341] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 2 3 3 3 3 3
+ [2377] 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [2413] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 1 1 1
+ [2449] 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2485] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2521] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 3 3 3 3 3
+ [2557] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [2593] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 3 1 1 1 1 3 3 3 3 3 3 3 3 2 2 2
+ [2629] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2665] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2701] 2 2 2 2 2 2 3 3 3 3 3 3 3 3 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [2737] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1
+ [2773] 3 3 3 3 3 3 1 1 1 3 3 1 1 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2809] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2845] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3
+ [2881] 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [2917] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3
+ [2953] 1 1 1 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [2989] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3025] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3061] 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [3097] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3 3 1 1 1 1 3 3 3 3 3 2
+ [3133] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3169] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3205] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3
+ [3241] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [3277] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3313] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3349] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3385] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [3421] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [3457] 3 3 3 3 1 1 1 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3493] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3529] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3565] 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [3601] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 3 3
+ [3637] 3 3 3 2 2 2 2 2 2 2 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3673] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3709] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 2 2 2 2 2 2 3 3 3 3 3
+ [3745] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [3781] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 3 3 3 2 2 2 2 2 2 2 2 4
+ [3817] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3853] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3889] 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [3925] 3 3 3 3 3 3 3 3 3 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [3961] 3 3 3 3 3 3 3 3 1 1 1 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [3997] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4033] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4069] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1
+ [4105] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1
+ [4141] 3 3 3 3 3 2 2 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4177] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4213] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3
+ [4249] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 1 1 3 3 3 3 3 3 3 3 3 3 3 3
+ [4285] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3 3 3 3 3 2 2 4 2 2
+ [4321] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4357] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4393] 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [4429] 3 3 3 3 3 3 3 3 1 1 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [4465] 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3 3 3 3 3 2 2 2 4 2 2 2 2 2 2 2 2 2 2 2 2
+ [4501] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4537] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4573] 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1
+ [4609] 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3 3
+ [4645] 1 3 3 3 3 3 3 3 3 3 2 2 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4681] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4717] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3
+ [4753] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [4789] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 1 1 1 1 1 3 3 3 3 3 3 3 3 3 4
+ [4825] 2 4 2 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4861] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [4897] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [4933] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3
+ [4969] 3 3 3 3 3 3 3 1 1 1 1 1 1 1 1 3 3 3 3 3 3 3 3 3 4 2 4 4 4 4 4 2 4 2 2 2
+ [5005] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [5041] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [5077] 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1
+ [5113] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 3 3 3 3 3 3 3 1 1 1
+ [5149] 1 1 3 3 3 3 3 3 3 3 3 3 3 2 2 2 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [5185] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [5221] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2 3 3 3 3 3 3 3
+ [5257] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 3 3 3 3 3 3 3 3 3
+ [5293] 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 3 3 3 1 1 1 1 1 1 1 1 3 3 3 3 3 3 3 3 3
+ [5329] 3 3 2 2 2 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [5365] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [5401] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [5437] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [5473] 3 3 1 1 1 3 3 3 3 1 1 1 1 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 4 2 4 4 4 4 4 4
+ [5509] 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [5545] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [5581] 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [5617] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 3 3 3 3
+ [5653] 1 1 1 1 1 1 1 1 3 3 3 3 3 3 3 3 3 4 2 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2
+ [5689] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [5725] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2 3 2 3 3 3 3 3 3 3 3 3
+ [5761] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [5797] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 3 3 3 3 3 3 1 1 1 1 1 1 1 3 3
+ [5833] 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [5869] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [5905] 2 2 2 2 2 2 2 2 2 2 2 2 3 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [5941] 3 3 3 3 3 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [5977] 3 3 3 3 3 3 1 1 1 3 3 3 3 3 3 1 1 1 1 1 1 1 1 3 3 3 3 3 3 3 3 3 3 4 4 4
+ [6013] 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [6049] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [6085] 2 2 2 2 2 2 2 2 2 2 3 3 3 3 2 3 2 3 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2
+ [6121] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 3 3 3 3 1 1 1 3 1
+ [6157] 3 3 3 3 1 1 1 1 3 3 1 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+ [6193] 4 4 4 4 4 2 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [6229] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [6265] 3 3 3 3 3 3 2 2 3 3 3 3 2 2 2 2 2 2 2 3 3 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3
+ [6301] 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 1 3 3 3 1 1 1 1 1 3 3 3 1 1 1 1 3 3 3 3
+ [6337] 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 2 4 4 4 4 4 4 4 4 4 4 2 2
+ [6373] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [6409] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 2 2 2 2 2 3
+ [6445] 3 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [6481] 3 1 1 1 1 1 3 3 3 1 1 1 1 1 1 3 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4
+ [6517] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [6553] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [6589] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3
+ [6625] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 3 1 1 3 1 1
+ [6661] 1 1 1 1 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+ [6697] 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [6733] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [6769] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [6805] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 3 3 1 1 1 1 1 1 1 1 3 3 3 3 3
+ [6841] 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+ [6877] 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [6913] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [6949] 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [6985] 3 3 3 3 3 3 1 1 1 1 3 3 1 1 1 1 1 3 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [7021] 3 4 4 4 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2
+ [7057] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [7093] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3
+ [7129] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 1 1 1 3 3
+ [7165] 3 3 1 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 3 3 4 4 4 4 4
+ [7201] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [7237] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [7273] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [7309] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 1 1 1 3 3 3 3 1 1 1 1 3 3 3 3 3
+ [7345] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+ [7381] 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [7417] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [7453] 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 3
+ [7489] 3 3 3 3 3 1 1 1 1 1 1 1 3 3 3 3 1 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [7525] 3 3 3 4 4 3 4 4 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2
+ [7561] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [7597] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3
+ [7633] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 1 3 3 3 3 1 1 1 1 1 1 1
+ [7669] 1 3 3 3 3 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 3 3 3 4 3 3 3
+ [7705] 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2
+ [7741] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [7777] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [7813] 3 3 3 3 3 3 3 3 1 1 1 1 1 1 3 3 3 3 1 1 1 1 1 1 1 1 1 3 3 3 1 1 1 3 3 3
+ [7849] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3 3 3 3 4 4 4 4 4 4 4 4 4 4
+ [7885] 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [7921] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [7957] 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1
+ [7993] 1 1 1 1 1 3 1 1 1 1 1 1 1 1 1 3 3 3 3 3 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [8029] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+ [8065] 2 2 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [8101] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3
+ [8137] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [8173] 1 1 1 1 1 1 3 3 3 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [8209] 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 4 4 4 4 2 2 2 2 2 2
+ [8245] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [8281] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [8317] 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3 3 3 1
+ [8353] 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4
+ [8389] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [8425] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2
+ [8461] 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [8497] 3 1 3 3 3 3 3 1 1 1 1 1 3 3 1 1 1 1 1 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [8533] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+ [8569] 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [8605] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2
+ [8641] 3 3 3 2 2 2 2 2 2 2 3 3 3 3 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1
+ [8677] 1 1 3 3 3 1 1 1 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [8713] 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2
+ [8749] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [8785] 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [8821] 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3 1 1 1 1 1
+ [8857] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 4 4 4 4 4
+ [8893] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [8929] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3
+ [8965] 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3
+ [9001] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3
+ [9037] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+ [9073] 4 4 4 4 4 4 4 4 4 4 2 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [9109] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 2 2 2 2 2
+ [9145] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [9181] 3 3 3 3 3 3 3 3 3 1 1 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [9217] 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2
+ [9253] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [9289] 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [9325] 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 1 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 1 1 1
+ [9361] 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3 3 3 3 3 3 3 3 3
+ [9397] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [9433] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [9469] 2 2 2 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3
+ [9505] 3 3 3 3 3 1 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 1 1 1 1 1 1 1 3 3 3 3 3 3 3
+ [9541] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4
+ [9577] 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [9613] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3
+ [9649] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [9685] 3 3 3 3 3 3 3 1 1 3 1 3 1 1 1 1 1 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [9721] 3 3 4 3 4 4 4 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+ [9757] 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [9793] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2
+ [9829] 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [9865] 3 1 1 1 1 1 1 3 3 3 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4
+ [9901] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2
+ [9937] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3
+ [9973] 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3
+[10009] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 3 3 3 3 3 2
+[10045] 4 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[10081] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[10117] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2 2 2 2 2 2 2 2 2 3 3
+[10153] 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[10189] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 3 3 3 2 4 4 3 3 4 3 3 3 3 3 3
+[10225] 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[10261] 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[10297] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3
+[10333] 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[10369] 3 3 3 3 3 3 3 1 1 3 3 3 3 3 3 3 3 4 4 4 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4
+[10405] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2
+[10441] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[10477] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 3 3
+[10513] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 3
+[10549] 3 3 3 3 3 3 3 4 4 4 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[10585] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2
+[10621] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[10657] 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3
+[10693] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3 3 3 3 3 3 4 4 4
+[10729] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[10765] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[10801] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3
+[10837] 3 3 3 3 3 3 3 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[10873] 3 3 3 3 3 3 3 3 3 3 3 3 1 3 3 3 3 3 3 3 1 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4
+[10909] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[10945] 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[10981] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 2
+[11017] 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[11053] 3 1 3 3 5 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[11089] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2
+[11125] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 2 2 2 2
+[11161] 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[11197] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[11233] 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[11269] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[11305] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[11341] 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[11377] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 5 1 3 3 4 4 4 4 4 4
+[11413] 4 4 4 4 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[11449] 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[11485] 2 2 2 2 2 2 2 2 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3
+[11521] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[11557] 3 3 3 3 3 3 3 3 3 3 3 4 4 4 3 3 5 1 3 3 4 4 4 4 4 4 3 3 3 3 4 4 4 4 4 4
+[11593] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2
+[11629] 2 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4
+[11665] 4 2 4 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 5
+[11701] 1 5 3 3 3 5 1 5 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4
+[11737] 4 4 4 3 3 3 1 1 3 4 4 4 4 4 4 4 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[11773] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 4 4 4 2 2 2 2 2 2 2 2 2
+[11809] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 2 2 2 2 2 2 2 2
+[11845] 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 5 5 1 1 5 5 3 3 5 1 5 5 3 3
+[11881] 3 3 5 5 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 2 2 4 4 4 4 4 4 4 3 3 1 1 3 3 4
+[11917] 4 4 4 4 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[11953] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[11989] 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3
+[12025] 3 3 3 3 3 3 3 3 3 3 3 5 1 1 1 5 5 3 3 5 5 5 3 3 3 5 5 1 5 5 3 3 3 3 3 3
+[12061] 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 3 5 1 1 3 3 4 4 4 4 4 3 3 3 3 3 4
+[12097] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[12133] 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[12169] 4 4 4 4 4 4 4 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 5 5 5 5 5 3 3 5
+[12205] 1 1 5 5 5 3 3 5 5 5 5 5 5 5 5 1 1 5 5 5 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4
+[12241] 4 4 4 4 4 4 4 4 4 3 5 1 1 3 4 4 4 4 4 4 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4
+[12277] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2
+[12313] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 2 2 2
+[12349] 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 5 5 5 5 5 5 5 1 1 5 1 5 5 3 3 5 5 5
+[12385] 5 1 5 1 1 1 1 5 5 5 3 3 5 5 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3
+[12421] 1 1 5 3 4 4 4 4 4 4 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[12457] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[12493] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 2 2 2 2 2 3 3 3 3 3 3 3 3 3
+[12529] 3 3 3 3 3 3 3 3 3 5 1 5 5 1 1 1 5 1 5 5 3 5 5 5 5 1 1 1 1 1 5 1 1 5 5 5
+[12565] 5 1 1 5 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 5 1 1 3 3 4 4 4 4 4 4
+[12601] 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[12637] 4 4 4 4 4 4 2 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[12673] 2 2 2 4 4 4 4 4 3 4 3 4 4 4 4 2 3 3 3 3 3 3 5 3 3 3 3 3 3 3 3 3 5 5 1 1
+[12709] 5 5 1 5 1 1 5 5 5 5 5 5 5 5 5 1 5 5 5 5 5 1 1 1 5 1 5 5 5 3 3 3 3 3 3 4
+[12745] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 5 5 5 3 4 4 4 4 4 4 4 3 3 3 4 4 4 4 4 4 4
+[12781] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[12817] 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 3
+[12853] 3 3 3 4 2 2 3 3 3 3 3 3 5 5 3 5 5 5 5 5 3 5 5 1 5 5 5 5 5 1 1 1 1 1 5 5
+[12889] 5 5 3 5 5 5 3 3 3 5 5 5 5 5 5 5 5 5 5 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4
+[12925] 4 4 4 4 3 5 1 3 4 4 4 4 4 4 4 4 4 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[12961] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2
+[12997] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 3 3 3
+[13033] 3 3 5 3 3 3 5 5 5 5 5 1 5 5 5 5 5 5 1 1 1 1 5 5 5 5 3 3 3 5 5 3 3 3 3 3
+[13069] 5 5 5 5 5 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 3 4 4 4
+[13105] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[13141] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[13177] 2 2 2 2 2 2 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 5 5 1
+[13213] 1 5 5 5 5 1 1 1 5 5 5 3 5 5 3 3 3 3 3 3 3 5 5 3 3 3 5 5 5 5 3 3 3 3 3 4
+[13249] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[13285] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[13321] 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4
+[13357] 4 4 4 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 5 3 5 5 5 5 5 5 5 5 3 5 1 1 1 5 5
+[13393] 5 3 3 3 3 5 3 3 3 3 5 5 3 3 5 3 3 3 5 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[13429] 4 4 4 4 4 4 4 4 4 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[13465] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2
+[13501] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3
+[13537] 3 3 3 3 3 3 3 5 3 3 5 3 5 5 3 3 5 5 5 5 1 1 1 5 1 5 5 5 5 5 5 5 3 3 5 5
+[13573] 5 3 5 5 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 5 3
+[13609] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[13645] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[13681] 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[13717] 3 3 3 3 3 5 3 5 1 1 5 5 1 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 3 3 3 3 3 3
+[13753] 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 1 3 3 3 3 3 3 4 4 4 4 4 4
+[13789] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[13825] 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4
+[13861] 4 4 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 5 5 1 5 5
+[13897] 5 5 5 5 5 5 5 5 5 5 5 5 1 5 5 5 5 5 3 3 5 5 5 5 5 3 3 3 4 4 4 4 4 4 4 4
+[13933] 4 4 4 4 4 4 4 4 4 4 4 5 1 1 5 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[13969] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2
+[14005] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4 4 4 4
+[14041] 4 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 5 5 5 1 5 3 5 5 3 5 3 3 3 3 5 5 5
+[14077] 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[14113] 5 5 5 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[14149] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[14185] 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3
+[14221] 3 3 3 3 3 3 3 3 3 5 5 5 5 3 5 3 3 5 3 3 3 3 3 5 5 5 5 5 5 5 5 5 5 5 5 5
+[14257] 5 5 5 5 5 5 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 4 4 4 4 4 4 4 4
+[14293] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[14329] 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[14365] 2 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[14401] 5 3 3 3 3 5 3 3 3 3 3 3 3 5 5 5 3 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 3 4 4 4
+[14437] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[14473] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2
+[14509] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4
+[14545] 4 4 4 4 4 4 4 4 3 3 3 3 3 5 5 5 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[14581] 3 3 5 5 5 5 3 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 3 4 4 4 4 4 4 4 4 4 4 4 4 4
+[14617] 4 4 4 4 4 4 4 4 4 4 4 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[14653] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[14689] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3
+[14725] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 5 5
+[14761] 5 5 5 5 5 5 5 5 5 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3
+[14797] 3 3 4 4 4 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[14833] 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[14869] 2 2 2 2 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 4 3 3
+[14905] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 5 5 5 5 5 5 5 5 5 5 5 5 5 5 3
+[14941] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 5 3 4 3 3 3 4 4 4 4 4
+[14977] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2
+[15013] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4
+[15049] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 3 3 3 4 4 4 4 3 3 3 3 3 3 3 3 3 3 3 3
+[15085] 3 3 3 3 3 3 3 3 3 3 5 5 5 5 5 5 5 5 5 5 5 5 5 5 3 4 4 4 4 4 4 4 4 4 4 4
+[15121] 4 4 4 4 4 4 4 4 4 4 4 3 3 3 5 5 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15157] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2
+[15193] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15229] 4 4 4 4 4 4 3 3 4 4 4 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 3 3 4 4 3 3 3
+[15265] 5 5 5 5 5 5 5 5 5 5 5 5 5 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15301] 3 5 5 5 1 5 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15337] 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[15373] 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15409] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 3 3 3 5 5 5 5 5 5 5 5 5
+[15445] 5 5 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 5 5 1 3 4 4 4 4 4
+[15481] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15517] 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4
+[15553] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3
+[15589] 4 4 4 4 4 4 4 3 4 4 4 4 3 3 3 5 5 5 5 5 5 5 5 5 5 5 5 3 4 4 4 4 4 4 4 4
+[15625] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 5 1 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15661] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2
+[15697] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15733] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15769] 4 4 3 5 5 5 3 5 5 5 5 5 5 5 5 5 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15805] 4 4 4 4 3 5 1 5 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15841] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[15877] 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[15913] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 5 5 3 5 5 5 5
+[15949] 5 5 5 5 5 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 5 1 5 4 4 4
+[15985] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[16021] 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4
+[16057] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[16093] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 3 5 5 5 5 5 5 5 5 5 3 4 4 4 4 4
+[16129] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 5 5 5 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[16165] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2
+[16201] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4 4 4
+[16237] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[16273] 4 4 3 4 4 4 4 4 4 3 5 5 5 5 5 5 5 5 5 5 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[16309] 4 4 4 4 4 3 5 5 5 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[16345] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[16381] 2 2 2 2 2 2 2 2 2 2 2 2 2 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[16417] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 3
+[16453] 3 3 3 5 5 5 5 5 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 5 5 5 3 3 4
+[16489] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[16525] 4 4 4 4 4 4 4 4 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[16561] 2 2
+
+Within cluster sum of squares by cluster:
+[1]  3011.554  5497.655 11266.241  5872.202  4334.660
+ (between_SS / total_SS =  69.8 %)
+
+Available components:
+
+[1] "cluster"      "centers"      "totss"        "withinss"     "tot.withinss"
+[6] "betweenss"    "size"         "iter"         "ifault"      
+```
+
+---
+
+### Copying a raster structure
+
+
+```r
+clus_raster = co$tmax
+values(clus_raster) = NA
+```
+
+--
+### Assign values
+
+```r
+clus_raster[idx] &lt;- E$cluster
+plot(clus_raster, col = RColorBrewer::brewer.pal(5, "Spectral"))
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-39-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Merging across data sources
+
+```r
+# Get elevations data
+elev = elevatr::get_elev_raster(AOI, z = 5) %&gt;% 
+  crop(AOI)
+
+# Align Raster extents and resolutions
+elev = projectRaster(elev, co$prcp)
+
+# Extract Values
+values = stack(co$prcp, elev) %&gt;% values()
+
+# Prep data
+idx = which(!is.na(values))
+v = na.omit(values)
+vs = scale(v)
+
+# Cluster
+E = kmeans(vs, 5, iter.max = 100)
+clus_raster = elev[[1]]
+values(clus_raster) = NA
+clus_raster[idx] &lt;- E$cluster
+```
+
+---
+
+.pull-left[
+
+```r
+par(mfrow = c(2,1))
+plot(elev)
+plot(co$prcp)
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-41-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+```r
+plot(clus_raster, col = RColorBrewer::brewer.pal(5, "Spectral"))
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-42-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Clustering at larger scales
+
+
+```r
+counties =  filter(USAboundaries::us_counties(), !state_abbr %in% c("AK", "HI", "PR"))
+
+params = c("tmax", "tmin", "prcp", "srad")
+
+s = getTerraClim(counties, params, startDate = "2018-06-01") %&gt;% 
+  stack() %&gt;% 
+  setNames(params)
+```
+
+&lt;img src="lec-img/20-raster-save.png" width="342" style="display: block; margin: auto;" /&gt;
+---
+
+
+
+
+```r
+dat = exactextractr::exact_extract(s, counties, "mean", progress = FALSE)
+```
+
+
+```r
+dat = scale(dat)
+
+counties$clust8 = kmeans(dat, 8)$cluster
+
+plot(st_transform(counties["clust8"], 5070), border = NA)
+```
+
+&lt;img src="lecture-20_files/figure-html/unnamed-chunk-47-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Daily Assignment
+
+In a new Rmd...
+
+- Install `climateR` (remotes::install_github("mikejohnson51/climateR"))
+
+- Pick 2-4 climate variables for a state of your choice for one month of your choice (winter,summer, spring, etc)
+
+  - Pick your climate variables based on the state and month you choose
+  - You can find available climate variables using (`param_meta$terraclim`) (use the `call` column)
+  
+
+```r
+param_meta$terraclim
+```
+
+```
+     common.name call                                      description units
+1            aet  aet                        Actual Evapotranspiration    mm
+2  water_deficit  def                           Climatic Water Deficit    mm
+3         palmer PDSI                    Palmer Drought Severity Index      
+4            pet  pet                     Reference Evapotranspiration    mm
+5           prcp  ppt                        Accumulated Precipitation    mm
+6              q    q                                           Runoff    mm
+7          soilm soil                    Soil Moisture at End of Month    mm
+8           srad srad Downward Shortwave Radiation Flux at the Surface  W/m2
+9            swe  swe            Snow Water Equivalent at End of Month    mm
+10          tmax tmax                          Maximum 2-m Temperature     C
+11          tmin tmin                          Minimum 2-m Temperature     C
+12            vp  vap                               2-m Vapor Pressure   kPa
+13           vpd  vpd                      Mean Vapor Pressure Deficit   kPa
+14          wind   ws                               Wind Speed at 10-m   m/s
+```
+  
+---
+
+- Implement a k-means classification for your state and your variables.
+
+- Plot your final image using a nice color palette
+
+---
+
+# Submission
+
+Submit your knit document to Gauchospace
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

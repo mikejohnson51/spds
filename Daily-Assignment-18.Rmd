@@ -1,0 +1,63 @@
+---
+title: "Daily Assignment 18"
+author: "Conor Dunn"
+date: "9/2/2020"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(viridis)
+library(sf)
+library(raster)
+library(rgdal)
+
+```
+
+```{r}
+#remotes::install_github("jhollist/elevatr")
+```
+
+
+```{r}
+bb = read_csv("/Users/mikejohnson/github/lab-05-W/data/uscities.csv") %>%
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) %>% 
+  filter(city == "Goleta") %>% 
+  st_transform(5070) %>% 
+  st_buffer(5000) %>% 
+  st_bbox() %>% 
+  st_as_sfc() %>% 
+  st_as_sf()
+
+elev = elevatr::get_elev_raster(bb, z = 11) %>% crop(bb)
+writeRaster(elev, filename = "lectures/data/goleta-elev-connor.tif", overwrite = TRUE)
+
+(elev = raster("data/goleta-elev.tif"))
+```
+
+
+
+
+```{r}
+
+(r = raster("data/goleta-elev.tif"))
+
+threshold = function(x) {ifelse(x <= 0 , NA, 1)}
+
+(m = calc(r, threshold))
+
+ocean_cut = m * r
+plot(ocean_cut, col = viridis::viridis(256))
+
+(rcl = data.frame(min = seq(0,500,100),max =  seq(100,600, 100), lab = c(0:5)))
+
+(rc = reclassify(ocean_cut, rcl, lowerTRUE = TRUE))
+
+(s = stack(r, m, ocean_cut, rc) %>% 
+  setNames(c("elevation", "land-mask", "terrain", "topography")))
+
+plot(s, col = viridis::viridis(256))
+```
+
+
