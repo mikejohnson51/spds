@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 176A</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 176A
+## Lecture 22: The end…
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+class: middle, inverse, center
+# Data Science
+---
+
+# Day #1: Introduction
+
+- GEOG 176A is part of a 3-part series, you are just getting started!
+
+--
+
+- Our goal was to learn the _underlying utilities_ and _concepts_ that drive **all** GIS platforms
+
+--
+
+- We chose to use `R` because it offers a powerful data science component and spatial component built on the international standards (simple features and raster)
+
+--
+
+- Programming is about finding a sequence of instructions to perform/automate a task (like your labs)
+
+--
+
+- The learning curve for coding is difficult and things click at different times
+
+---
+
+# Day #2: Geoinformatics
+
+- Information and Geographic _Systems_
+
+--
+
+
+- Information and Geographic _Science_
+
+--
+
+
+- Spatial Data Science - or - **Geoinformatics**
+
+--
+
+
+_How do we combine the knowledge of computer science, mathmatics, information science, and data science to answer geographic questions?_
+
+
+--
+
+
+  - Understand our computer and systems for working with digital data in a reproducible, flexible way.
+
+--
+
+  - Have a strong foundation in standard data manipulation and data visualization
+
+--
+
+  - Understand what makes "spatial" special including familiarity with vector objects, raster fields, and time.
+
+
+---
+
+# Day #3: The Digital Environment
+
+- **Files** : comprised of a path, name and extension
+
+  - Files are made of of bits and bytes
+  
+--
+
+- **Naming things:** 
+  - being intentional about how we name "things" (directories, files, and variables)
+  - focusing on making names machine and human readable, as well as sortable (think lab 5!)
+
+--
+
+- **Never, never, never, never have spaces in your paths or names!!!**
+
+--
+
+- RStudio Projects as a way of enforcing a common  working directory
+
+--
+
+- All projects contain structure, and almost all projects (ArcMap, R, Java, Word) can use the same structure
+
+--
+
+- Never, never, never, never use `setwd()`!!!
+
+
+---
+# Our goal for good GI science ...
+*Well-annotated*: Through documentation and comments
+
+*Organized*: Project Structure
+
+*Raw Data*: Keep raw data raw!
+
+*Final Reports*: Rmarkdown files
+
+*Unbreakable Paths*: Rproj to the rescue
+
+*Complete History*: Version control with git and GitHub
+
+--
+
+For this we learned Rmarkdown, GitHub, GitHub Pages, Rmd files, and R scripts
+
+---
+
+# Day #4: Data Types and Structure
+
+- Data Types (logical, numeric, integer, **raw**)
+
+--
+
+- Dates, factors, POSIXct are S3 classs built on these primitive types
+
+
+--
+
+- Types can be stored as atomic (single-type) vectors
+
+--
+
+- Vectors can have dimension!
+  - 2D is a matrix
+  - 3D is an array
+  
+-- 
+
+- Multiple vectors of varying size can be stored as a list
+
+--
+
+- A `data.frame` is a list of equaled sized 1D vectors.
+
+--
+
+- data.frames drive our vectors view of the world
+- diminsioned vectors drive our raster view of the world
+
+---
+
+# Day #5: Data Frame Manipulation
+
+- Grammer of Data manipulation: `dplyr`
+
+--
+
+- Based on SQL (Structured Query Language)
+
+--
+
+- Pure verbs: `select` (columnwise reduction) and `filter` (row-wise reduction)
+
+--
+
+- Manipulation verbs: `mutate` (add), `summarize` (reduce), `arrange` (sort)
+
+--
+
+
+- The level of analysis can be controlled by `group_by`
+
+---
+
+# Day #6: Data Visulaization
+
+- Grammar of Graphics: `ggplot`
+
+--
+
+- ggplot graphics are built step by step by adding new elements and layers
+
+  - Data
+  - Geometry (geom)
+  - Aesthetic mapping
+  - Theme
+  - Elements of a plot are layered by iteritavly adding elements
+  
+--
+
+- These can be added in a series of 5 steps:
+
+  - Setup
+  - Layers
+  - Labels
+  - Facets
+  - Themes
+  
+---
+
+# Day #7: Relations and Format
+
+- Joining data
+
+--
+
+  - Data can be integrated/joined/merged by defining a relation (relational data)
+
+--
+
+  - Relations are defined by a shared key (*primary* and *foreign*)
+
+--
+
+  - The join operation you chose dictates which dataset "dominates" the join
+    - left, right, inner, full, semi, and anti joins
+
+--
+  
+Data can be formatted in different ways:
+
+--
+
+  - "tidy" or "wide" way (each row is one observation)
+
+--
+
+  - Or "long"  (each row is one data point)
+
+--
+
+- `pivot_wider` and `pivot_longer` allow us to move between these forms
+
+--
+
+- `sfc` columns cannot yet be pivoted! (`st_drop_geometry`)
+
+---
+
+# Day #8: Time and Summary
+
+- Lags and rolling functions are useful for feature-based time data
+
+--
+
+- Recreated graphics from the NY-Times related to COVID using table manipulation and ggplot
+
+---
+class: middle, inverse, center
+# Spatial Objects
+---
+
+
+# Day #9: Spatial Data Libraries
+
+- OSGeo and OGC are high-level governing bodies for geospatial libraries
+
+--
+
+# GEOS 
+  - ports a subset of the JTS Topology Suite which conforms to the Simple Features specification for SQL
+
+--
+
+  - Provides an object model for planar geometry and geometric functions
+
+--
+
+  - Area and distance functions, spatial predicats (DE-9IM) overlay, buffer, simplifications, voronoi tesselation ...
+
+--
+
+  - Reading and writing of WKT and WKB (as well as GML)
+
+--
+
+# PRØJ
+
+- transforms geospatial coordinates from one coordinate reference system (CRS) to another including cartographic projections and geodetic transformations.
+
+---
+
+# GDAL
+
+- provides a software library for reading and writing raster and vector data formats
+
+--
+
+- presents a single abstract data model to the calling application for all supported formats.
+
+---
+
+# PostGIS
+
+  - PostGIS (POST-jis) follows the Simple Features for SQL specification
+  
+--
+
+  - adds support for geographic objects to the PostgreSQL object-relational database.
+
+# PostgreSQL
+
+  - is relational database management system (R/DBMS) emphasizing extensibility and SQL compliance.
+
+
+---
+
+# sf: Simple features in R
+
+Binds to these libraries represents simple features as records (rows) in a `data.frame` _with_ a geometry list-column
+
+
+```r
+library(sf)
+sf::sf_extSoftVersion()
+```
+
+```
+          GEOS           GDAL         proj.4 GDAL_with_GEOS     USE_PROJ_H 
+       "3.8.1"        "3.1.1"        "6.3.1"         "true"         "true" 
+```
+
+
+&lt;img src="lec-img/09-sf-depends.png" width="497" style="display: block; margin: auto;" /&gt;
+---
+
+# Day #10: Simple Features
+
+Simple features refer to the formal standard (ISO 19125-1:2004) describing how objects in the real world can be represented in computers, with emphasis on the spatial geometry of these objects.
+
+Simple features require 2 components a geometry and a CRS
+
+---
+
+# Day #10: Simple Features
+
+- 17 geometry types with the "big" 7
+
+--
+
+- All geometries are composed of `POINT` features
+
+--
+
+- `POINT` features can have 2-4 dimensions (XYZM), but are 0 dimensional features!
+
+- `LINESTRING` features are an ordered set of POINTS (1D feature)
+
+- `POLYGON` features are a ordered, closed set of POINTS (2D feature)
+
+--
+
+- Geometries can be encoded as WKT or WKB (human and machine readable forms)
+
+--
+
+- Geometries can be cast to other forms but need to be leveled (`st_cast`, `st_union`, `st_combine`)
+
+---
+
+# In R
+
+- each geometry is a `sfg`
+
+--
+
+- a collection of `sfg` features is `sfc` (list-column)
+
+--
+
+- an `sfc` can be added to a data.frame of attributes to create a `sf`
+
+&lt;img src="lec-img/10-sf-diagram.png" width="499" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Day #11: CRS
+
+How do we take a 3D earth and translate it into a 2D (planar) planar representation? 
+
+--
+
+- Geographic coordinate systems (GCS) identify a location on the Earth’s surface using longitude and latitude.
+
+  - Longitude is the angular distance East or West of the Prime Meridian plane.
+
+  - Latitude is angular distance North or South of the equatorial plane.
+  
+--
+
+- The _surface_ of the Earth in GCS is represented by _ellipsoidal_ surface.
+
+- Ellipsoidal models are defined by two parameters: the semi major and semi minor axis
+
+---
+
+- Ellipsoids are part of a wider component of GCSs: the datum
+
+- Datums describe the irregularities in a earths surface (geoid) compared to a smooth ellipsoid surface
+
+&lt;img src="lec-img/22-geoid.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Datum 
+
+&lt;img src="lec-img/22-GCS.png" width="444" style="display: block; margin: auto;" /&gt;
+
+---
+
+- It is difficult to measure things like area, distance, or length on a `3D` model 
+
+--
+
+- think of the speed in calculating geodesic (ellipsoid based) distances in lab 2)
+
+--
+
+- Therefore we need a `2D` planar surface to compute geometric properties
+
+--
+
+- To create this we must **project** the GCS to a _Projected Coordinate System_
+
+--
+
+- Every PCS distorts the 3D surface is some way (`area`, `shape`, `distance`, `size`)
+
+--
+
+- All PCS have a unit of measurement and a false origin unique to that projection
+
+--
+
+- These are defined in the `proj4string`, and if common, and `EPSG` integer identifier
+
+---
+
+# Day #12: Spatial Predicates
+
+- Geometries have `interiors`, `exteriors` and `boundaries` (3)
+
+--
+
+- The relation between two geometries can be defined by the intersection of these three states (`3x3 = 9`)
+
+--
+
+- Intersection can occur as `0D` (point), `1D` (line), or `2D` (area)
+
+--
+
+- These 9 intersections define the DE-9IM matrix which can have the set domain of `{0,1,2,F}` or `{T,F}`
+
+--
+
+- The DE-9IM string for an intersection is something like `T*F**FFF*` 
+
+--
+
+- Certain combinations of the DE-9IM matrix are so common that they  are called spatial predicates  
+  - `equals`, `disjoin`, `touches`, `contains`, `covers`, `intersects`, etc
+
+--
+  
+- These spatial predicates are "masks" that test against DE-9IM strings to return `{T,F}` conditions
+
+---
+
+# Day #13: Unary, Binary, Simplification
+
+- Spatial predicates can be used to *join* and *filter* spatially (boolean reducers)
+
+--
+
+- Simplification is a way of reducing the vertex count in a geometry to speed up topology calculations
+
+--
+
+  - Looked at the **Douglas–Peucker** methods which works feature by feature
+
+--
+
+  - **Visvalingam** (`rmapshaper`): which is topology preserving 
+
+--
+
+- Looked at **Unary** (single) feature operations like `centroids`, `buffer`, and `bbox`
+
+--
+
+- Looked at **Binary** (mutli) feature operations like `intersection` (clip), `union`, `combine` 
+
+---
+
+# Day #14: Writing Functions
+
+- Realized that `functions` are `R` objects (of type `closure`)
+
+--
+
+- Began to look at reducing our repetitious work flows by writing functions
+
+
+--
+
+- Created plotting and a Point-in-Polygon (PIP) function
+
+---
+
+# Day #15: MAUP and Tessalations
+
+- We introduced the idea of object (discrete) and field (continuous) views of the world (Kuhn 2012)
+
+--
+
+- Discussed ways to produce object based coverages using:
+
+  - `tessellations` (`grid` and `hexagon`) 
+  - `triagulation` (Delaunay) 
+  - `Voroni` (Thiessen) polygons
+
+--
+
+- The last two required "anchor" points
+
+--
+
+- Each tessellation type has pros and cons depending on the use, size and  application
+
+--
+
+- We discussed some of these implications in the contexts of gerrymandering
+
+--
+
+- The notion of a square/grid (`st_make_grid`) tessellation carries us into our raster discussion
+
+---
+
+# Day #16: Interactive Web Mapping
+
+- Web tiles are served as 256 x 256 pixel png files indexed as {X}{Y}{Z}: Z equals Zoom
+
+&lt;img src="lec-img/16-zoom-0.png" width="114" style="display: block; margin: auto;" /&gt;
+
+--
+
+- Each zoom level (0-21) breaks the tiles from the previous zoom into 4 new pieces.
+
+--
+
+- This tiling allows only the data that needed to be rendered
+
+--
+
+- Is the basis for Google Earth Engine
+
+---
+class: middle, center, inverse
+# Field Data
+---
+
+# Day #17: Raster Data Model
+
+- Raster Data is 2-pronged: _values_ and _structure_
+
+--
+
+- **values** are diminsioned vectors - nothing more (`getValues()`)
+
+--
+
+- **Structure** is intentionally light weight and without coordinates:
+
+&lt;img src="lec-img/18-raster.png" width="50%" style="display: block; margin: auto;" /&gt;
+---
+
+- *colors* are mapped over a _range_ and a _set number of breaks_, on screen you can have 256 colors 
+
+- 8-bit color graphics are a method of storing image information in a computer's memory or in an image file, so that each pixel is represented by one 8-bit byte.
+
+- The maximum number of colors that can be displayed at any one time is 256 or 28
+---
+
+# Day #18: Raster Data Manipulation
+
+- Raster data can be cropped and masked
+
+--
+
+- Masks are a version of a local operation where 1 = keep, NA = remove
+
+--
+
+- Looked carefully at `reclassify`, `cellStats` (global), `calc` (local)
+
+--
+
+- Focused on raster thesholding on conditions and statements
+
+--
+
+- The raster class has specific implementations of _logical_, _algebraic_, and _common_ functions, for anything outside of these `calc` should be used
+
+
+--
+
+# OSM
+
+- Open Street Map is a rich source for feature data about "anything"
+
+--
+
+- Data is accessed through the Overpass Query (POSTs an http request)
+
+--
+
+- Data is scoped by a bounding box, and a `key=value` pair
+
+--
+
+- The OSM Wiki is a one stop shop to identify key=value pairs
+
+--
+
+- OSM data is organized as node/way/area which we know as `POINT`/`LINESTRING`/`POLYGON`
+
+---
+
+# Raster Vector Realations
+
+- Vector data (like OSM) can be used to summarize or ask questions about raster data:
+
+--
+
+- `raster::extract`: extracts cell values that intersect with a geometery
+- `fasterize::fasterize`: convert vector to raster)
+- `textractr::exact_extract`: performs zonal summaries for a feature set
+
+---
+
+# Day #19: Map Alegra and OSM
+
+- **Local** operations are applied to each individual cell and only involve those cells sharing the same location.
+
+--
+
+- **Focal** operations assigns summary values to the output cells based on the neighboring cells in the input raster. **Requires a window and a reducer**
+
+--
+
+- **Zonal** operations compute a summary values (such as the mean) from cells aggregated to some zonal unit.
+
+--
+
+- **Global** operations make use of some or all input cells when computing an output cell value.
+
+---
+
+# Day #20: Categorization
+
+- A common task (arguably all of remote sensing) is about understanding and classifiying/categorizing patterns that occur
+
+--
+
+- This process is about reducing the dinimsionality or the noise in a dataset
+
+--
+
+- We looked at the `kmeans` algorithm which is an unsupervised classification method.
+
+&lt;img src="lec-img/20-kmeans-5.png" width="50%" style="display: block; margin: auto;" /&gt;
+--
+
+- Other more technical techniques include random forest, decision tree, and other clustering algorithms
+
+---
+
+# Day #21: Terrain Analysis
+
+- Terrain analysis is a common task to make sense of elevation data. 
+
+--
+
+- In its own right is a form of classification
+
+--
+
+- Terrain analysis implements complex (e.g. 3d-finite difference) neighborhood functions
+
+--
+
+- Specifically we looked at `hillshade`, `slope`, `aspect`, and `HAND`
+
+--
+
+- We can speed these processes up by using `whitebox`
+
+--
+
+- Using `whitebox` introduced a second valuable skill about interfacing with _command line utilities_ which require path names rather then in memory objects as input (this is largley how ArcMap works!)
+
+--
+
+- These types of tools are one way of locally speeding up complex/intensive calculations
+
+---
+
+# Day #22: Google Earth Engine
+
+- A remote solution to speed up intensive raster calculations
+
+--
+
+- Upcoming integration with AI and ML via TensorFlow
+
+--
+
+- The mentioned forest analysis: 700,000,000,000,000 pixels!
+
+--
+
+- We also saw that the spatial implementation was not different (just javascript syntax)
+
+--
+
+  - properties/attributes, 
+  - working environment, 
+  - variables, 
+  - assignment, 
+  - WKT, 
+  - filter, 
+  - reducers (summarize), 
+  - indexing ([])
+
+---
+class: center, middle
+# [Lab 6](lab-06.html)
+
+---
+class: center, middle
+# [Final](final.html)
+
+---
+
+# Grades
+
+- The class is out of 1000 points
+
+- All said, 1120 points were offered
+
+- Your score will be your total points divided by 1000
+
+- The last 15 are class based and depends if we hit 90% completion on the ESCI forms (is extra credit)
+---
+
+# Thank you
+
+
+### Two great TAs
+
+- Jiwon Baik
+- Matthew Feliciano
+
+--
+
+### Instructional Assistant 
+
+- Ryan Erickson
+
+--
+
+### Guest Lecture
+
+- Jim Coll
+
+--
+
+### All of you
+
+---
+
+# The class is not over...
+
+- Always feel free to reach out with questions about GIS, R, grad school, ect
+
+---
+
+# Go forth and keep coding!
+
+&lt;img src="lec-img/22-horst.jpeg" width="50%" style="display: block; margin: auto;" /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
