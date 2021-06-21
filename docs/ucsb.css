@@ -1,0 +1,130 @@
+.remark-slide-content {
+  border-top: 5px solid #003660;
+  border-bottom: 5px solid #003660;
+  font-size: 1.2em;
+  padding: 20px 60px;
+}
+
+.remark-slide-content > h1 {
+  margin-top: 20px;
+  margin-bottom: 0px;
+}
+
+.inverse {
+  background-color: #FEBC11;
+  border:none;
+  font-color: #fff;
+  text-shadow: none;
+  border: 10px solid #003660;;
+}
+
+.inverse, .inverse h1, .inverse h2, .inverse a {
+  color: #003660;
+}
+
+.inverse h3 {
+  color: #000;
+}
+
+.inverse code {
+  color: #E1E000;
+}
+
+.footnote {
+  border-top: 1px solid #003660;
+  font-size: 0.6em;
+}
+
+.remark-code-line-highlighted { background-color: rgba(225, 224, 0, 0.6); }
+
+h1, h2 {
+  color: #003660;
+}
+
+h3 {
+  color: #47484D;
+  margin: 0px;
+  padding: 0px;
+}
+
+code {
+  color: #003660;
+}
+
+a {
+  color: #3F97B5;
+  text-decoration: none;
+  transition: all .2s ease-in-out;
+}
+
+a:hover {
+    font-size: 1.2em;
+    color: #EC008C;
+}
+
+.remark-slide-number {
+  font-size: 0.6em;
+}
+
+.title-slide {
+  background-image: url(ucsb_logo.png);
+  background-position: 95% 95%;
+  background-color: #003660;
+  background-size: 250px;
+  border: 10px solid #FEBC11;;
+}
+
+.title-slide h1 {
+  padding-top: 260px;
+  font-size: 60px;
+  text-align: left;
+  color: #FEBC11;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+}
+
+.title-slide h2 {
+  font-size: 40px;
+  color: #DCE1E5;
+  text-align: left;
+  padding-top: 0px;
+  margin-top: 0px;
+}
+
+.title-slide h3 {
+  font-size: 30px;
+  color: #DCE1E5;
+  text-align: left;
+  text-shadow: none;
+  padding: 0px;
+  margin: 0px;
+  line-height: 1;
+}
+
+.title-slide .remark-slide-number {
+  display: none;
+}
+
+.mjx-chtml { font-size: 100% !important; }
+
+.pull-left {
+  float: left;
+  width: 47%;
+}
+.pull-right {
+  float: right;
+  width: 47%;
+}
+.pull-right ~ * {
+  clear: both;
+}
+
+span.code {
+      background:rgba(127,240,0, 0.2);
+      border-radius: 5px 5px 5px 5px;
+      padding-left:5px;
+      padding-top:2px;
+      padding-right:5px;
+      padding-bottom:2px;
+      color:#008000;
+     }
