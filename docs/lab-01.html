@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<!-- Github Logo -->
+<a href="https://github.com/mikejohnson51/" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#003660; color:#FEBC11; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+
+
+<meta name="author" content="Mike Johnson" />
+
+
+<title>Lab 1</title>
+
+<script src="lab-01_files/header-attrs-2.9/header-attrs.js"></script>
+<script src="lab-01_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="lab-01_files/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
+<script src="lab-01_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="lab-01_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="lab-01_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="lab-01_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="lab-01_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="lab-01_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="lab-01_files/navigation-1.1/tabsets.js"></script>
+<script src="lab-01_files/navigation-1.1/codefolding.js"></script>
+<link href="lab-01_files/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="lab-01_files/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="lab-01_files/font-awesome-5.3.1/css/fontawesome-all.min.css" rel="stylesheet" />
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.sourceCode {
+  overflow-x: visible;
+}
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="/Library/Frameworks/R.framework/Versions/4.0/Resources/library/mikedown/rmarkdown/templates/ucsb/resources/style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+    <img style="margin-bottom: 20px" src="https://github.com/mikejohnson51/mikedown/raw/master/inst/rmarkdown/templates/ucsb/resources/ucsb-navy-white.png" alt="logo">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore"><a href="index.html">Lab 1</a></h1>
+<h3 class="subtitle"><em>Publishing an RMarkdown Website on Github</em></h3>
+<h4 class="author" style="text-align: center;"><em><a href="https://github.com/mikejohnson51">Mike Johnson</a> - Lab 01</em></h4>
+
+</div>
+
+
+<p><br></p>
+<style>
+code {
+  white-space : pre-wrap !important;
+  padding: 2px !important;
+}
+
+span.myhead {
+  font-size: 250%;
+  text-align: center !important;
+}
+
+img.outline {
+  width: 800px;
+  display: block;
+  margin: 0 auto;
+  border: 5px solid #003660;
+  width: 65%;
+}
+
+</style>
+<blockquote>
+<p><a href="https://rmarkdown.rstudio.com">R markdown</a> creates interactive reports from <a href="https://www.r-project.org">R</a> code. In this lab you will create the skeleton for a personal web site using R, RStudio and Rmarkdown. You will host the site on Github.</p>
+</blockquote>
+<div id="goals" class="section level1">
+<h1>Goals</h1>
+<p>Already you should have R and RStudio on your machine. You should also have a Github account and should be comfortable creating a new repository and connecting in to a new R Project in your <code>~/github</code> folder. Building on these, this lab has a few key learning objectives.</p>
+<ol style="list-style-type: decimal">
+<li>It will ensure you are comfortable with the tools of reproducible science including:
+<ul>
+<li>RStudio (for developing),</li>
+<li>Rmarkdown (for authoring)</li>
+<li>Github (for version control and publishing)</li>
+</ul></li>
+<li>It will provide a central repository for your work throughout the quarter</li>
+<li>It will become an artifact you can take with you to showcase your skills to future employers.</li>
+</ol>
+<p>By the end of this activity you will have:</p>
+<ol style="list-style-type: decimal">
+<li>Constructed a simple website with basic information</li>
+<li>Hosted it your personal Github for the world to see</li>
+<li>Been exposed to markdown, YMAL, CSS, HTML and website construction</li>
+<li>Practiced Forking and contributing to another repository.</li>
+</ol>
+<p>All said, the more time you put into refining, personalizing and developing this site through the quarter, the more it will benefit you in the long run, both in this class and beyond!</p>
+<p>Okay, let’s get started.</p>
+<hr />
+</div>
+<div id="jargon" class="section level1">
+<h1>Jargon</h1>
+<p>As with any field, web development (or web communication!) has its own lingo and toolsets. Here is a brief summary of the unfamiliar terms you will see in this activity:</p>
+<ul>
+<li><p><strong>URL</strong>: URL stands for Uniform Resource Locator and is a reference to a web resource specifying its location on a computer network and a mechanism for retrieving it. Think of it as a web address.</p></li>
+<li><p><strong>HTML</strong>: HTML stands for Hyper Text Markup Language. HTML is the standard markup language for Web pages. Remember that we knit our markdown (Rmd) files to HTML.</p></li>
+<li><p><strong>CSS</strong>: CSS stands for Cascading Style Sheets. CSS describes how HTML elements are displayed. Should a header (#) be blue? Green? Orange? CSS saves a lot of work because it can control the layout of multiple web pages at once.</p></li>
+<li><p><strong>YML (or YAML)</strong>: YAML (stands for “YAML Ain’t Markup Language”) is a human-readable data-serialization language. It is commonly used to configure “global” information. In Rmarkdown files, it describes how the file should knit.</p></li>
+</ul>
+<hr />
+</div>
+<div id="website-hosting" class="section level1">
+<h1>Website Hosting</h1>
+<div id="github-pages" class="section level2">
+<h2>GitHub Pages</h2>
+<p>GitHub Pages is a static site hosting service that takes HTML, CSS, and JavaScript files straight from a repository and publishes them as a website. GitHub Pages is available for <em>public</em> repositories.</p>
+<p>There are three types of GitHub Pages sites: <strong>project</strong>, <strong>user</strong>, and <strong>organization</strong>.</p>
+<p>We are <em>not</em> interested is <strong>organization</strong> sites, and will focus on the details of <strong>user</strong> and <strong>project</strong> sites.</p>
+<p>In this lab, we will be building your <strong>user site</strong>, and in future labs, you might build a <strong>project site</strong>.</p>
+<hr />
+<ul>
+<li><p><strong>user sites</strong> are connected to a GitHub <em>account</em> (not a project/repository). To publish a user site, you must create a repository named <code>&lt;user&gt;.github.io</code>. Active user sites are available at <code>http(s)://&lt;username&gt;.github.io</code>.</p></li>
+<li><p><strong>project sites</strong> are connected to a single project (repository). The source files for a <strong>project site</strong> are stored in the same repository as their project. Active project sites are available at URLs following the pattern: <code>http(s)://&lt;username&gt;.github.io/&lt;repository&gt;</code>.</p></li>
+</ul>
+<p>Why are Github Pages cool? Well they are free. They are secure. And like the versioned code, all you need to do to modify a sites is edit, commit, and push your changes.</p>
+<hr />
+</div>
+<div id="set-up" class="section level2">
+<h2>Set up</h2>
+<p>These first steps will be used in every lab, and we outline them in detail here:</p>
+<ol style="list-style-type: decimal">
+<li>Create a new repository on your Github account named: <code>&lt;username&gt;.github.io</code>. The following image shows the process but the repositoty name should be <strong>your</strong> username!!</li>
+</ol>
+<p><img class="outline" src="lab-img/01-new-repo.png"></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Once created, copy the repositories <strong>URL</strong></li>
+</ol>
+<p><img class="outline" src="lab-img/01-repo-url.png"></p>
+<ol start="3" style="list-style-type: decimal">
+<li><p>Launch RStudio</p></li>
+<li><p>Create a new version controlled project using the Github URL</p>
+<ul>
+<li>File –&gt; New Project –&gt; Version Control –&gt; Git</li>
+<li>Enter the Github URL, keep the default name, and create the project as a sub directory of your <code>~/github</code> folder</li>
+</ul></li>
+</ol>
+<p><img class="outline" src="lab-img/01-new-project.png"></p>
+<ol start="5" style="list-style-type: decimal">
+<li>Create the project!</li>
+</ol>
+</div>
+</div>
+<div id="building-your-content" class="section level1">
+<h1>Building your content</h1>
+<div id="initiating-the-needed-files" class="section level2">
+<h2>Initiating the needed files:</h2>
+<p>To build a website, we need to initialize a couple empty files in our repository. We will do this using the terminal! Go ahead create three new files in our <code>&lt;username&gt;.github.io</code> project:</p>
+<ul>
+<li>"_site.yml" (the underscore is needed!)</li>
+<li>“index.rmd”</li>
+<li>“geog13.rmd”</li>
+</ul>
+<p><code>_site.yml</code> tells your website how to assemble itself</p>
+<p><code>index.Rmd</code> is the main Rmd file</p>
+<p><code>geog13.Rmd</code> provides a home page for this course</p>
+<p>Last, make a new directory called <code>img</code></p>
+<p>Your resulting project should match this structure:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>fs<span class="sc">::</span><span class="fu">dir_tree</span>(<span class="st">&quot;first-webpage&quot;</span>)</span></code></pre></div>
+<pre><code>## first-webpage
+## ├── _site.yml
+## ├── geog13.rmd
+## ├── img
+## └── index.rmd</code></pre>
+<p>Now open all of these files in RStudio.</p>
+</div>
+<div id="filling-in-our-information" class="section level2">
+<h2>Filling in our information</h2>
+<div id="site.yml" class="section level3">
+<h3>_site.yml</h3>
+<p>We will start by filling out the <code>yml</code> file. <code>yml</code> files provide a road-map telling R how to assemble a website. We use a <code>yml</code> file to specify how our website looks, just as we use yml in the header of an Rmarkdown file to define how our document renders. yml files are super sensitive to tabbing so make sure your spacing is correct if problems arise.</p>
+<p>We want to tell our site 4 things:</p>
+<ol style="list-style-type: decimal">
+<li>What is the name of the site</li>
+<li>Where should the HTML files knit to? (output_dir)</li>
+<li>That we want a nav-bar and</li>
+<li>What should be in the nav-bar</li>
+</ol>
+<p>We can do this by filling in the appropriate yml metadata (make name and title more meaningful to you…):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>name<span class="sc">:</span> <span class="st">&quot;first-website&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>output_dir<span class="sc">:</span> <span class="st">&quot;.&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>navbar<span class="sc">:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  title<span class="sc">:</span> <span class="st">&quot;My Beautiful Website&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  left<span class="sc">:</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> text<span class="sc">:</span> <span class="st">&quot;Home&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      href<span class="sc">:</span> index.html</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> text<span class="sc">:</span> <span class="st">&quot;GIS Work&quot;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      href<span class="sc">:</span> geog13.html</span></code></pre></div>
+<p>Think about the relationship between the href elements and the output directory! How does this align with what we learned about file paths?</p>
+</div>
+<div id="the-navbar" class="section level3">
+<h3>The navbar</h3>
+<p><code>navbar</code> references Bootstrap’s powerful, responsive navigation header. The “navbar” includes support for branding, navigation, and more. Bootstrap is one of the world’s most popular front-end open source toolkits and is integrated (in a limited way, with knitr/rmarkdown). We not only use Bootstrap elements here, but will apply Bootstrap themes, later on. An example of a “navbar” can be seen below:</p>
+<p><img class="outline" src="lab-img/01-navbar-example.png"></p>
+<p>In our navbar we state there should be a title - “My Beautiful Website” - and on the left side of the navbar, two text strings, one that says “Home” and one that says “GIS Work”. If someone clicks on “Home” it will redirect (href = hyperlink reference) them to a file called “index.html”. Equally, if they click on “GIS Work” they will be redirected to an HTML file called, “geog13.html”.</p>
+<p>navbars are really common. See an example of a navbar with icons and themes on ‘ResearchGates’ main page:</p>
+<p><img class="outline" src="lab-img/01-rg-navbar.png"></p>
+<p>At this point, we do not have an index.html or geog13.html file to point to, so, lets make those:</p>
+<p><br><br><br></p>
+</div>
+<div id="index.html" class="section level3">
+<h3>index.html</h3>
+<p><code>index.html</code> is the most common name for the default page shown on a website. If you publish a website, and a server looks for the web address, the information rendered is likely stored in the <code>index.html</code> file. Therefore it is critical you have a file named <code>index.html</code> if you are going to host your own site.</p>
+<p>We will use your websites landing page as an “about me” section to introduce yourself to our class and more broadly to the internet. Take some time to write a concise and clear paragraph introducing yourself, describing what you enjoy, and what you aim to do (within a professional context). Feel free to add hyperlinks to relevant accounts or other web pages using the Rmarkdown syntax.</p>
+<p>A nice example of an ‘about me’ can be found on James Clears website:</p>
+<p><img class="outline" src="lab-img/01-james-clear.png"></p>
+<p>If we wanted to replicate this in markdown we would need something like the following in our <code>index.Rmd</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="sc">---</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>title<span class="sc">:</span> <span class="st">&quot;About Me&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="sc">---</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="er">&lt;</span>center<span class="sc">&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Hi, I&#39;m Mike Johnson.</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="er">&lt;/</span>center<span class="sc">&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>[Lorem ipsum](https<span class="sc">:</span><span class="er">//</span>www.lipsum.com<span class="sc">/</span>) dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor <span class="cf">in</span> reprehenderit <span class="cf">in</span> voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt <span class="cf">in</span> culpa qui officia deserunt mollit anim id est laborum.</span></code></pre></div>
+<p>Which would render as:</p>
+<hr />
+<center>
+<span class="myhead">Hi, I’m Mike Johnson.</span>
+</center>
+<p><br> <a href="https://www.lipsum.com/">Lorem ipsum</a> dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<hr />
+<p>Your job is to make this paragraph meaningful to you, and to add a image of yourself (or something relevant to you) using Rmarkdown or HTML syntax. The image should be saved in the appropriate img folder following the basic structure of an solid project.</p>
+<p>The image can go above, below, or beside your text. After all, this is your website!</p>
+<p>Make sure to knit regularly to see how your changes are taking effect.</p>
+<p><br><br><br></p>
+</div>
+<div id="geog13.html" class="section level3">
+<h3>geog13.html</h3>
+<p>We will treat <code>geog13.Rmd</code> as a “projects” page for this class. Here we will describe and link to the projects and activities we do through the quarter. Below is an example:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="sc">---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>title<span class="sc">:</span> <span class="st">&quot;Projects&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="sc">---</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>In the summer of <span class="dv">2021</span> I took a class GIS course based <span class="cf">in</span> R. I worte some code, and did some cool data science. Here is a collection of links<span class="sc">!</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## [Building a project website]()</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span> In this assignment we built a static users site with Github Pages </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span> Includes a github repo <span class="cf">for</span> access to all the code.</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span> Look at how high quality my work is<span class="sc">!</span></span></code></pre></div>
+<p>Your job is to make this text meaningful to you, and to add the appropriate URL to the header. You must also describe what you learned in this activity in 3-5 bullet points. Do this in a way that is directed at showing an audience what you know, not as an exercise to satisfy me.</p>
+</div>
+</div>
+</div>
+<div id="build-your-site" class="section level1">
+<h1>Build your site</h1>
+<p>The minimum requirement for an R Markdown website is an <code>index.Rmd</code> file and a <code>_site.yml</code> file. We have each of these! Now you can run <code>render_site()</code> in the console.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">render_site</span>()</span></code></pre></div>
+<p>When you do this, the following occurs:</p>
+<ol style="list-style-type: decimal">
+<li>All *.Rmd and *.md files in the root directory are rendered into HTML.
+<ul>
+<li>Markdown files beginning with **_** are not rendered (a convention to designate files that are to be included by top level Rmd documents as child documents).</li>
+</ul></li>
+<li>The generated HTML files and any supporting files (such as CSS and JavaScript) are copied into an output directory (<code>_site/</code> by default).
+<ul>
+<li>However! If you look at the <code>yml</code> file we created, we OVERRODE this default by defining the <code>output_dir</code> as “.” -or- the root project directory.</li>
+</ul></li>
+</ol>
+<p>Now if everything has gone according to plan, by running the code you should get a bunch of unintelligible output followed by the message:</p>
+<p><code>Output created: index.html</code></p>
+<p>If so, 🎉 <strong>congrats</strong> 🎉, if not, double check all the stuff above and make sure you are in the right directory (try <code>pwd</code> in the terminal).</p>
+<p>Go ahead and open <code>index.html</code> in a browser (right click on the file in the RStudio files tab) to see your website!</p>
+<p>That is pretty awesome but is notably a bit ugly… lets make it better!</p>
+<div id="website-theme" class="section level2">
+<h2>Website theme</h2>
+<p>Remember our friend Bootstap? Well, the html_document engine uses the <a href="https://bootswatch.com/3/">Bootswatch</a> theme library to support different styles of documents. Bootswatch simply provides free themes for Bootstrap. Check out the above link to see which theme you like, or the image below:</p>
+<p><img class="outline" src="lab-img/01-bootswatch.png"></p>
+<p>You can also check which themes are valid for the html_document engine:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Note the 3 :::</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">:::</span><span class="fu">themes</span>()</span></code></pre></div>
+<pre><code>##  [1] &quot;default&quot;   &quot;cerulean&quot;  &quot;journal&quot;   &quot;flatly&quot;    &quot;darkly&quot;    &quot;readable&quot;  &quot;spacelab&quot;  &quot;united&quot;    &quot;cosmo&quot;     &quot;lumen&quot;     &quot;paper&quot;     &quot;sandstone&quot; &quot;simplex&quot;  
+## [14] &quot;yeti&quot;</code></pre>
+<p>To control the output styles of an HTML document in R Markdown, we must specify the output format (<code>html_document</code>) in the YAML metadata. Only by doing this can we specify the theme we want to use. For an example, see our modified <code>_site.yml</code> below, again remembering that tabbing is sensitive:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>name<span class="sc">:</span> <span class="st">&quot;first-website&quot;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>output_dir<span class="sc">:</span> <span class="st">&quot;.&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>navbar<span class="sc">:</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  title<span class="sc">:</span> <span class="st">&quot;My Beautiful Website&quot;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  left<span class="sc">:</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> text<span class="sc">:</span> <span class="st">&quot;Home&quot;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      href<span class="sc">:</span> index.html</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> text<span class="sc">:</span> <span class="st">&quot;GIS Work&quot;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>      href<span class="sc">:</span> geog13.html</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>output<span class="sc">:</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  html_document<span class="sc">:</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    theme<span class="sc">:</span> darkly</span></code></pre></div>
+<p>Test a few different themes (change the theme and run <code>rmarkdown::render_site()</code>) to find the one you like!</p>
+</div>
+<div id="icons" class="section level2">
+<h2>Icons</h2>
+<p>Font Awesome is a font and icon toolkit based on CSS. It was made for use with Bootstrap, and later was incorporated into the BootstrapCDN. Font Awesome provides scalable vector icons (SVGs) that can be customized (size, color, drop shadow, etc).</p>
+<p>The complete set of icons can be see <a href="https://fontawesome.com/icons?d=gallery">here</a>. Many of them only come with the paid “pro” version, but there are still many that are free to!</p>
+<p><img class="outline" src = "lab-img/01-fa-home.png"></p>
+<p>In the above image, we are looking at the “home” icon on fontawesome.com, with the <a href="https://fontawesome.com/icons/home?style=solid">link</a>. Here we see the “home” icon is identified as “fas-home” where the “fas” is “Font Awesome Solid” and “home” is name. There are many ways that we can use these icons, lets take a look at a few of them:</p>
+<div id="in-the-navbar" class="section level4">
+<h4>In the navbar</h4>
+<p>Icons can be added to the navbar as either the primary, or sub, element, of a link. Below we see a code chunk from our yml file that places the <code>fa-home</code> icon next to the hyperlinked text “Home”, and the <code>fa-github</code> icon serving as the hyperlinked object directly. Notice also that the github logo has been placed on the right side of the navbar per the yml.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>  left<span class="sc">:</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> text<span class="sc">:</span> <span class="st">&quot;Home&quot;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>      icon<span class="sc">:</span> fa<span class="sc">-</span>home</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>      href<span class="sc">:</span> index.html</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  right<span class="sc">:</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> icon<span class="sc">:</span> fa<span class="sc">-</span>github</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>      href<span class="sc">:</span> https<span class="sc">:</span><span class="er">//</span>github.com<span class="sc">/</span>mikejohnson51<span class="sc">/</span>geog13</span></code></pre></div>
+<p>The result of this would be something similar to:</p>
+<p><img class="outline" src="lab-img/01-class-site.png"></p>
+<p>Currently, direct support for icons in rmarkdown is limited to FA-4 (see github issue <a href="https://github.com/rstudio/rmarkdown/issues/1554">here</a>). I will update this when/if it changes. Until then, valid FA-4 icon names can be found <a href="https://fontawesome.com/v4.7.0/icons/">here</a></p>
+</div>
+<div id="fa-as-html" class="section level4">
+<h4>FA as HTML</h4>
+<p>Icons can also be called directly by HTML. For example, if we wanted to place the home icon in our text, we could simply add:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&lt;</span>i class<span class="ot">=</span><span class="st">&quot;fas fa-home&quot;</span><span class="sc">&gt;</span><span class="er">&lt;/</span>i<span class="sc">&gt;</span> </span></code></pre></div>
+<p>To get an icon like: <i class="fas fa-home"></i></p>
+<p>We could change the size of the icon by growing it by some amount “X”. For example to make our icon 3 times bigger:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&lt;</span>i class<span class="ot">=</span><span class="st">&quot;fas fa-home fa-5x&quot;</span><span class="sc">&gt;</span><span class="er">&lt;/</span>i<span class="sc">&gt;</span> </span></code></pre></div>
+<p>To get an icon like: <i class="fas fa-home fa-5x"></i></p>
+<p>We can also use the HTML Tag to dictate the color under the objects style. So if we wanted to make it red we could add code like:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&lt;</span>i class<span class="ot">=</span><span class="st">&quot;fas fa-home fa-5x&quot;</span> style<span class="ot">=</span><span class="st">&quot;color:red;&quot;</span><span class="sc">&gt;</span><span class="er">&lt;/</span>i<span class="sc">&gt;</span> </span></code></pre></div>
+<p>To get an icon like: <i class="fas fa-home fa-5x" style="color:red;"></i></p>
+</div>
+<div id="though-the-icons-package" class="section level3">
+<h3>Though the <code>icons</code> package</h3>
+<p>Granted using HTML to add &amp; control these icons is not “hard” but it is tedious and difficult to remember the syntax. One of the great things about R and the R community, is that developers create packages to help us overcome typical hurdles. One of these is the <code>icon</code> <a href="https://github.com/ropenscilabs/icon">package</a>. <code>icon</code> is not on CRAN, so we must download it from Github using the <code>remotes</code> package:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;remotes&quot;) ## if not installed</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;ropenscilabs/icon&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(icon)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Call by fa name</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fa</span>(<span class="st">&quot;rocket&quot;</span>)</span></code></pre></div>
+<p><i class="fas  fa-rocket "></i></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Is the same as calling unique function:</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fa_rocket</span>()</span></code></pre></div>
+<p><i class="fas  fa-rocket "></i></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Can change the size</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fa</span>(<span class="st">&quot;rocket&quot;</span>, <span class="at">size =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><i class="fas  fa-rocket fa-2x "></i></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># And the color!</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fa</span>(<span class="st">&quot;rocket&quot;</span>, <span class="at">color =</span> <span class="st">&quot;yellow&quot;</span>, <span class="at">size =</span> <span class="dv">5</span>)</span></code></pre></div>
+<p><i class="fas  fa-rocket fa-5x " style="color:yellow;"></i></p>
+<p>And since this is is a class that hopefully gets you loving R and Spatial data, lets add a series of icons in line:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">r fa_globe(color = &quot;green&quot;, size =5)</span><span class="st">`</span> <span class="st">`</span><span class="at">r fa_plus(color = &quot;black&quot;, size =2)</span><span class="st">`</span> <span class="st">`</span><span class="at">r fa_r_project(color = &quot;blue&quot;, size =5)</span><span class="st">`</span>  <span class="st">`</span><span class="at">r fa_equals(color = &quot;black&quot;, size =2)</span><span class="st">`</span> <span class="st">`</span><span class="at">r fa_heart(color = &quot;red&quot;, size =5, animate = &quot;spin&quot;)</span><span class="st">`</span></span></code></pre></div>
+<p><i class="fas  fa-globe fa-5x " style="color:#1FA67A;"></i> <i class="fas  fa-plus fa-2x " style="color:black;"></i> <i class="fab  fa-r-project fa-5x " style="color:#384CB7;"></i> <i class="fas  fa-equals fa-2x " style="color:black;"></i> <i class="fas  fa-heart fa-5x fa-spin " style="color:red;"></i></p>
+<p>Take some time to personalize your <code>yml</code>, <code>index</code>, and <code>geog13</code> files with a few icons.</p>
+</div>
+<div id="commitpush" class="section level3">
+<h3>Commit/Push</h3>
+<p>You now have an awesome set of documents ready to share, but since they are only on your machine, they cannot be made into a website. To do that we need to get our files to Github, and, tell Github to host it as a site! Now that you have all your code ready to publish, go ahead and stage/commit/push your work to GitHub!</p>
+</div>
+<div id="activate-the-webpage" class="section level3">
+<h3>Activate the Webpage</h3>
+<p>From your repo (once your push has cleared):</p>
+<ol style="list-style-type: decimal">
+<li>Navigate to Settings –&gt; Pages</li>
+<li>Change the <code>source</code> to master branch and the <code>folder</code> to root.</li>
+<li>At the top, a URL will appear telling you your pages are published. Copy that URL.</li>
+</ol>
+<p><img class="outline" src="lab-img/01-pages.png"></p>
+<ol start="4" style="list-style-type: decimal">
+<li>Return to the repositories main page and click the Settings icon (<i class="fas fa-cog"></i>) next to “About”</li>
+<li>Paste your URL under website, and add a brief description (see below)</li>
+</ol>
+<p><img class="outline" src="lab-img/01-set-url.png" width=75%></p>
+<p>Note: github has to build stuff on its end so it may take a minute or so for changes to render to show up. Just keep refreshing the page and it will go faster.</p>
+<p>🎉 <strong>Congrats</strong> 🎉 you have created a personal website and hosted it online.</p>
+</div>
+</div>
+</div>
+<div id="add-a-cv" class="section level1">
+<h1>Add a CV</h1>
+<p>Ok, now it’s on you!</p>
+<p>Practice what you’ve learned by creating a brief CV.</p>
+<ul>
+<li>Create a new Rmarkdown file</li>
+<li>The title should be your name, and you should include headings for (at least) education and experience.</li>
+<li>Each of the sections should include a <em>bulleted</em> list of things you find important (Highlight the year in <strong>bold</strong>)</li>
+<li>Add the CV/Resume as a link in your websites navbar and ensure it is referenced correctly</li>
+<li>Render your site</li>
+<li>Push the updates to GitHub</li>
+</ul>
+<div id="submitting-your-assignment." class="section level2">
+<h2>Submitting your assignment.</h2>
+<p>I have created a repository <a href="https://github.com/mikejohnson51/geog13_2021">here</a> for our class. Notice, it is identical to the site you just built with some minor modifications. You’ll see that one of the tabs in the navbar is “Roster”. If you look at the site <code>yml.</code> You’ll see this is associated with the <code>roster.html</code>, that is knit from the <code>roster.Rmd</code> file.</p>
+<p>To submit your assignment, you must do the following:</p>
+<ol style="list-style-type: decimal">
+<li>Fork the above repo (click)</li>
+<li>Make a local copy as an RProject in your <code>~/github</code> directory</li>
+<li>Update the <code>roster.Rmd</code> with an H4 heading (####) including:
+<ul>
+<li>A colored icon unique to you</li>
+<li>Your name in <strong>bold</strong></li>
+<li>The text “repo” linked to your repo</li>
+<li>The text “webpage” linked to your website</li>
+</ul></li>
+<li>Under that, as a list add:
+<ul>
+<li>Your year and major (with the “user” icon <i class="fas  fa-user "></i>)</li>
+<li>An area of research you enjoy (with the “university” icon <i class="fas  fa-university "></i>).</li>
+<li>The lat long of where you are taking this class form: (with the “map-marker” icon <i class="fas  fa-map-marker "></i>).</li>
+<li>An example of what we want would look like this:</li>
+</ul></li>
+</ol>
+<hr />
+<div id="mike-johnson-repo-webpage" class="section level4">
+<h4><i class="fas  fa-globe " style="color:green;"></i> <strong>Mike Johnson</strong> <a href="https://github.com/mikejohnson51/mikejohnson51.github.io">repo</a> — <a href="http://mikejohnson51.github.io">webpage</a></h4>
+<ul>
+<li><i class="fas  fa-user "></i> Instructor</li>
+<li><i class="fas  fa-university "></i> Water Resources</li>
+<li><i class="fas  fa-map-marker "></i> 34.4140, -119.8489</li>
+</ul>
+<hr />
+<ol start="5" style="list-style-type: decimal">
+<li>Knit (button or CMD+SHIFT+K) <code>roster.Rmd</code> with your additions and make sure it looks right,</li>
+<li>Commit your changes to your local copy,</li>
+<li>Push the changes to your online repo,</li>
+<li>Submit a pull request to have your modifications merged with my master branch doing the following:</li>
+</ol>
+<ul>
+<li>On GitHub, navigate to the main page of your version of the <code>geog13_2021</code> repository.</li>
+<li>Above the list of files, click Pull request.</li>
+</ul>
+<p><img class="outline" src="lab-img/01-pull-request.png"></p>
+<ul>
+<li>Use the base branch dropdown menu to select the branch you’d like to merge your changes into (my master), then use the compare branch drop-down menu to choose the topic branch you made your changes in (your master).</li>
+</ul>
+<p><img class="outline" src="lab-img/01-open-pull-request.png"></p>
+<ul>
+<li>Type a title and description for your pull request.</li>
+</ul>
+<p><img class="outline" src="lab-img/01-describe-pull-request.png"></p>
+<ul>
+<li>Create a pull request that is ready for review, by clicking “Create Pull Request”.</li>
+</ul>
+<p><img class="outline" src="lab-img/01-button-pull-request.png"></p>
+<p>When you do this, I will merge your changes into the master site. In addition, submit your webpage URL to the appropriate Gauchospace dropbox.</p>
+</div>
+</div>
+<div id="rubric" class="section level2">
+<h2>Rubric</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled="" />
+<strong>Github repo</strong> (10)<ul class="task-list">
+<li><input type="checkbox" disabled="" />
+With a description and website URL in the “about”</li>
+</ul></li>
+<li><input type="checkbox" disabled="" />
+<strong>Clear RProject Structure</strong> (10)<ul class="task-list">
+<li><input type="checkbox" disabled="" />
+.Rproj</li>
+<li><input type="checkbox" disabled="" />
+img folder</li>
+</ul></li>
+<li><input type="checkbox" disabled="" />
+<strong>yml</strong> (20)<ul class="task-list">
+<li><input type="checkbox" disabled="" />
+with choosen theme</li>
+<li><input type="checkbox" disabled="" />
+with link to your github account</li>
+<li><input type="checkbox" disabled="" />
+with fa-icons</li>
+</ul></li>
+<li><input type="checkbox" disabled="" />
+<strong>index Rmd/html</strong> (10)<ul class="task-list">
+<li><input type="checkbox" disabled="" />
+Add an image of yourself/relevant image</li>
+<li><input type="checkbox" disabled="" />
+Concise “about me” paragraph<br />
+</li>
+</ul></li>
+<li><input type="checkbox" disabled="" />
+<strong>geog13 Rmd/html</strong> (10)<ul class="task-list">
+<li><input type="checkbox" disabled="" />
+Project description with link to home page (index.html)<br />
+</li>
+<li><input type="checkbox" disabled="" />
+Summary of skills gained in the project</li>
+</ul></li>
+<li><input type="checkbox" disabled="" />
+<strong>Basic CV Rmd/html</strong> (10)<ul class="task-list">
+<li><input type="checkbox" disabled="" />
+minimal CV</li>
+<li><input type="checkbox" disabled="" />
+link to CV in navbar</li>
+</ul></li>
+<li><input type="checkbox" disabled="" />
+<strong>All links work (from https)</strong> (10)<br />
+</li>
+<li><input type="checkbox" disabled="" />
+<strong>Submitted as a pull request</strong> (20)</li>
+</ul>
+<p><strong>Total:</strong> 100 points</p>
+<p>So what did we learn in this process and why does it relate to GIS? Well, GIS is slowly moving towards a more open and collaborative science where you will be expected to share, contribute, and understand the code of others. Being familiar with the tools for basic documentation and communication (markdown and webpages) is a great step in this direction.</p>
+<p>Further being able to navigate, clone, maintain and contribute to version controlled projects is another huge plus!</p>
+<p>A large part of this class, as well as your education at UCSB, is exposure to what exists “in the wild”. Here you were exposed to the HTML/CSS/YML stack, the way websites index and navigate, and made a first stab at creating an online presence. Today, it is so dang easy to submit a resume that job pools are bloated. Being able to set yourself apart - in a way that showcases a skill set - will benefit you.</p>
+<p>Congrats! Remember, if this seemed like a lot, it is because it is! You should be proud of what you accomplished and know you have set hte ground work for some great data science work!</p>
+</div>
+</div>
+
+
+
+&nbsp;
+<hr />
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+&nbsp;
+
+
+</div>
+</div>
+
+</div>
+
+
+
+
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+
+</body>
+</html>
