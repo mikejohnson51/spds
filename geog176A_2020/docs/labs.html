@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<!-- Github Logo -->
+<a href="https://github.com/mikejohnson51/" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#003660; color:#FEBC11; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+
+
+<meta name="author" content="Mike Johnson" />
+
+
+<title>Geography 176A</title>
+
+<script src="labs_files/header-attrs-2.3/header-attrs.js"></script>
+<script src="labs_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="labs_files/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
+<script src="labs_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="labs_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="labs_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="labs_files/navigation-1.1/tabsets.js"></script>
+<script src="labs_files/navigation-1.1/codefolding.js"></script>
+<script src="labs_files/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="labs_files/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="labs_files/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="labs_files/font-awesome-5.3.1/css/fontawesome-all.min.css" rel="stylesheet" />
+
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="/Library/Frameworks/R.framework/Versions/4.0/Resources/library/mikedown/rmarkdown/templates/ucsb/resources/style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+
+
+
+
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Geography 176A</h1>
+<h3 class="subtitle"><em>Introduction to Geographic Information Science</em></h3>
+<h4 class="author" style="text-align: center;"><em><a href="https://github.com/mikejohnson51">Mike Johnson</a> - Summer Session B</em></h4>
+
+</div>
+
+
+<center>
+<div class="section level1">
+<h1><i class="fas  fa-file-alt "></i> <a href="syllabus.html"><strong>Syllabus</strong></a> — <i class="fas  fa-desktop "></i> <a href="index.html"><strong>Lectures</strong></a></h1>
+</center>
+<p><br><br> <br><br></p>
+<div class="section level2">
+<h2><i class="fas  fa-wifi " style="color:#7fc97f;"></i> <strong>Lab 01</strong>: Data Science Workflows</h2>
+<blockquote>
+<p>This week we will use Rmarkdown and Github Pages to author a static website. The skills learned will include, Rmarkdown formating, project organization, and a brief introduction to HTML/CSS. The ultimate goal is to improve your understanding of local/remote datasets and to build the tools for communicating your work in a reproducable, sharable way.</p>
+</blockquote>
+<hr />
+<div id="due-august-9th-600-pm" class="section level5">
+<h5>Due: August 9<sup>th</sup> 6:00 pm</h5>
+</div>
+<div id="discussion-live-this-week-no-link" class="section level5">
+<h5>Discussion (live this week = no link)</h5>
+</div>
+<div id="activity" class="section level5">
+<h5><a href="lab-01.html">Activity</a></h5>
+</div>
+<div id="material" class="section level5">
+<h5><a href="lab-01-materials.zip">Material</a></h5>
+</div>
+<div id="submission-repo" class="section level5">
+<h5><a href="https://github.com/mikejohnson51/geog176A_2020">Submission Repo</a></h5>
+<p><br><br></p>
+</div>
+</div>
+<div class="section level2">
+<h2><i class="fas  fa-chart-area " style="color:#beaed4;"></i> <strong>Lab 02</strong>: Data Wrangling</h2>
+<blockquote>
+<p>This week we will practice data wrangling and visualization skills using real-time COVID-19 data maintained by the New York Times. Emphasis is placed on <code>data.frame</code> manipulation, and joining datasets.</p>
+</blockquote>
+<hr />
+<div id="due-august-17th-600-pm" class="section level5">
+<h5>Due: August 17<sup>th</sup> 6:00 pm</h5>
+</div>
+<div id="activity-1" class="section level5">
+<h5><a href="lab-02.html">Activity</a></h5>
+</div>
+<div id="material-1" class="section level5">
+<h5><a href="lab-02-materials.zip">Material</a></h5>
+</div>
+<div id="submit-via-gauchospace" class="section level5">
+<h5>Submit via Gauchospace</h5>
+<p><br><br></p>
+</div>
+</div>
+<div class="section level2">
+<h2><i class="fas  fa-compass " style="color:#FEBC11;"></i> <strong>Lab 03</strong>: Projections, Distances, and Mapping</h2>
+<blockquote>
+<p>This week we will work with simple feature objects and geos measures. Emphasis is placed on feature aggregations (combines/unions); coordinate references systems; and distance measurements. You will work to replicate the ACLU assessment that 2/3 of the USA population lives within the 100 mile “Border Zone” where 4th ammendment rights are being questioned.</p>
+</blockquote>
+<hr />
+<div id="due-august-24th-1159-pm" class="section level5">
+<h5>Due: August 24<sup>th</sup> 11:59 pm</h5>
+</div>
+<div id="discussion" class="section level5">
+<h5><a href="lab-03-discussion.R">Discussion</a></h5>
+</div>
+<div id="activity-2" class="section level5">
+<h5><a href="lab-03-questions.html">Activity</a></h5>
+</div>
+<div id="hints-tricks" class="section level5">
+<h5><a href="lab-03-hints.html">Hints &amp; Tricks</a></h5>
+</div>
+<div id="submit-via-gauchospace-1" class="section level5">
+<h5>Submit via Gauchospace</h5>
+</div>
+</div>
+<div class="section level2">
+<h2><i class="fas  fa-draw-polygon " style="color:#d95f02;"></i> <strong>Lab 04</strong>: Tesselations, Spatial Joins, and Point-in-Polygon</h2>
+<blockquote>
+<p>This week we will work with the National Dams Inventory. Questions of geometry simplication, centroid generation, and tesselations will be raised. We will uses our tesselations to explore the distribution of dams (and dam purpose) across the USA and challenges with the MAUP.</p>
+</blockquote>
+<hr />
+<div id="due-august-31th-1159-pm" class="section level5">
+<h5>Due: August 31<sup>th</sup> 11:59 pm</h5>
+</div>
+<div id="discussion-1" class="section level5">
+<h5><a href="lab-04-utils.R">Discussion</a></h5>
+</div>
+<div id="activity-3" class="section level5">
+<h5><a href="lab-04.html">Activity</a></h5>
+</div>
+<div id="submit-via-gauchospace-2" class="section level5">
+<h5>Submit via Gauchospace</h5>
+</div>
+</div>
+<div class="section level2">
+<h2><i class="fas  fa-th " style="color:#386cb0;"></i> <strong>Lab 05</strong>: Raster Analysis</h2>
+<blockquote>
+<p>This week we will work with multiband raster files to detect and analyze a flood event near Palo, Iowa. We will complete the entire workflow from data aquisition through analysis in R and will see how the raster data structure allows us to draw meaningful conclusions from the data. This kind of work goes on regularly and is part of a couple national efforts (NOAA, USGS, FirstStreet, FEMA) to generate flood inundation libraries that contribute to better extraction and classification of real-time flood events, resource allocation during events, and damage assessments post events.</p>
+</blockquote>
+<hr />
+<div id="due-september-7th-1159-pm" class="section level5">
+<h5>Due: September 7<sup>th</sup> 11:59 pm</h5>
+</div>
+<div id="discussion-2" class="section level5">
+<h5><a href="">Discussion</a></h5>
+</div>
+<div id="activity-4" class="section level5">
+<h5><a href="lab-05.html">Activity</a></h5>
+</div>
+<div id="submit-via-gauchospace-3" class="section level5">
+<h5>Submit via Gauchospace</h5>
+</div>
+</div>
+<div class="section level2">
+<h2><i class="fas  fa-map-marked-alt " style="color:#f0027f;"></i> <strong>Lab 06</strong>: Terrain Analysis</h2>
+<blockquote>
+<p>This week we will estimate the number of buildings impacted in the 2017 Santa Barbara flood event along Mission Creek using data from web APIs (NLDI, OSM, AWS Elevation tiles). We will use the <code>whitebox</code> frontend to generate a Height Above Nearest Drainage layer for the Mission Creek watershed, and convert this layer into a Flood Inudation Map (FIM) Library complete with structural damaage assessment.</p>
+</blockquote>
+<hr />
+<div id="due-september-14th-1159-pm" class="section level5">
+<h5>Due: September 14<sup>th</sup> 11:59 pm</h5>
+</div>
+<div id="arcmap-crash-course" class="section level5">
+<h5><a href="">ArcMap Crash Course</a></h5>
+</div>
+<div id="activity-5" class="section level5">
+<h5><a href="lab-06.html">Activity</a></h5>
+</div>
+<div id="submit-via-gauchospace-4" class="section level5">
+<h5>Submit via Gauchospace</h5>
+</div>
+</div>
+</div>
+
+
+
+&nbsp;
+<hr />
+<p style="text-align: center;">Prepared for <a href="https://github.com//">Geography 176A</a> by <a href="https://github.com/mikejohnson51"><a href="https://github.com/mikejohnson51">Mike Johnson</a></a></p>
+<p style="text-align: center;"><span style="color: #004D9F;background-color:transparent"><em><a href="mailto:jmj00@ucsb.edu" class="email">jmj00@ucsb.edu</a></em></span></p>
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+&nbsp;
+
+
+
+</div>
+
+
+
+
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+
+</body>
+</html>

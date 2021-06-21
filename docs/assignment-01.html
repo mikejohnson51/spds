@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<!-- Github Logo -->
+<a href="https://github.com/mikejohnson51/" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#003660; color:#FEBC11; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+
+
+<meta name="author" content="Daily Exercise 01" />
+
+
+<title>Geography 13</title>
+
+<script src="assignment-01_files/header-attrs-2.9/header-attrs.js"></script>
+<script src="assignment-01_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="assignment-01_files/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
+<script src="assignment-01_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="assignment-01_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="assignment-01_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="assignment-01_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="assignment-01_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="assignment-01_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="assignment-01_files/navigation-1.1/tabsets.js"></script>
+<script src="assignment-01_files/navigation-1.1/codefolding.js"></script>
+<link href="assignment-01_files/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="assignment-01_files/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="assignment-01_files/font-awesome-5.3.1/css/fontawesome-all.min.css" rel="stylesheet" />
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.sourceCode {
+  overflow-x: visible;
+}
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="/Library/Frameworks/R.framework/Versions/4.0/Resources/library/mikedown/rmarkdown/templates/ucsb/resources/style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+    <img style="margin-bottom: 20px" src="https://github.com/mikejohnson51/mikedown/raw/master/inst/rmarkdown/templates/ucsb/resources/ucsb-navy-white.png" alt="logo">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore"><a href="index.html">Geography 13</a></h1>
+<h3 class="subtitle"><em>Get R &amp; RStudio</em></h3>
+<h4 class="author" style="text-align: center;"><em>Daily Exercise 01 - <a href="https://github.com/mikejohnson51">Mike Johnson</a></em></h4>
+
+</div>
+
+
+<blockquote>
+<p>Getting all the necessary software installed, configured, and playing nicely together is half the battle when first adopting an open source, reproducable scientific workflow. These steps have become increasingly easier over the years and we are here to help you if you hit a hurdle 😄 <br></p>
+</blockquote>
+<p>Welcome to Geography 13, <em>Introduction to Spatial Data Science</em> In this course we will use <a href="https://www.r-project.org">R</a> and <a href="https://www.rstudio.com">RStudio</a> for data organization and manipulation, analysis, and communication/visualization. You’ll learn more about both throughout the course.</p>
+<p>Since this class is online, you will need to use your own laptop (or to set up a free RStudio Server Account). If you can, it is preferable to have the software on your own system.</p>
+<p>The step-by-step document will help you get R &amp; RStudio on your own computer, along with several tools we’ll be using through out the quarter. If you have problems, you can contact me, or a TA.</p>
+<div id="do-you-already-have-r-installed" class="section level4">
+<h4>Do you already have R installed?</h4>
+<p>If you have an older versions of R/RStudio installed, we recommend updating. You can check what version of R you are running by typing <code>version</code> in the console of RStudio.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>version</span></code></pre></div>
+<pre><code>               _                           
+platform       x86_64-apple-darwin17.0     
+arch           x86_64                      
+os             darwin17.0                  
+system         x86_64, darwin17.0          
+status                                     
+major          4                           
+minor          0.1                         
+year           2020                        
+month          06                          
+day            06                          
+svn rev        78648                       
+language       R                           
+version.string R version 4.0.1 (2020-06-06)
+nickname       See Things Now              </code></pre>
+<p>And you can check what version of RStudio you are running by going to “Help –&gt; About RStudio”</p>
+<p>If you don’t have at least <span style="     color: red !important;">R 4.0.XXX</span> and <span style="     color: blue !important;">RStudio 1.4.XXX</span>. Proceed with this document.</p>
+</div>
+<div id="getting-r-and-rstudio" class="section level1">
+<h1>Getting R and RStudio</h1>
+<p>R is a programming language and free software environment for statistical computing and graphics supported by the R Foundation for Statistical Computing. The R language is widely used for developing statistical software and data analysis. R also provides unparalleled opportunities for analyzing spatial data for spatial modeling.</p>
+<p>RStudio is an integrated development environment (IDE) for R. Combined the R language and RStudio IDE provide the open-source, free, toolset for this course.</p>
+<div id="macos-install" class="section level3">
+<h3>MacOS Install <i class="fab  fa-apple "></i></h3>
+<div id="install-r" class="section level4">
+<h4>Install R</h4>
+<ul>
+<li><p><a href="https://cran.r-project.org/bin/macosx/">Download</a> the latest release (“R-version.pkg”) of R and save the .pkg file. Double-click it to open, and follow the installation instructions. Note that there are different version in you have an Intel chip (e.g. R-4.1.0.pkg) or an Apple M1 chip (e.g. R-4.1.0-arm64.pkg)</p></li>
+<li><p>Now that R is installed, you can download and install RStudio.</p></li>
+</ul>
+</div>
+<div id="install-rstudio" class="section level4">
+<h4>Install RStudio</h4>
+<ul>
+<li><a href="https://rstudio.com/products/rstudio/download/#download">Download</a> RStudio for Mac. After downloading, double-click the file to open it, and make sure it ends up in your applications folder.</li>
+</ul>
+<hr />
+</div>
+</div>
+<div id="windows-install" class="section level3">
+<h3>Windows Install <i class="fab  fa-windows "></i></h3>
+<div id="install-r-1" class="section level4">
+<h4>Install R</h4>
+<ul>
+<li><p><a href="https://cran.r-project.org/bin/windows/base/">Download</a> the latest R installer (.exe) for Windows. Install the downloaded file as any other windows app. Now that R is installed, you can download and install RStudio.</p></li>
+<li><p>Now that R is installed, you can download and install RStudio.</p></li>
+</ul>
+</div>
+<div id="install-rstudio-1" class="section level4">
+<h4>Install RStudio</h4>
+<ul>
+<li><a href="https://rstudio.com/products/rstudio/download/#download">Download</a> the RStudio version for Windows. Run the installer (.exe file) and follow the instructions.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="launch-rstudio" class="section level1">
+<h1>Launch RStudio</h1>
+<p>Once both R and RStudio are installed, you can find and click on the RStudio icon to open the program. The RStudio icon looks like this:</p>
+<center>
+<img src="act-img/rstudio-logo.png" style="width:10.0%" />
+</center>
+<p>Opening RStudio will launch a workplace. If something like the below image appears for you, then you are all set!</p>
+<p><img src="act-img/rstudio-panels.png" /></p>
+<p>We will spend the quarter working in this IDE so the layout and features will become clear as we go. A few things to note now are:</p>
+<ul>
+<li>Your session is linked to a project (<span style="     color: pink !important;">pink</span> box).<br />
+</li>
+<li>In the <span style="     color: blue !important;">blue</span> box, you have:
+<ul>
+<li>An <em>Environment</em> tab that shows all the active objects in your session</li>
+<li>A <em>files</em> tab that shows all the files and folders in your default (project) workplace</li>
+<li>A <em>plots</em> tab that will show all your graphs once we start visualizing data.</li>
+</ul></li>
+<li>In the <span style="     color: red !important;">red</span> window you will write code and open new/existing scripts and markdown files.</li>
+<li>All output will be printed to your console (<span style="     color: gold !important;">yellow</span> box). Code and prompts can be directly entered in the console but will not be saved after executing.</li>
+</ul>
+<p>Your layout and theme may not look like the above (all the elements are the same but arranged differently). If you want to change your theme and layout got to RStudio –&gt; Preferences.</p>
+<p>Here you can adjust the “Appearance” and “Pane Layout”. If you want your to look like mine, see below:</p>
+<p><img src="act-img/rstudio-appearance.png" style="width:50.0%" /><img src="act-img/rstudio-layout.png" style="width:50.0%" /></p>
+</div>
+<div id="install-packages" class="section level1">
+<h1>Install Packages</h1>
+<p>R comes loaded with many base packages and tools. There are also many additional tools that will make your life easier. Throughout this class, we’ll use packages that exist in the aggregate <code>tidyverse</code> package.</p>
+<div id="tidyverse" class="section level3">
+<h3>Tidyverse</h3>
+<p>The <code>tidyverse</code> contains a collection of very useful packages that play nicely together for data exploration, manipulation, wrangling and visualization (among other things). Packages can be installed from CRAN (Comprehensive R Archive Network) using the following pattern which should be typed in the console (<span style="     color: gold !important;">yellow</span> box):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;tidyverse&quot;</span>)</span></code></pre></div>
+<p>After you press ‘Enter,’ you should see a whole bunch of text streaming across the Console Window. This is a good sign and is simply logging what’s being downloaded/installed. This process can go on for a few minutes (the tidyverse has a lot of different components). You will know it’s done when the active cursor shows up again waiting for your next command.</p>
+<p>Once it’s installed, you can ensure that everything worked by loading/attaching the <code>tidyverse</code> using the library call:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
+<p>When you press enter, some information will come up below the command. Don’t worry too much about it now as long as there are no errors!</p>
+<p>If you got something similar to the above you’ve successfully installed <strong>R</strong>, <strong>RStudio</strong>, and the <strong>tidyverse</strong> package. Congratulations!</p>
+</div>
+</div>
+<div id="assignment" class="section level1">
+<h1>Assignment</h1>
+<p>Ok, with everything you just learned your assignment is to install three new packages: <code>rmarkdown</code>, <code>remotes</code>, <code>gapminder</code>.</p>
+<p>Once you do that, clear the console by clicking the broom icon (<i class="fas  fa-broom "></i>) and run the following 3 lines of code:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.getenv</span>(<span class="st">&quot;LOGNAME&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>version<span class="sc">$</span>major</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">RStudio.Version</span>()<span class="sc">$</span>version</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="st">&quot;tidyverse&quot;</span>, <span class="st">&quot;rmarkdown&quot;</span>, <span class="st">&#39;remotes&#39;</span>, <span class="st">&#39;gapminder&#39;</span>)  <span class="sc">%in%</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>()) </span></code></pre></div>
+<p>For exercise 1, submit a screenshot of the output to the relevant Gauchospace dropbox. It should look like this:</p>
+<p><img src="act-img/assignment-01.png" /></p>
+<p>The key, is to make sure the version of R is correct (4); the version of RStudio is correct (1.4.XXXX) and your packages are installed (four TRUE values).</p>
+<p>You can close RStudio (you don’t need to “Save the Workspace” or anything else when prompted).</p>
+<p>Nice work!</p>
+<div id="end" class="section level2">
+<h2>END</h2>
+</div>
+</div>
+
+
+
+&nbsp;
+<hr />
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+&nbsp;
+
+
+</div>
+</div>
+
+</div>
+
+
+
+
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+
+</body>
+</html>

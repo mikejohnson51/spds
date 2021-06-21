@@ -16,18 +16,26 @@
 <meta name="author" content="Mike Johnson" />
 
 
-<title>Geography 176A</title>
+<title>Geography 13</title>
 
-<script src="index_files/header-attrs-2.3/header-attrs.js"></script>
+<script src="index_files/header-attrs-2.7/header-attrs.js"></script>
 <script src="index_files/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="index_files/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
 <script src="index_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="index_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="index_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
 <script src="index_files/navigation-1.1/tabsets.js"></script>
 <script src="index_files/navigation-1.1/codefolding.js"></script>
-<script src="index_files/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <link href="index_files/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="index_files/pagedtable-1.1/js/pagedtable.js"></script>
 <link href="index_files/font-awesome-5.3.1/css/fontawesome-all.min.css" rel="stylesheet" />
@@ -128,9 +136,9 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Geography 176A</h1>
-<h3 class="subtitle"><em>Introduction to Geographic Information Science</em></h3>
-<h4 class="author" style="text-align: center;"><em><a href="https://github.com/mikejohnson51">Mike Johnson</a> - Summer Session B</em></h4>
+<h1 class="title toc-ignore">Geography 13</h1>
+<h3 class="subtitle"><em>Introduction to Spatial Data Science</em></h3>
+<h4 class="author" style="text-align: center;"><em><a href="https://github.com/mikejohnson51">Mike Johnson</a> - Summer Session A</em></h4>
 
 </div>
 
@@ -152,7 +160,7 @@ h3.subtitle {
 </style>
 <p><br><br></p>
 <blockquote>
-<p>Comprehensive overview of Geographic Information Systems and Science. Topics span the nature of geographic information and the procedures for operating GIS. Labs provide hands-on experience with GIS and related software.</p>
+<p>Comprehensive overview of data science and its applications to Geography and GIS.</p>
 </blockquote>
 <header class="masthead">
 <div id="particles-js">
@@ -164,8 +172,8 @@ h3.subtitle {
 <script src="../js/appHome.js"></script>
 <p><br><br> <br><br></p>
 <center>
-<div class="section level1">
-<h1><i class="fas  fa-file-alt "></i> <a href="syllabus.html"><strong>Syllabus</strong></a> — <i class="fas  fa-desktop "></i> <a href="labs.html"><strong>Lab Activites</strong></a> – <i class="fas  fa-user "></i> <a href="https://mikejohnson51.github.io/geog176A_2020/"><strong>People</strong></a></h1>
+<div id="syllabus-lab-activites-people" class="section level1">
+<h1><i class="fas  fa-file-alt "></i> <a href="syllabus.html"><strong>Syllabus</strong></a> — <i class="fas  fa-desktop "></i> <a href="labs.html"><strong>Lab Activites</strong></a> – <i class="fas  fa-user "></i> <a href="https://mikejohnson51.github.io/geog13_2021/"><strong>People</strong></a></h1>
 </center>
 <p><br><br><br></p>
 <div id="week-1-computational-environment" class="section level2">
@@ -177,213 +185,28 @@ h3.subtitle {
 <h4><i class="fa fa-map-marker"></i> <strong>Lecture 01</strong>: <a href="lecture-01.html">Introduction</a></h4>
 </div>
 <div id="lecture-02-geoinformatics" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 02</strong>: <a href="lecture-02.html">Geoinformatics</a></h4>
+<h4><i class="fa fa-map-marker"></i> <strong>Lecture 02</strong>: Geoinformatics</h4>
 </div>
 <div id="lecture-03-the-digital-environment" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 03</strong>: <a href="lecture-03.html">The Digital Environment</a></h4>
+<h4><i class="fa fa-map-marker"></i> <strong>Lecture 03</strong>: The Digital Environment</h4>
 </div>
 <div id="lecture-04-data-types-structure" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 04</strong>: <a href="lecture-04.html">Data Types &amp; Structure</a></h4>
+<h4><i class="fa fa-map-marker"></i> <strong>Lecture 04</strong>: Data Types &amp; Structure</h4>
 </div>
 </div>
 <div class="col-md-6">
-<div class="section level4">
+<div id="exercise-01-set-up-r-rstudio" class="section level4">
 <h4><strong>Exercise 01</strong>: <a href="01-setup-R-Rstudio.html">Set up R &amp; RStudio</a> <i class="fab  fa-r-project "></i></h4>
 </div>
-<div class="section level4">
-<h4><strong>Exercise 02</strong>: <a href="02-bash-git.html">Intro to Bash / Git Install</a> <i class="fas  fa-terminal "></i></h4>
+<div id="exercise-02-intro-to-bash-git-install" class="section level4">
+<h4><strong>Exercise 02</strong>: Intro to Bash / Git Install <i class="fas  fa-terminal "></i></h4>
 </div>
-<div class="section level4">
-<h4><strong>Exercise 03</strong>: <a href="03-github-project.html">Your first Project</a> <i class="fab  fa-github "></i></h4>
+<div id="exercise-03-your-first-project" class="section level4">
+<h4><strong>Exercise 03</strong>: Your first Project <i class="fab  fa-github "></i></h4>
 </div>
-<div class="section level4">
-<h4><strong>Exercise 04</strong>: <a href="https://github.com/mikejohnson51/exercise-04">Forking &amp; Rmarkdown</a> <i class="fas  fa-code-branch "></i></h4>
+<div id="exercise-04-forking-rmarkdown" class="section level4">
+<h4><strong>Exercise 04</strong>: Forking &amp; Rmarkdown <i class="fas  fa-code-branch "></i></h4>
 </div>
-</div>
-</div>
-<p><br><br> <br></p>
-</div>
-<div id="week-2-working-with-tables" class="section level2">
-<h2><strong>Week 2</strong>: Working with Tables</h2>
-<br>
-<div class="row">
-<div class="col-md-6">
-<div id="lecture-05-data-frame-manipulation" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 05</strong>: <a href="lecture-05.html">Data Frame Manipulation</a></h4>
-</div>
-<div id="lecture-06-data-visualization" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 06</strong>: <a href="lecture-06.html">Data Visualization</a></h4>
-</div>
-<div id="lecture-07-relations-formats" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 07</strong>: <a href="lecture-07.html">Relations &amp; Formats</a></h4>
-</div>
-<div id="lecture-08-working-with-tables-wrap-up" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 08</strong>: <a href="lecture-08.html">Working with Tables Wrap Up</a></h4>
-</div>
-</div>
-<div class="col-md-6">
-<div class="section level4">
-<h4><strong>Exercise 05</strong>: <a href="https://github.com/mikejohnson51/geog176A-daily-exercises"><code>dplyr</code> verbs</a> <i class="fas  fa-syringe "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 06</strong>: <a href="lecture-06#143">Your first plots</a> <i class="fas  fa-chart-area "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 07</strong>: <a href="lecture-07#173">Joins &amp; Pivots</a> <i class="fas  fa-object-group "></i> <i class="fas  fa-sync "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 08</strong>: <a href="lecture-08#127">Lags &amp; Rolling Means</a> <i class="fas  fa-history "></i></h4>
-</div>
-</div>
-</div>
-<p><br><br> <br></p>
-</div>
-<div id="week-3-vector-data-1" class="section level2">
-<h2><strong>Week 3</strong>: Vector Data 1</h2>
-<br>
-<div class="row">
-<div class="col-md-6">
-<div id="lecture-09-spatial-data-libraries" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 09</strong>: <a href="lecture-09.html">Spatial Data Libraries</a></h4>
-</div>
-<div id="lecture-10-feature-geometries" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 10</strong>: <a href="lecture-10.html">Feature Geometries</a></h4>
-</div>
-<div id="lecture-11-coordinate-reference-systems" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 11</strong>: <a href="lecture-11.html">Coordinate Reference Systems</a></h4>
-</div>
-<div id="lecture-12-spatial-predicates" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 12</strong>: <a href="lecture-12.html">Spatial Predicates</a></h4>
-</div>
-</div>
-<div class="col-md-6">
-<div class="section level4">
-<h4><strong>Exercise 09</strong>: <a href="lecture-09#100">Setting up R as a GIS</a> <i class="fas  fa-cloud-download-alt "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 10</strong>: <a href="lecture-10#137">Feature Geometries</a> <i class="fas  fa-cubes "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 11</strong>: <a href="lecture-11#194">Projecting Data</a> <i class="fas  fa-globe-americas "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 12</strong>: <a href="lecture-12#10">Spatial filtering</a> <i class="fas  fa-filter "></i></h4>
-</div>
-</div>
-</div>
-<p><br><br> <br></p>
-</div>
-<div id="week-4-vector-data-2" class="section level2">
-<h2><strong>Week 4</strong>: Vector Data 2</h2>
-<br>
-<div class="row">
-<div class="col-md-6">
-<div id="lecture-13-unary-binary-simplification" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 13</strong>: <a href="lecture-13.html">Unary, Binary, Simplification</a></h4>
-</div>
-<div id="lecture-14-point-in-polygon-writing-functions" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 14</strong>: <a href="lecture-14.html">Point-in-Polygon / Writing functions</a></h4>
-</div>
-<div id="lecture-15-maup-and-tesselations" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 15</strong>: <a href="lecture-15.html">MAUP and Tesselations</a></h4>
-</div>
-<div id="lecture-16-interactive-web-mapping" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 16</strong>: <a href="lecture-16.html">Interactive Web Mapping</a></h4>
-</div>
-<div id="leaflet-examples" class="section level4">
-<h4>     <i class="fa fa-map-marker"></i>  <a href="https://mikejohnson51.github.io/lecture-16/">Leaflet Examples</a></h4>
-</div>
-</div>
-<div class="col-md-6">
-<div class="section level4">
-<h4><strong>Exercise 13</strong>: <a href="lecture-13#90">Simplification</a> <i class="fas  fa-draw-polygon "></i> <i class="fas  fa-vector-square "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 14</strong>: <a href="lecture-14#130">Your first function</a> <i class="fas  fa-equals "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 15</strong>: <a href="lecture-15#106">Building Tesselations</a> <i class="fas  fa-project-diagram "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 16</strong>: <a href="lecture-16#49">Create a Leaflet map</a> <i class="fas  fa-mouse-pointer "></i></h4>
-</div>
-</div>
-</div>
-<p><br><br> <br></p>
-</div>
-<div id="week-5-field-data-1" class="section level2">
-<h2><strong>Week 5</strong>: Field Data 1</h2>
-<br>
-<div class="row">
-<div class="col-md-6">
-<div id="lecture-17-the-raster-data-model" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 17</strong>: <a href="lecture-17.html">The Raster Data Model</a></h4>
-</div>
-<div id="lecture-18-raster-data-manipulation" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 18</strong>: <a href="lecture-18.html">Raster Data Manipulation</a></h4>
-</div>
-<div id="lecture-19-map-algebra-and-osm" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 19</strong>: <a href="lecture-19.html">Map Algebra and OSM</a></h4>
-</div>
-<div id="lecture-20-categorization" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 20</strong>: <a href="lecture-20.html">Categorization</a></h4>
-</div>
-</div>
-<div class="col-md-6">
-<div class="section level4">
-<h4><strong>Exercise 17</strong>: <a href="lecture-17#90">Your first raster</a> <i class="fas  fa-grip-horizontal "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 18</strong>: <a href="lecture-18#61">Managing your data values</a> <i class="fas  fa-compass "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 19</strong>: <a href="lecture-19#90">OpenStreetMap and Value Extraction</a> <i class="fas  fa-search "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 20</strong>: <a href="lecture-20#92">Climate Classification</a> <i class="fas  fa-sort "></i></h4>
-</div>
-</div>
-</div>
-<p><br><br> <br></p>
-</div>
-<div id="week-6-field-data-2" class="section level2">
-<h2><strong>Week 6</strong>: Field Data 2</h2>
-<br>
-<div class="row">
-<div class="col-md-6">
-<div id="holiday-no-class" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>HOLIDAY</strong>: No Class</h4>
-</div>
-<div id="lecture-21-terrain-analysis" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 21</strong>: <a href="lecture-21.html">Terrain Analysis</a></h4>
-</div>
-<div id="lecture-22-google-earth-engine-jim-coll" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 22</strong>: <a href="https://kansas-my.sharepoint.com/:p:/g/personal/j610c377_home_ku_edu/ETfr7zWGfFdFh4MIeMxxFegBlInh0ufYEKVfgamLTzUxmQ?rtime=LSwJP89U2Eg">Google Earth Engine</a> — <a href="https://jimcoll.github.io/">Jim Coll</a></h4>
-</div>
-<div id="lecture-23-wrap-up" class="section level4">
-<h4><i class="fa fa-map-marker"></i> <strong>Lecture 23</strong>: <a href="lecture-22.html">Wrap up</a></h4>
-</div>
-</div>
-<div class="col-md-6">
-<div class="section level4">
-<h4><strong>HOLIDAY</strong>: No exercise <i class="fas  fa-umbrella-beach "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 21</strong>: <a href="lecture-21.html#75">Terrain Processing</a> <i class="fas  fa-flag "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 22</strong>: Complete ESCII Evaluations <i class="fas  fa-pen "></i></h4>
-</div>
-<div class="section level4">
-<h4><strong>Exercise 23</strong>: Finish lab 6 and final <i class="fas  fa-cocktail "></i></h4>
-</div>
-</div>
-<p><br><br><br></p>
-<hr />
-<center>
-<div class="section level1">
-<h1><i class="fas  fa-file-alt "></i> <a href="final.html"><strong>Final</strong></a></h1>
-</center>
 </div>
 </div>
 </div>
@@ -393,8 +216,6 @@ h3.subtitle {
 
 &nbsp;
 <hr />
-<p style="text-align: center;">Prepared for <a href="https://github.com//">Geography 176A</a> by <a href="https://github.com/mikejohnson51"><a href="https://github.com/mikejohnson51">Mike Johnson</a></a></p>
-<p style="text-align: center;"><span style="color: #004D9F;background-color:transparent"><em><a href="mailto:jmj00@ucsb.edu" class="email">jmj00@ucsb.edu</a></em></span></p>
 
 <!-- Add icon library -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">

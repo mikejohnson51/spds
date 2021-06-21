@@ -4,16 +4,16 @@
     <title>Geography 176A</title>
     <meta charset="utf-8" />
     <meta name="author" content="Mike Johnson" />
-    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
-    <script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
     <script src="libs/jquery-1.12.4/jquery.min.js"></script>
     <link href="libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
     <script src="libs/leaflet-1.3.1/leaflet.js"></script>
     <link href="libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
-    <script src="libs/Proj4Leaflet-1.0.1/proj4-compressed.js"></script>
+    <script src="libs/proj4-2.6.2/proj4.min.js"></script>
     <script src="libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
     <link href="libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
-    <script src="libs/leaflet-binding-2.0.3/leaflet.js"></script>
+    <script src="libs/leaflet-binding-2.0.4.1/leaflet.js"></script>
     <link rel="stylesheet" href="ucsb.css" type="text/css" />
   </head>
   <body>
@@ -160,85 +160,87 @@ class: center, middle
 
 ## [Syllabus](./syllabus.html)
 
- <div class="row hide-if-small-screen" style="padding-top: 5%">
-      <div class="col-lg-12 text-center">
-        <svg width="1000" height="120">
-          <line x1="0" y1="50" x2="950" y2="50" style="stroke:#003660; stroke-width:1.5" />
-          <circle cx="11.5" cy="50" r="10" stroke="#003660" stroke-width="3" fill="#FEBC11" />
-          <circle cx="175" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" />
-          <text text-anchor="middle" x="175" y="80" fill="black">Week 1</text>
-          <text font-size="13" text-anchor="middle" x="100" y="15" fill="black">Geoinformatics & </text>
-          <text font-size="13" text-anchor="middle" x="100" y="30" fill="black">Digital Data</text>
 
-          <circle cx="350" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" />
-          <text text-anchor="middle" x="350" y="80" fill="black">Week 2</text>
-          <text font-size="13" text-anchor="middle" x="275" y="15" fill="black">Data Wrangling & </text>
-          <text font-size="13" text-anchor="middle" x="275" y="30" fill="black">Visualization</text>
+```{=html}
+ &lt;div class="row hide-if-small-screen" style="padding-top: 5%"&gt;
+      &lt;div class="col-lg-12 text-center"&gt;
+        &lt;svg width="1000" height="120"&gt;
+          &lt;line x1="0" y1="50" x2="950" y2="50" style="stroke:#003660; stroke-width:1.5" /&gt;
+          &lt;circle cx="11.5" cy="50" r="10" stroke="#003660" stroke-width="3" fill="#FEBC11" /&gt;
+          &lt;circle cx="175" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="175" y="80" fill="black"&gt;Week 1&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="100" y="15" fill="black"&gt;Geoinformatics &amp; &lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="100" y="30" fill="black"&gt;Digital Data&lt;/text&gt;
 
-       
-          <text text-anchor="middle" x="475" y="80" fill="black">Week 3</text>
-          <text font-size="13" text-anchor="middle" x="475" y="15" fill="black">Object (Vector) </text>
-          <text font-size="13" text-anchor="middle" x="475" y="30" fill="black">Structures & Operations</text>
-    
-     
-          <text text-anchor="middle" x="650" y="80" fill="black">Week 4</text>
-          <text font-size="13" text-anchor="middle" x="650" y="15" fill="black">Field (Raster) </text>
-          <text font-size="13" text-anchor="middle" x="650" y="30" fill="black">Structures & Operations</text>
+          &lt;circle cx="375" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="375" y="80" fill="black"&gt;Week 2&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="275" y="15" fill="black"&gt;Data Wrangling &amp; &lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="275" y="30" fill="black"&gt;Visualization&lt;/text&gt;
 
-          
-          <circle cx="775" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" />
-          <text text-anchor="middle" x="775" y="80" fill="black">Week 5</text>
+          &lt;circle cx="525" cy="50" r="5" stroke="#f8f9fa" stroke-width="2" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="525" y="80" fill="black"&gt;Week 3&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="525" y="15" fill="black"&gt;Object (Vector) &lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="525" y="30" fill="black"&gt;Structures &amp; Operations&lt;/text&gt;
+
+          &lt;circle cx="650" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="650" y="80" fill="black"&gt;Week 4&lt;/text&gt;
+
+          &lt;circle cx="800" cy="50" r="5" stroke="#f8f9fa" stroke-width="2" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="800" y="80" fill="black"&gt;Week 5&lt;/text&gt;
+
+          &lt;circle cx="940" cy="50" r="10" stroke="#003660" stroke-width="3" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="940" y="80" fill="black"&gt;Week 6&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="800" y="15" fill="black"&gt;Field (Raster) &lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="800" y="30" fill="black"&gt;Structures &amp; Operations&lt;/text&gt;
+
+        &lt;/svg&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+```
+
+
+```{=html}
+ &lt;div class="row hide-if-small-screen" style="padding-top: 5%"&gt;
+      &lt;div class="col-lg-12 text-center"&gt;
+        &lt;svg width="1000" height="120"&gt;
+          &lt;line x1="0" y1="50" x2="950" y2="50" style="stroke:#003660; stroke-width:1.5" /&gt;
+
+          &lt;circle cx="11.5" cy="50" r="10" stroke="#003660" stroke-width="3" fill="#FEBC11" /&gt;
+          &lt;circle cx="185" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="185" y="80" fill="black"&gt;Week 1&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="100" y="15" fill="black"&gt;Static Websites &lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="100" y="30" fill="black"&gt;Rmarkdown &amp; GitHub&lt;/text&gt;
          
-
-          <circle cx="940" cy="50" r="10" stroke="#003660" stroke-width="3" fill="#FEBC11" />
-          <text text-anchor="middle" x="940" y="80" fill="black">Week 6</text>
-          <text font-size="13" text-anchor="middle" x="875" y="15" fill="black">Time</text>
-          <text font-size="13" text-anchor="middle" x="875" y="30" fill="black">Adding 3D</text>
-
-        </svg>
-      </div>
-    </div>
-
- <div class="row hide-if-small-screen" style="padding-top: 5%">
-      <div class="col-lg-12 text-center">
-        <svg width="1000" height="120">
-          <line x1="0" y1="50" x2="950" y2="50" style="stroke:#003660; stroke-width:1.5" />
-
-          <circle cx="11.5" cy="50" r="10" stroke="#003660" stroke-width="3" fill="#FEBC11" />
-          <circle cx="185" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" />
-          <text text-anchor="middle" x="185" y="80" fill="black">Week 1</text>
-          <text font-size="13" text-anchor="middle" x="100" y="15" fill="black">Static Websites </text>
-          <text font-size="13" text-anchor="middle" x="100" y="30" fill="black">Rmarkdown & GitHub</text>
-         
-          <circle cx="335" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" />
-          <text text-anchor="middle" x="335" y="80" fill="black">Week 2</text>
-          <text font-size="13" text-anchor="middle" x="250" y="15" fill="black">Data Visualization</text>
-          <text font-size="13" text-anchor="middle" x="250" y="30" fill="black">& Wrangling</text>
+          &lt;circle cx="335" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="335" y="80" fill="black"&gt;Week 2&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="250" y="15" fill="black"&gt;Data Visualization&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="250" y="30" fill="black"&gt;&amp; Wrangling&lt;/text&gt;
         
 
-          <circle cx="500" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" />
-          <text text-anchor="middle" x="500" y="80" fill="black">Week 3</text>
-          <text font-size="13" text-anchor="middle" x="425" y="15" fill="black">Spatial Data Visualization</text>
-          <text font-size="13" text-anchor="middle" x="425" y="30" fill="black"> & Wrangling</text>
+          &lt;circle cx="500" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="500" y="80" fill="black"&gt;Week 3&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="425" y="15" fill="black"&gt;Spatial Data Visualization&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="425" y="30" fill="black"&gt; &amp; Wrangling&lt;/text&gt;
          
-          <circle cx="625" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" />
-          <text text-anchor="middle" x="625" y="80" fill="black">Week 4</text>
-          <text font-size="13" text-anchor="middle" x="560" y="15" fill="black">Vector</text>
-          <text font-size="13" text-anchor="middle" x="560" y="30" fill="black">Operations</text>
+          &lt;circle cx="625" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="625" y="80" fill="black"&gt;Week 4&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="560" y="15" fill="black"&gt;Vector&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="560" y="30" fill="black"&gt;Operations&lt;/text&gt;
           
-          <circle cx="775" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" />
-          <text text-anchor="middle" x="775" y="80" fill="black">Week 5</text>
-          <text font-size="13" text-anchor="middle" x="700" y="15" fill="black">Rasters &</text>
-          <text font-size="13" text-anchor="middle" x="700" y="30" fill="black">Remote Sensing</text>
+          &lt;circle cx="775" cy="50" r="10" stroke="#f8f9fa" stroke-width="6" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="775" y="80" fill="black"&gt;Week 5&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="700" y="15" fill="black"&gt;Rasters &amp;&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="700" y="30" fill="black"&gt;Remote Sensing&lt;/text&gt;
 
-           <circle cx="940" cy="50" r="10" stroke="#003660" stroke-width="3" fill="#FEBC11" />
-          <text text-anchor="middle" x="940" y="80" fill="black">Week 6</text>
-          <text font-size="13" text-anchor="middle" x="850" y="15" fill="black">Final</text>
-          <text font-size="13" text-anchor="middle" x="850" y="30" fill="black">Putting it all together</text>
+           &lt;circle cx="940" cy="50" r="10" stroke="#003660" stroke-width="3" fill="#FEBC11" /&gt;
+          &lt;text text-anchor="middle" x="940" y="80" fill="black"&gt;Week 6&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="850" y="15" fill="black"&gt;Final&lt;/text&gt;
+          &lt;text font-size="13" text-anchor="middle" x="850" y="30" fill="black"&gt;Putting it all together&lt;/text&gt;
         
-        </svg>
-      </div>
-    </div>
+        &lt;/svg&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+```
 
 ---
 
@@ -585,10 +587,10 @@ world = st_as_sf(rnaturalearth::countries110)
 
 ```
 Simple feature collection with 177 features and 2 fields
-geometry type:  MULTIPOLYGON
-dimension:      XY
-bbox:           xmin: -180 ymin: -90 xmax: 180 ymax: 83.64513
-CRS:            +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -180 ymin: -90 xmax: 180 ymax: 83.64513
+CRS:           +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0
 First 10 features:
             sovereignt sov_a3                       geometry
 0          Afghanistan    AFG MULTIPOLYGON (((61.21082 35...
@@ -728,8 +730,11 @@ count: false
 ]
  
 .right-panel-interactive-auto[
-<div id="htmlwidget-a6afc93b2688ebc10559" style="width:432px;height:504px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-a6afc93b2688ebc10559">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}}},"evals":[],"jsHooks":[]}</script>
+
+```{=html}
+&lt;div id="htmlwidget-28ff04b993c2dd06fa13" style="width:432px;height:504px;" class="leaflet html-widget"&gt;&lt;/div&gt;
+&lt;script type="application/json" data-for="htmlwidget-28ff04b993c2dd06fa13"&gt;{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}}},"evals":[],"jsHooks":[]}&lt;/script&gt;
+```
 ]
 
 ---
@@ -745,8 +750,11 @@ leaflet(instructors) %&gt;%
 ]
  
 .right-panel-interactive-auto[
-<div id="htmlwidget-1328ff0656ced371edb6" style="width:432px;height:504px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1328ff0656ced371edb6">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}]},"evals":[],"jsHooks":[]}</script>
+
+```{=html}
+&lt;div id="htmlwidget-a73556deb4f3f7e64713" style="width:432px;height:504px;" class="leaflet html-widget"&gt;&lt;/div&gt;
+&lt;script type="application/json" data-for="htmlwidget-a73556deb4f3f7e64713"&gt;{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&amp;copy; &lt;a href=\"http://openstreetmap.org\"&gt;OpenStreetMap&lt;\/a&gt; contributors, &lt;a href=\"http://creativecommons.org/licenses/by-sa/2.0/\"&gt;CC-BY-SA&lt;\/a&gt;"}]}]},"evals":[],"jsHooks":[]}&lt;/script&gt;
+```
 ]
 
 ---
@@ -765,8 +773,11 @@ leaflet(instructors) %&gt;%
 ]
  
 .right-panel-interactive-auto[
-<div id="htmlwidget-7d310f3125686e671840" style="width:432px;height:504px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-7d310f3125686e671840">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[[38.8,40.1,35.9],[-104.8,-74.4,127.7],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},["Mike","Matt","Jiwon"],null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[35.9,40.1],"lng":[-104.8,127.7]}},"evals":[],"jsHooks":[]}</script>
+
+```{=html}
+&lt;div id="htmlwidget-365211b04287da59f6bd" style="width:432px;height:504px;" class="leaflet html-widget"&gt;&lt;/div&gt;
+&lt;script type="application/json" data-for="htmlwidget-365211b04287da59f6bd"&gt;{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&amp;copy; &lt;a href=\"http://openstreetmap.org\"&gt;OpenStreetMap&lt;\/a&gt; contributors, &lt;a href=\"http://creativecommons.org/licenses/by-sa/2.0/\"&gt;CC-BY-SA&lt;\/a&gt;"}]},{"method":"addMarkers","args":[[38.8,40.1,35.9],[-104.8,-74.4,127.7],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},["Mike","Matt","Jiwon"],null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[35.9,40.1],"lng":[-104.8,127.7]}},"evals":[],"jsHooks":[]}&lt;/script&gt;
+```
 ]
 
 &lt;style&gt;
