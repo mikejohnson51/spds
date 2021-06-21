@@ -1,8 +1,8 @@
-# Course Website for Geography 176A <img src="docs/ucsb_logo.png" width=160 height = 120 align="right" />
+# Course Website for Geography 13 <img src="docs/ucsb_logo.png" width=160 height = 120 align="right" />
 
-### Summer 2020 *(August 3rd - September 12th)*
+### Summer 2021 *(June 21 - July 31st)*
 
-This is the course [website](https://mikejohnson51.github.io/spds) for Geography 176A, *Introduction to GIS*, offered at the 
+This is the course [website](https://mikejohnson51.github.io/spds) for Geography 13, *Introduction to Geoinformatics*, offered at the 
 University of California, Santa Barbara. This course has been designed from the ground up to address the growing need for data science and programming in GIS profession.
 
 The webpage archives links to the lectures, activities and labs for the course.
