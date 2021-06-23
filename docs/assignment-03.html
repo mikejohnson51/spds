@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<!-- Github Logo -->
+<a href="https://github.com/mikejohnson51/" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#003660; color:#FEBC11; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+
+
+<meta name="author" content="Daily Exercise 03" />
+
+
+<title>Geography 13</title>
+
+<script src="assignment-03_files/header-attrs-2.9/header-attrs.js"></script>
+<script src="assignment-03_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="assignment-03_files/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
+<script src="assignment-03_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="assignment-03_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="assignment-03_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="assignment-03_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="assignment-03_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="assignment-03_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="assignment-03_files/navigation-1.1/tabsets.js"></script>
+<script src="assignment-03_files/navigation-1.1/codefolding.js"></script>
+<link href="assignment-03_files/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="assignment-03_files/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="assignment-03_files/font-awesome-5.3.1/css/fontawesome-all.min.css" rel="stylesheet" />
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.sourceCode {
+  overflow-x: visible;
+}
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="/Library/Frameworks/R.framework/Versions/4.0/Resources/library/mikedown/rmarkdown/templates/ucsb/resources/style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+    <img style="margin-bottom: 20px" src="https://github.com/mikejohnson51/mikedown/raw/master/inst/rmarkdown/templates/ucsb/resources/ucsb-navy-white.png" alt="logo">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore"><a href="index.html">Geography 13</a></h1>
+<h3 class="subtitle"><em>Your first project to Github</em></h3>
+<h4 class="author" style="text-align: center;"><em>Daily Exercise 03 - <a href="https://github.com/mikejohnson51">Mike Johnson</a></em></h4>
+
+</div>
+
+
+<style type="text/css">
+span.code {
+      background:rgba(240,128,128, 0.2);
+      border-radius: 5px 5px 5px 5px;
+      padding-left:5px;
+      padding-top:2px;
+      padding-right:5px;
+      padding-bottom:2px;
+      color:red;
+     } 
+</style>
+<hr />
+<p>So far you have done a LOT!! You’ve installed a programming language and IDE, you’ve mastered some terminal commands, you’ve installed a version control system, and created a GitHub Account. All in the first 2 days of class!</p>
+<p>The assignment for today is to set up your first project using the R Terminal, Github, and RStudio Projects.</p>
+<hr />
+<p>For the purposes of GEOG 13, the things you’ll need to do with GitHub are:</p>
+<ol style="list-style-type: decimal">
+<li>Create new GitHub repositories (INITIALIZE) and/or copy existing ones (FORK)</li>
+<li>Get that repo talking with your local R/RStudio (CLONE)</li>
+<li>Modify files on your computer</li>
+<li>Push them back to your version of the repo (STAGE/COMMIT/PUSH workflow)</li>
+</ol>
+<div id="create" class="section level2">
+<h2><i class="fas  fa-plus "></i> Create</h2>
+<p>The first thing we want to do is create a new repository on your GitHUb account. After logging in, look in the upper right hand corner of your account for the “+” button. Click on that and select “New Repository”:</p>
+<p><img src="act-img/new-repo2.png" class="border"></p>
+<p>This will create a new repository and will prompt a new window that looks like:</p>
+<br>
+<center>
+<img src="act-img/blank-repo.png" class="border">
+</center>
+<p><br></p>
+<p>Here we can fill in the metadata for our new repo:</p>
+<ul>
+<li>Let call it: <code>hello-world</code></li>
+<li>Give it an informative description: <code>My first GitHub Repository!</code></li>
+<li>Keep it “Public”</li>
+<li><i class="fas  fa-check-square "></i> Initialize it with a README</li>
+<li>Keep .gitignore and License as NONE</li>
+</ul>
+<p>Awesome! You created your own first Github Repository</p>
+</div>
+<div id="connect-to-rstudio" class="section level2">
+<h2><i class="fab  fa-r-project "></i> Connect to RStudio</h2>
+<p>We now need to ensure that RStudio can communicate with that GitHub Repository. By doing this we will be able sync our local files with a remote copy, make changes/additions, and the publish those changes back to remote repo. This “pulling” from and “pushing” to is the basic Github workflow.</p>
+<p>To practice this, lets walk through the steps of cloning a copy of the empty “hello-world” repo.</p>
+<ol style="list-style-type: decimal">
+<li>first navigate to (<code>YOUR USERNAME/hello-world</code>).</li>
+<li>Click on the green ‘Clone or download’ button prompting a window that looks like this:</li>
+</ol>
+<br>
+<center>
+<img src="act-img/url-copy.png" class="border" width = "75%">
+</center>
+<p><br></p>
+<ol start="3" style="list-style-type: decimal">
+<li><p>The URL listed provides a dedicated path to the repo that RStudio can use to communicate. Copy that link (easiest to click the clippy icon) and return to (or launch) RStudio.</p></li>
+<li><p>Once in RStudio, create a new version controlled project using the Github URL</p>
+<ul>
+<li>File –&gt; New Project –&gt; Version Control –&gt; Git</li>
+</ul></li>
+</ol>
+<p><br></p>
+<ol start="5" style="list-style-type: decimal">
+<li>To provide the metadata for this project lets do the following:
+<ul>
+<li>Paste the URL you copied into the <em>Repository URL</em> section, and press TAB</li>
+<li>Keep the default <em>Project directory name</em> that matches the GitHub project</li>
+<li>Create the project as a sub directory of your <code>~/github</code> folder created in the last activity</li>
+<li>Optional: select ‘Open in new session’ (if you’re already working on stuff that you don’t want to close)</li>
+</ul></li>
+</ol>
+<br><br />
+
+<center>
+<img src="act-img/hello-world-rstudio.png" class="border" width = "50%">
+</center>
+<p><br></p>
+<ol start="6" style="list-style-type: decimal">
+<li>Click create!</li>
+</ol>
+<p>Congratulations! You just created a git-enabled project. You will know you are successful if you see the Git tab somewhere in your RStudio IDE (mine is next to “History” and “Environment”).</p>
+</div>
+<div id="structure-your-project" class="section level2">
+<h2><i class="fas  fa-terminal "></i> Structure your Project</h2>
+<p>Taking what we learned today in lecture, construct a skeleton for a project. If you think carefully you should only need 4 terminal prompts. I will start you with the first:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> data</span></code></pre></div>
+<p>Using <code>cd</code> to navigate, add one <code>Rmd</code> file and one <code>R</code> file in the correct directories. Use (<code>touch</code>/<code>$null &gt;</code>) to create them.</p>
+<p>Once you’ve built your skeleton, open your README.md from the RStudio file viewer and enter the following, replacing the ‘XXXX’ with your info:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># My first Project</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">## **Course**: Geography 13</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">## **Name**: XXXXX</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">## **Year**: XXXXX</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">## **Major**: XXXXX</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">## **OS**: XXXXX</span></span></code></pre></div>
+<p>How does your structure look compared to what we discussed in lecture? Do you have a place for data? What about images? Source Code? Remember it should <strong>NOT</strong> look like my pseudo example here but rather a solid project…</p>
+</div>
+<div id="back-to-github" class="section level2">
+<h2><i class="fas  fa-file-import "></i> Back to GitHub</h2>
+<p>You know that Git is a version control software that allows us to track changes in files. You also know GitHub is a web platform for hosting and working with git enabled projects…</p>
+<p>Version control is kind of weird. Not only are you keeping current files, but you are keeping past versions of your files. BUT, you dont want to archive each and every little change. Instead, your versions (think snapshots) have to be determined by you through commits.</p>
+<p>Here is a helpful illustration of this process (<a href="https://dev.to/erikaheidi/stage-commit-push-a-git-story-comic-a37">source</a>):</p>
+<p><img src="act-img/git-comic.jpeg" /> <br><br><br><br><br></p>
+<p>Armed with that idea, it is time to introduce the <code>Git tab</code> in RStudio. If you click on the Git tab, you will see all the files that have changed from the last commit.</p>
+<p><br><br><br></p>
+<center>
+<img src="act-img/git-tab.png" style="width:75.0%" />
+</center>
+<p><br><br><br><br></p>
+<ul>
+<li>To stage files, select the empty box (under ‘Staged’) next to each file
+<ul>
+<li>To select all files, click in the Git tab, and click CMND+SHIFT+A (Mac) or CRTL+SHIT+A (Windows)</li>
+</ul></li>
+<li>Add your checked files by clicking Commit</li>
+<li>In the dialogue box, enter a brief commit message (e.g. “Project Structure”) and press ‘Commit’ to stage these files to git.</li>
+<li>Finally, press the upward green push arrow to “Push” your changes to GitHub. You may need to enter your github user.name/password the first time you do this.</li>
+</ul>
+<p>If you receive no errors then you successfully staged, committed and pushed your project to <code>YOUR USERNAME/hello-world</code></p>
+<p>To make sure:</p>
+<ul>
+<li><p>Go to GitHub and refresh the repo page.</p></li>
+<li><p>You should see the files you recently committed and the associated rendered README. If this is true. You are done - Great work!</p></li>
+</ul>
+</div>
+<div id="assignment" class="section level2">
+<h2><i class="fas  fa-pencil-alt "></i> Assignment</h2>
+<p>For this assignment submit the URL to your <code>hello-world</code> repository.</p>
+<p>And 🎉 congrats 🎉! All the setup is done for this course and we are on to bigger and more fun things!</p>
+<p>If you are interested in the idea of good coding practice, I encourage you to read <a href="readings/wilson2017.pdf">Wilson, 2017</a></p>
+</div>
+<div id="end" class="section level2">
+<h2>END</h2>
+</div>
+
+
+
+&nbsp;
+<hr />
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+&nbsp;
+
+
+</div>
+</div>
+
+</div>
+
+
+
+
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+
+</body>
+</html>
