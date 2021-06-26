@@ -545,8 +545,8 @@ img.outline {
 <p>You can also check which themes are valid for the html_document engine:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Note the 3 :::</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">:::</span><span class="fu">themes</span>()</span></code></pre></div>
-<pre><code>##  [1] &quot;default&quot;   &quot;cerulean&quot;  &quot;journal&quot;   &quot;flatly&quot;    &quot;darkly&quot;    &quot;readable&quot;  &quot;spacelab&quot;  &quot;united&quot;    &quot;cosmo&quot;     &quot;lumen&quot;     &quot;paper&quot;     &quot;sandstone&quot; &quot;simplex&quot;  
-## [14] &quot;yeti&quot;</code></pre>
+<pre><code>##  [1] &quot;default&quot;   &quot;cerulean&quot;  &quot;journal&quot;   &quot;flatly&quot;    &quot;darkly&quot;    &quot;readable&quot;  &quot;spacelab&quot;  &quot;united&quot;   
+##  [9] &quot;cosmo&quot;     &quot;lumen&quot;     &quot;paper&quot;     &quot;sandstone&quot; &quot;simplex&quot;   &quot;yeti&quot;</code></pre>
 <p>To control the output styles of an HTML document in R Markdown, we must specify the output format (<code>html_document</code>) in the YAML metadata. Only by doing this can we specify the theme we want to use. For an example, see our modified <code>_site.yml</code> below, again remembering that tabbing is sensitive:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>name<span class="sc">:</span> <span class="st">&quot;first-website&quot;</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>output_dir<span class="sc">:</span> <span class="st">&quot;.&quot;</span></span>
@@ -654,12 +654,12 @@ img.outline {
 </ul>
 <div id="submitting-your-assignment." class="section level2">
 <h2>Submitting your assignment.</h2>
-<p>I have created a repository <a href="https://github.com/mikejohnson51/geog13_2021">here</a> for our class. Notice, it is identical to the site you just built with some minor modifications. You’ll see that one of the tabs in the navbar is “Roster”. If you look at the site <code>yml.</code> You’ll see this is associated with the <code>roster.html</code>, that is knit from the <code>roster.Rmd</code> file.</p>
+<p>I have created a repository <a href="https://github.com/mikejohnson51/geog13_2021">here</a> for our class. Notice, it is identical to the site you just built with some minor modifications.</p>
 <p>To submit your assignment, you must do the following:</p>
 <ol style="list-style-type: decimal">
 <li>Fork the above repo (click)</li>
 <li>Make a local copy as an RProject in your <code>~/github</code> directory</li>
-<li>Update the <code>roster.Rmd</code> with an H4 heading (####) including:
+<li>Update the <code>index.Rmd</code> with an H4 heading (####) including:
 <ul>
 <li>A colored icon unique to you</li>
 <li>Your name in <strong>bold</strong></li>
