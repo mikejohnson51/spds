@@ -41,7 +41,6 @@
 <script src="lab-01_files/navigation-1.1/codefolding.js"></script>
 <link href="lab-01_files/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="lab-01_files/pagedtable-1.1/js/pagedtable.js"></script>
-<link href="lab-01_files/font-awesome-5.3.1/css/fontawesome-all.min.css" rel="stylesheet" />
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -545,8 +544,11 @@ img.outline {
 <p>You can also check which themes are valid for the html_document engine:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Note the 3 :::</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">:::</span><span class="fu">themes</span>()</span></code></pre></div>
-<pre><code>##  [1] &quot;default&quot;   &quot;cerulean&quot;  &quot;journal&quot;   &quot;flatly&quot;    &quot;darkly&quot;    &quot;readable&quot;  &quot;spacelab&quot;  &quot;united&quot;   
-##  [9] &quot;cosmo&quot;     &quot;lumen&quot;     &quot;paper&quot;     &quot;sandstone&quot; &quot;simplex&quot;   &quot;yeti&quot;</code></pre>
+<pre><code>##  [1] &quot;default&quot;   &quot;cerulean&quot;  &quot;journal&quot;  
+##  [4] &quot;flatly&quot;    &quot;darkly&quot;    &quot;readable&quot; 
+##  [7] &quot;spacelab&quot;  &quot;united&quot;    &quot;cosmo&quot;    
+## [10] &quot;lumen&quot;     &quot;paper&quot;     &quot;sandstone&quot;
+## [13] &quot;simplex&quot;   &quot;yeti&quot;</code></pre>
 <p>To control the output styles of an HTML document in R Markdown, we must specify the output format (<code>html_document</code>) in the YAML metadata. Only by doing this can we specify the theme we want to use. For an example, see our modified <code>_site.yml</code> below, again remembering that tabbing is sensitive:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>name<span class="sc">:</span> <span class="st">&quot;first-website&quot;</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>output_dir<span class="sc">:</span> <span class="st">&quot;.&quot;</span></span>
@@ -585,36 +587,71 @@ img.outline {
 <div id="fa-as-html" class="section level4">
 <h4>FA as HTML</h4>
 <p>Icons can also be called directly by HTML. For example, if we wanted to place the home icon in our text, we could simply add:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&lt;</span>i class<span class="ot">=</span><span class="st">&quot;fas fa-home&quot;</span><span class="sc">&gt;</span><span class="er">&lt;/</span>i<span class="sc">&gt;</span> </span></code></pre></div>
-<p>To get an icon like: <i class="fas fa-home"></i></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&lt;</span>i class<span class="ot">=</span><span class="st">&quot;fa fa-home&quot;</span><span class="sc">&gt;</span><span class="er">&lt;/</span>i<span class="sc">&gt;</span></span></code></pre></div>
+<p>To get an icon like: <i class="fa fa-home"></i></p>
 <p>We could change the size of the icon by growing it by some amount “X”. For example to make our icon 3 times bigger:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&lt;</span>i class<span class="ot">=</span><span class="st">&quot;fas fa-home fa-5x&quot;</span><span class="sc">&gt;</span><span class="er">&lt;/</span>i<span class="sc">&gt;</span> </span></code></pre></div>
-<p>To get an icon like: <i class="fas fa-home fa-5x"></i></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&lt;</span>i class<span class="ot">=</span><span class="st">&quot;fa fa-home fa-5x&quot;</span><span class="sc">&gt;</span><span class="er">&lt;/</span>i<span class="sc">&gt;</span></span></code></pre></div>
+<p>To get an icon like: <i class="fa fa-home fa-5x"></i></p>
 <p>We can also use the HTML Tag to dictate the color under the objects style. So if we wanted to make it red we could add code like:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&lt;</span>i class<span class="ot">=</span><span class="st">&quot;fas fa-home fa-5x&quot;</span> style<span class="ot">=</span><span class="st">&quot;color:red;&quot;</span><span class="sc">&gt;</span><span class="er">&lt;/</span>i<span class="sc">&gt;</span> </span></code></pre></div>
-<p>To get an icon like: <i class="fas fa-home fa-5x" style="color:red;"></i></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&lt;</span>i class<span class="ot">=</span><span class="st">&quot;fa fa-home fa-5x&quot;</span> style<span class="ot">=</span><span class="st">&quot;color:red;&quot;</span><span class="sc">&gt;</span><span class="er">&lt;/</span>i<span class="sc">&gt;</span> </span></code></pre></div>
+<p>To get an icon like: <i class="fa fa-home fa-5x" style="color:red;"></i></p>
 </div>
 <div id="though-the-icons-package" class="section level3">
 <h3>Though the <code>icons</code> package</h3>
-<p>Granted using HTML to add &amp; control these icons is not “hard” but it is tedious and difficult to remember the syntax. One of the great things about R and the R community, is that developers create packages to help us overcome typical hurdles. One of these is the <code>icon</code> <a href="https://github.com/ropenscilabs/icon">package</a>. <code>icon</code> is not on CRAN, so we must download it from Github using the <code>remotes</code> package:</p>
+<p>Granted using HTML to add &amp; control these icons is not “hard” but it is tedious and difficult to remember the syntax. One of the great things about R and the R community, is that developers create packages to help us overcome typical hurdles. One of these is the <code>icons</code> <a href="https://github.com/ropenscilabs/icon">package</a>. <code>icons</code> is not on CRAN, so we must download it from Github using the <code>remotes</code> package:</p>
+<p><strong>NOTE</strong>: One of the great things about open source code is that it is often improving. These regular improvements can introduce “breaking” changes at time. It is typically avoid, but other times impossible. For this lab, if the new <code>icons</code> package (which supersedes the <code>icon</code>) package has a few breaking changes as noted <a href="https://pkg.mitchelloharawild.com/icons/news/">here</a></p>
+<ul>
+<li>Icons are no longer included directly in the package, and will require downloading before use. Use the <code>download_*()</code> functions to download an icon library you want to use.</li>
+<li>The short names (fa, ii, etc.) have been replaced with longer, more informative names (<code>fontawesome</code>, <code>ionicons</code>, etc.).</li>
+<li>Animations of icons is no longer supported (this functionality will be made possible in a new package specific to CSS animations).</li>
+</ul>
+<p>The following directions have been updates to match this new package syntax:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;remotes&quot;) ## if not installed</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;ropenscilabs/icon&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(icon)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;ropenscilabs/icon&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># download the font awesome library</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">download_fontawesome</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(icons)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Call by fa name</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fa</span>(<span class="st">&quot;rocket&quot;</span>)</span></code></pre></div>
-<p><i class="fas  fa-rocket "></i></p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Is the same as calling unique function:</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fa_rocket</span>()</span></code></pre></div>
-<p><i class="fas  fa-rocket "></i></p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Can change the size</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fa</span>(<span class="st">&quot;rocket&quot;</span>, <span class="at">size =</span> <span class="dv">2</span>)</span></code></pre></div>
-<p><i class="fas  fa-rocket fa-2x "></i></p>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fontawesome</span>(<span class="st">&quot;rocket&quot;</span>)</span></code></pre></div>
+<svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M505.12019,19.09375c-1.18945-5.53125-6.65819-11-12.207-12.1875C460.716,0,435.507,0,410.40747,0,307.17523,0,245.26909,55.20312,199.05238,128H94.83772c-16.34763.01562-35.55658,11.875-42.88664,26.48438L2.51562,253.29688A28.4,28.4,0,0,0,0,264a24.00867,24.00867,0,0,0,24.00582,24H127.81618l-22.47457,22.46875c-11.36521,11.36133-12.99607,32.25781,0,45.25L156.24582,406.625c11.15623,11.1875,32.15619,13.15625,45.27726,0l22.47457-22.46875V488a24.00867,24.00867,0,0,0,24.00581,24,28.55934,28.55934,0,0,0,10.707-2.51562l98.72834-49.39063c14.62888-7.29687,26.50776-26.5,26.50776-42.85937V312.79688c72.59753-46.3125,128.03493-108.40626,128.03493-211.09376C512.07526,76.5,512.07526,51.29688,505.12019,19.09375ZM384.04033,168A40,40,0,1,1,424.05,128,40.02322,40.02322,0,0,1,384.04033,168Z"></path>
+</svg>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#is the same as calling by list element:</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>fontawesome<span class="sc">$</span>solid<span class="sc">$</span>rocket</span></code></pre></div>
+<svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M505.12019,19.09375c-1.18945-5.53125-6.65819-11-12.207-12.1875C460.716,0,435.507,0,410.40747,0,307.17523,0,245.26909,55.20312,199.05238,128H94.83772c-16.34763.01562-35.55658,11.875-42.88664,26.48438L2.51562,253.29688A28.4,28.4,0,0,0,0,264a24.00867,24.00867,0,0,0,24.00582,24H127.81618l-22.47457,22.46875c-11.36521,11.36133-12.99607,32.25781,0,45.25L156.24582,406.625c11.15623,11.1875,32.15619,13.15625,45.27726,0l22.47457-22.46875V488a24.00867,24.00867,0,0,0,24.00581,24,28.55934,28.55934,0,0,0,10.707-2.51562l98.72834-49.39063c14.62888-7.29687,26.50776-26.5,26.50776-42.85937V312.79688c72.59753-46.3125,128.03493-108.40626,128.03493-211.09376C512.07526,76.5,512.07526,51.29688,505.12019,19.09375ZM384.04033,168A40,40,0,1,1,424.05,128,40.02322,40.02322,0,0,1,384.04033,168Z"></path>
+</svg>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Can change the size by updating the icon &quot;style&quot;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">icon_style</span>(<span class="fu">fontawesome</span>(<span class="st">&quot;rocket&quot;</span>), <span class="at">scale =</span> <span class="dv">2</span>)</span></code></pre></div>
+<svg viewBox="0 0 512 512" style="position:relative;display:inline-block;top:.1em;height:2em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M505.12019,19.09375c-1.18945-5.53125-6.65819-11-12.207-12.1875C460.716,0,435.507,0,410.40747,0,307.17523,0,245.26909,55.20312,199.05238,128H94.83772c-16.34763.01562-35.55658,11.875-42.88664,26.48438L2.51562,253.29688A28.4,28.4,0,0,0,0,264a24.00867,24.00867,0,0,0,24.00582,24H127.81618l-22.47457,22.46875c-11.36521,11.36133-12.99607,32.25781,0,45.25L156.24582,406.625c11.15623,11.1875,32.15619,13.15625,45.27726,0l22.47457-22.46875V488a24.00867,24.00867,0,0,0,24.00581,24,28.55934,28.55934,0,0,0,10.707-2.51562l98.72834-49.39063c14.62888-7.29687,26.50776-26.5,26.50776-42.85937V312.79688c72.59753-46.3125,128.03493-108.40626,128.03493-211.09376C512.07526,76.5,512.07526,51.29688,505.12019,19.09375ZM384.04033,168A40,40,0,1,1,424.05,128,40.02322,40.02322,0,0,1,384.04033,168Z"></path>
+</svg>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># And the color!</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fa</span>(<span class="st">&quot;rocket&quot;</span>, <span class="at">color =</span> <span class="st">&quot;yellow&quot;</span>, <span class="at">size =</span> <span class="dv">5</span>)</span></code></pre></div>
-<p><i class="fas  fa-rocket fa-5x " style="color:yellow;"></i></p>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">icon_style</span>(<span class="fu">fontawesome</span>(<span class="st">&quot;rocket&quot;</span>), <span class="at">scale =</span> <span class="dv">5</span>, <span class="at">fill =</span> <span class="st">&quot;yellow&quot;</span>)</span></code></pre></div>
+<svg viewBox="0 0 512 512" style="position:relative;display:inline-block;top:.1em;fill:yellow;height:5em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M505.12019,19.09375c-1.18945-5.53125-6.65819-11-12.207-12.1875C460.716,0,435.507,0,410.40747,0,307.17523,0,245.26909,55.20312,199.05238,128H94.83772c-16.34763.01562-35.55658,11.875-42.88664,26.48438L2.51562,253.29688A28.4,28.4,0,0,0,0,264a24.00867,24.00867,0,0,0,24.00582,24H127.81618l-22.47457,22.46875c-11.36521,11.36133-12.99607,32.25781,0,45.25L156.24582,406.625c11.15623,11.1875,32.15619,13.15625,45.27726,0l22.47457-22.46875V488a24.00867,24.00867,0,0,0,24.00581,24,28.55934,28.55934,0,0,0,10.707-2.51562l98.72834-49.39063c14.62888-7.29687,26.50776-26.5,26.50776-42.85937V312.79688c72.59753-46.3125,128.03493-108.40626,128.03493-211.09376C512.07526,76.5,512.07526,51.29688,505.12019,19.09375ZM384.04033,168A40,40,0,1,1,424.05,128,40.02322,40.02322,0,0,1,384.04033,168Z"></path>
+</svg>
 <p>And since this is is a class that hopefully gets you loving R and Spatial data, lets add a series of icons in line:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">r fa_globe(color = &quot;green&quot;, size =5)</span><span class="st">`</span> <span class="st">`</span><span class="at">r fa_plus(color = &quot;black&quot;, size =2)</span><span class="st">`</span> <span class="st">`</span><span class="at">r fa_r_project(color = &quot;blue&quot;, size =5)</span><span class="st">`</span>  <span class="st">`</span><span class="at">r fa_equals(color = &quot;black&quot;, size =2)</span><span class="st">`</span> <span class="st">`</span><span class="at">r fa_heart(color = &quot;red&quot;, size =5, animate = &quot;spin&quot;)</span><span class="st">`</span></span></code></pre></div>
-<p><i class="fas  fa-globe fa-5x " style="color:#1FA67A;"></i> <i class="fas  fa-plus fa-2x " style="color:black;"></i> <i class="fab  fa-r-project fa-5x " style="color:#384CB7;"></i> <i class="fas  fa-equals fa-2x " style="color:black;"></i> <i class="fas  fa-heart fa-5x fa-spin " style="color:red;"></i></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">r icon_style(fontawesome(&quot;globe&quot;), scale = 5, fill = &quot;green&quot;)</span><span class="st">`</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">r icon_style(fontawesome(&quot;plus&quot;), scale = 2, fill = &quot;black&quot;)</span><span class="st">`</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">r icon_style(fontawesome(&quot;r-project&quot;), scale = 5, fill = &quot;blue&quot;)</span><span class="st">`</span>   </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">r icon_style(fontawesome(&quot;equals&quot;), scale = 2, fill = &quot;black&quot;)</span><span class="st">`</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">r icon_style(fontawesome(&quot;heart&quot;), scale = 5, fill = &quot;red&quot;)</span><span class="st">`</span></span></code></pre></div>
+<svg viewBox="0 0 496 512" style="position:relative;display:inline-block;top:.1em;fill:green;height:5em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M336.5 160C322 70.7 287.8 8 248 8s-74 62.7-88.5 152h177zM152 256c0 22.2 1.2 43.5 3.3 64h185.3c2.1-20.5 3.3-41.8 3.3-64s-1.2-43.5-3.3-64H155.3c-2.1 20.5-3.3 41.8-3.3 64zm324.7-96c-28.6-67.9-86.5-120.4-158-141.6 24.4 33.8 41.2 84.7 50 141.6h108zM177.2 18.4C105.8 39.6 47.8 92.1 19.3 160h108c8.7-56.9 25.5-107.8 49.9-141.6zM487.4 192H372.7c2.1 21 3.3 42.5 3.3 64s-1.2 43-3.3 64h114.6c5.5-20.5 8.6-41.8 8.6-64s-3.1-43.5-8.5-64zM120 256c0-21.5 1.2-43 3.3-64H8.6C3.2 212.5 0 233.8 0 256s3.2 43.5 8.6 64h114.6c-2-21-3.2-42.5-3.2-64zm39.5 96c14.5 89.3 48.7 152 88.5 152s74-62.7 88.5-152h-177zm159.3 141.6c71.4-21.2 129.4-73.7 158-141.6h-108c-8.8 56.9-25.6 107.8-50 141.6zM19.3 352c28.6 67.9 86.5 120.4 158 141.6-24.4-33.8-41.2-84.7-50-141.6h-108z"></path>
+</svg>
+<svg viewBox="0 0 448 512" style="position:relative;display:inline-block;top:.1em;fill:black;height:3em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
+</svg>
+<svg viewBox="0 0 581 512" style="position:relative;display:inline-block;top:.1em;fill:blue;height:5em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M581 226.6C581 119.1 450.9 32 290.5 32S0 119.1 0 226.6C0 322.4 103.3 402 239.4 418.1V480h99.1v-61.5c24.3-2.7 47.6-7.4 69.4-13.9L448 480h112l-67.4-113.7c54.5-35.4 88.4-84.9 88.4-139.7zm-466.8 14.5c0-73.5 98.9-133 220.8-133s211.9 40.7 211.9 133c0 50.1-26.5 85-70.3 106.4-2.4-1.6-4.7-2.9-6.4-3.7-10.2-5.2-27.8-10.5-27.8-10.5s86.6-6.4 86.6-92.7-90.6-87.9-90.6-87.9h-199V361c-74.1-21.5-125.2-67.1-125.2-119.9zm225.1 38.3v-55.6c57.8 0 87.8-6.8 87.8 27.3 0 36.5-38.2 28.3-87.8 28.3zm-.9 72.5H365c10.8 0 18.9 11.7 24 19.2-16.1 1.9-33 2.8-50.6 2.9v-22.1z"></path>
+</svg>
+<svg viewBox="0 0 448 512" style="position:relative;display:inline-block;top:.1em;fill:black;height:3em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M416 304H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32zm0-192H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
+</svg>
+<svg viewBox="0 0 512 512" style="position:relative;display:inline-block;top:.1em;fill:red;height:5em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M458.4 64.3C400.6 15.7 311.3 23 256 79.3 200.7 23 111.4 15.6 53.6 64.3-21.6 127.6-10.6 230.8 43 285.5l175.4 178.7c10 10.2 23.4 15.9 37.6 15.9 14.3 0 27.6-5.6 37.6-15.8L469 285.6c53.5-54.7 64.7-157.9-10.6-221.3zm-23.6 187.5L259.4 430.5c-2.4 2.4-4.4 2.4-6.8 0L77.2 251.8c-36.5-37.2-43.9-107.6 7.3-150.7 38.9-32.7 98.9-27.8 136.5 10.5l35 35.7 35-35.7c37.8-38.5 97.8-43.2 136.5-10.6 51.1 43.1 43.5 113.9 7.3 150.8z"></path>
+</svg>
 <p>Take some time to personalize your <code>yml</code>, <code>index</code>, and <code>geog13</code> files with a few icons.</p>
 </div>
 <div id="commitpush" class="section level3">
@@ -668,19 +705,28 @@ img.outline {
 </ul></li>
 <li>Under that, as a list add:
 <ul>
-<li>Your year and major (with the “user” icon <i class="fas  fa-user "></i>)</li>
-<li>An area of research you enjoy (with the “university” icon <i class="fas  fa-university "></i>).</li>
-<li>The lat long of where you are taking this class form: (with the “map-marker” icon <i class="fas  fa-map-marker "></i>).</li>
+<li>Your year and major (with the “user” icon <svg viewBox="0 0 448 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"> <path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path></svg>)</li>
+<li>An area of research you enjoy (with the “university” icon <svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"> <path d="M496 128v16a8 8 0 0 1-8 8h-24v12c0 6.627-5.373 12-12 12H60c-6.627 0-12-5.373-12-12v-12H24a8 8 0 0 1-8-8v-16a8 8 0 0 1 4.941-7.392l232-88a7.996 7.996 0 0 1 6.118 0l232 88A8 8 0 0 1 496 128zm-24 304H40c-13.255 0-24 10.745-24 24v16a8 8 0 0 0 8 8h464a8 8 0 0 0 8-8v-16c0-13.255-10.745-24-24-24zM96 192v192H60c-6.627 0-12 5.373-12 12v20h416v-20c0-6.627-5.373-12-12-12h-36V192h-64v192h-64V192h-64v192h-64V192H96z"></path></svg>).</li>
+<li>The lat long of where you are taking this class form: (with the “map-marker” icon <svg viewBox="0 0 384 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"> <path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z"></path></svg>).</li>
 <li>An example of what we want would look like this:</li>
 </ul></li>
 </ol>
 <hr />
 <div id="mike-johnson-repo-webpage" class="section level4">
-<h4><i class="fas  fa-globe " style="color:green;"></i> <strong>Mike Johnson</strong> <a href="https://github.com/mikejohnson51/mikejohnson51.github.io">repo</a> — <a href="http://mikejohnson51.github.io">webpage</a></h4>
+<h4><svg viewBox="0 0 496 512" style="height:1em;position:relative;display:inline-block;top:.1em;fill:green;" xmlns="http://www.w3.org/2000/svg"> <path d="M336.5 160C322 70.7 287.8 8 248 8s-74 62.7-88.5 152h177zM152 256c0 22.2 1.2 43.5 3.3 64h185.3c2.1-20.5 3.3-41.8 3.3-64s-1.2-43.5-3.3-64H155.3c-2.1 20.5-3.3 41.8-3.3 64zm324.7-96c-28.6-67.9-86.5-120.4-158-141.6 24.4 33.8 41.2 84.7 50 141.6h108zM177.2 18.4C105.8 39.6 47.8 92.1 19.3 160h108c8.7-56.9 25.5-107.8 49.9-141.6zM487.4 192H372.7c2.1 21 3.3 42.5 3.3 64s-1.2 43-3.3 64h114.6c5.5-20.5 8.6-41.8 8.6-64s-3.1-43.5-8.5-64zM120 256c0-21.5 1.2-43 3.3-64H8.6C3.2 212.5 0 233.8 0 256s3.2 43.5 8.6 64h114.6c-2-21-3.2-42.5-3.2-64zm39.5 96c14.5 89.3 48.7 152 88.5 152s74-62.7 88.5-152h-177zm159.3 141.6c71.4-21.2 129.4-73.7 158-141.6h-108c-8.8 56.9-25.6 107.8-50 141.6zM19.3 352c28.6 67.9 86.5 120.4 158 141.6-24.4-33.8-41.2-84.7-50-141.6h-108z"></path></svg> <strong>Mike Johnson</strong> <a href="https://github.com/mikejohnson51/mikejohnson51.github.io">repo</a> — <a href="http://mikejohnson51.github.io">webpage</a></h4>
 <ul>
-<li><i class="fas  fa-user "></i> Instructor</li>
-<li><i class="fas  fa-university "></i> Water Resources</li>
-<li><i class="fas  fa-map-marker "></i> 34.4140, -119.8489</li>
+<li><svg viewBox="0 0 448 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path>
+</svg>
+Instructor</li>
+<li><svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M496 128v16a8 8 0 0 1-8 8h-24v12c0 6.627-5.373 12-12 12H60c-6.627 0-12-5.373-12-12v-12H24a8 8 0 0 1-8-8v-16a8 8 0 0 1 4.941-7.392l232-88a7.996 7.996 0 0 1 6.118 0l232 88A8 8 0 0 1 496 128zm-24 304H40c-13.255 0-24 10.745-24 24v16a8 8 0 0 0 8 8h464a8 8 0 0 0 8-8v-16c0-13.255-10.745-24-24-24zM96 192v192H60c-6.627 0-12 5.373-12 12v20h416v-20c0-6.627-5.373-12-12-12h-36V192h-64v192h-64V192h-64v192h-64V192H96z"></path>
+</svg>
+Water Resources</li>
+<li><svg viewBox="0 0 384 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg">
+<path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z"></path>
+</svg>
+34.41, -119.84</li>
 </ul>
 <hr />
 <ol start="5" style="list-style-type: decimal">
@@ -766,7 +812,7 @@ link to CV in navbar</li>
 <p>So what did we learn in this process and why does it relate to GIS? Well, GIS is slowly moving towards a more open and collaborative science where you will be expected to share, contribute, and understand the code of others. Being familiar with the tools for basic documentation and communication (markdown and webpages) is a great step in this direction.</p>
 <p>Further being able to navigate, clone, maintain and contribute to version controlled projects is another huge plus!</p>
 <p>A large part of this class, as well as your education at UCSB, is exposure to what exists “in the wild”. Here you were exposed to the HTML/CSS/YML stack, the way websites index and navigate, and made a first stab at creating an online presence. Today, it is so dang easy to submit a resume that job pools are bloated. Being able to set yourself apart - in a way that showcases a skill set - will benefit you.</p>
-<p>Congrats! Remember, if this seemed like a lot, it is because it is! You should be proud of what you accomplished and know you have set hte ground work for some great data science work!</p>
+<p>Congrats! Remember, if this seemed like a lot, it is because it is! You should be proud of what you accomplished and know you have set the ground work for some great data science work!</p>
 </div>
 </div>
 
