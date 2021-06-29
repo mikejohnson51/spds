@@ -1,0 +1,4883 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 05: Data Frame Manipulation
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+# Changes
+
+- office hours will be Tuesdays from 2-4 following class.
+- labs will be due Tuesday at 11:59 following office hours
+
+---
+
+# Picking back up!
+
+---
+
+# Subsetting
+
+ - R’s subsetting operators are **fast** and powerful. 
+ - Subsetting in R is easy to learn but hard to master.
+ - There are 3 subsetting operators, `[[`, `[`, and `$`.
+ - Subsetting operators interact differently with different vector types (e.g., atomic vectors, lists, factors, matrices, and data frames).
+
+---
+count: false
+ 
+#Atomics
+.panel1-subvec-auto[
+
+```r
+*(x = c(3.4, 7, 18, 9.6))
+```
+]
+ 
+.panel2-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.panel1-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))
+
+*x[3]
+```
+]
+ 
+.panel2-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.panel1-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))
+
+x[3]
+
+*x[c(3,4)]
+```
+]
+ 
+.panel2-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.panel1-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))
+
+x[3]
+
+x[c(3,4)]
+
+*x[-3]
+```
+]
+ 
+.panel2-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.panel1-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))
+
+x[3]
+
+x[c(3,4)]
+
+x[-3]
+
+*x[c(T,T,F,F)]
+```
+]
+ 
+.panel2-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.panel1-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))
+
+x[3]
+
+x[c(3,4)]
+
+x[-3]
+
+x[c(T,T,F,F)]
+
+*x = setNames(x, c('A', 'B','C','D'))
+```
+]
+ 
+.panel2-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.panel1-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))
+
+x[3]
+
+x[c(3,4)]
+
+x[-3]
+
+x[c(T,T,F,F)]
+
+x = setNames(x, c('A', 'B','C','D'))
+
+*x["A"]
+```
+]
+ 
+.panel2-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+
+```
+  A 
+3.4 
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.panel1-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))
+
+x[3]
+
+x[c(3,4)]
+
+x[-3]
+
+x[c(T,T,F,F)]
+
+x = setNames(x, c('A', 'B','C','D'))
+
+x["A"]
+*x[c("A", "C")]
+```
+]
+ 
+.panel2-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+
+```
+  A 
+3.4 
+```
+
+```
+   A    C 
+ 3.4 18.0 
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.panel1-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))
+
+x[3]
+
+x[c(3,4)]
+
+x[-3]
+
+x[c(T,T,F,F)]
+
+x = setNames(x, c('A', 'B','C','D'))
+
+x["A"]
+x[c("A", "C")]
+*x[c("A", "A")]
+```
+]
+ 
+.panel2-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+
+```
+  A 
+3.4 
+```
+
+```
+   A    C 
+ 3.4 18.0 
+```
+
+```
+  A   A 
+3.4 3.4 
+```
+]
+
+---
+count: false
+ 
+#Atomics
+.panel1-subvec-auto[
+
+```r
+(x = c(3.4, 7, 18, 9.6))
+
+x[3]
+
+x[c(3,4)]
+
+x[-3]
+
+x[c(T,T,F,F)]
+
+x = setNames(x, c('A', 'B','C','D'))
+
+x["A"]
+x[c("A", "C")]
+x[c("A", "A")]
+```
+]
+ 
+.panel2-subvec-auto[
+
+```
+[1]  3.4  7.0 18.0  9.6
+```
+
+```
+[1] 18
+```
+
+```
+[1] 18.0  9.6
+```
+
+```
+[1] 3.4 7.0 9.6
+```
+
+```
+[1] 3.4 7.0
+```
+
+```
+  A 
+3.4 
+```
+
+```
+   A    C 
+ 3.4 18.0 
+```
+
+```
+  A   A 
+3.4 3.4 
+```
+]
+
+&lt;style&gt;
+.panel1-subvec-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-subvec-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-subvec-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+count: false
+ 
+#Matrices
+.panel1-submat-auto[
+
+```r
+*(x = matrix(1:9, nrow = 3))
+```
+]
+ 
+.panel2-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+]
+
+---
+count: false
+ 
+#Matrices
+.panel1-submat-auto[
+
+```r
+(x = matrix(1:9, nrow = 3))
+
+*x[3,]
+```
+]
+ 
+.panel2-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+[1] 3 6 9
+```
+]
+
+---
+count: false
+ 
+#Matrices
+.panel1-submat-auto[
+
+```r
+(x = matrix(1:9, nrow = 3))
+
+x[3,]
+*x[,3]
+```
+]
+ 
+.panel2-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+[1] 3 6 9
+```
+
+```
+[1] 7 8 9
+```
+]
+
+---
+count: false
+ 
+#Matrices
+.panel1-submat-auto[
+
+```r
+(x = matrix(1:9, nrow = 3))
+
+x[3,]
+x[,3]
+*x[3,3]
+```
+]
+ 
+.panel2-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+[1] 3 6 9
+```
+
+```
+[1] 7 8 9
+```
+
+```
+[1] 9
+```
+]
+
+---
+count: false
+ 
+#Matrices
+.panel1-submat-auto[
+
+```r
+(x = matrix(1:9, nrow = 3))
+
+x[3,]
+x[,3]
+x[3,3]
+*x[1:2,1:2]
+```
+]
+ 
+.panel2-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+[1] 3 6 9
+```
+
+```
+[1] 7 8 9
+```
+
+```
+[1] 9
+```
+
+```
+     [,1] [,2]
+[1,]    1    4
+[2,]    2    5
+```
+]
+
+---
+count: false
+ 
+#Matrices
+.panel1-submat-auto[
+
+```r
+(x = matrix(1:9, nrow = 3))
+
+x[3,]
+x[,3]
+x[3,3]
+x[1:2,1:2]
+*x[-1,]
+```
+]
+ 
+.panel2-submat-auto[
+
+```
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+```
+
+```
+[1] 3 6 9
+```
+
+```
+[1] 7 8 9
+```
+
+```
+[1] 9
+```
+
+```
+     [,1] [,2]
+[1,]    1    4
+[2,]    2    5
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    2    5    8
+[2,]    3    6    9
+```
+]
+
+&lt;style&gt;
+.panel1-submat-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-submat-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-submat-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+count: false
+ 
+#Arrays
+.panel1-subarr-auto[
+
+```r
+*(x = array(1:12, dim = c(2,2,3)))
+```
+]
+ 
+.panel2-subarr-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+, , 2
+
+     [,1] [,2]
+[1,]    5    7
+[2,]    6    8
+
+, , 3
+
+     [,1] [,2]
+[1,]    9   11
+[2,]   10   12
+```
+]
+
+---
+count: false
+ 
+#Arrays
+.panel1-subarr-auto[
+
+```r
+(x = array(1:12, dim = c(2,2,3)))
+
+*x[1,,]
+```
+]
+ 
+.panel2-subarr-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+, , 2
+
+     [,1] [,2]
+[1,]    5    7
+[2,]    6    8
+
+, , 3
+
+     [,1] [,2]
+[1,]    9   11
+[2,]   10   12
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    3    7   11
+```
+]
+
+---
+count: false
+ 
+#Arrays
+.panel1-subarr-auto[
+
+```r
+(x = array(1:12, dim = c(2,2,3)))
+
+x[1,,]
+*x[,1,]
+```
+]
+ 
+.panel2-subarr-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+, , 2
+
+     [,1] [,2]
+[1,]    5    7
+[2,]    6    8
+
+, , 3
+
+     [,1] [,2]
+[1,]    9   11
+[2,]   10   12
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    3    7   11
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    2    6   10
+```
+]
+
+---
+count: false
+ 
+#Arrays
+.panel1-subarr-auto[
+
+```r
+(x = array(1:12, dim = c(2,2,3)))
+
+x[1,,]
+x[,1,]
+*x[,,1]
+```
+]
+ 
+.panel2-subarr-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+, , 2
+
+     [,1] [,2]
+[1,]    5    7
+[2,]    6    8
+
+, , 3
+
+     [,1] [,2]
+[1,]    9   11
+[2,]   10   12
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    3    7   11
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    2    6   10
+```
+
+```
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+```
+]
+
+---
+count: false
+ 
+#Arrays
+.panel1-subarr-auto[
+
+```r
+(x = array(1:12, dim = c(2,2,3)))
+
+x[1,,]
+x[,1,]
+x[,,1]
+```
+]
+ 
+.panel2-subarr-auto[
+
+```
+, , 1
+
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+
+, , 2
+
+     [,1] [,2]
+[1,]    5    7
+[2,]    6    8
+
+, , 3
+
+     [,1] [,2]
+[1,]    9   11
+[2,]   10   12
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    3    7   11
+```
+
+```
+     [,1] [,2] [,3]
+[1,]    1    5    9
+[2,]    2    6   10
+```
+
+```
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+```
+]
+
+&lt;style&gt;
+.panel1-subarr-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-subarr-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-subarr-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+count: false
+ 
+#Lists
+.panel1-sublist-auto[
+
+```r
+*(ll &lt;- list(name = c("George", "Stan", "Carly"),
+*                 age  = c(75,15,31),
+*                 retired = c(T,F,F)))
+```
+]
+ 
+.panel2-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+]
+
+---
+count: false
+ 
+#Lists
+.panel1-sublist-auto[
+
+```r
+(ll &lt;- list(name = c("George", "Stan", "Carly"),
+                  age  = c(75,15,31),
+                  retired = c(T,F,F)))
+*ll$name
+```
+]
+ 
+.panel2-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+]
+
+---
+count: false
+ 
+#Lists
+.panel1-sublist-auto[
+
+```r
+(ll &lt;- list(name = c("George", "Stan", "Carly"),
+                  age  = c(75,15,31),
+                  retired = c(T,F,F)))
+ll$name
+*ll$name[1]
+```
+]
+ 
+.panel2-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+]
+
+---
+count: false
+ 
+#Lists
+.panel1-sublist-auto[
+
+```r
+(ll &lt;- list(name = c("George", "Stan", "Carly"),
+                  age  = c(75,15,31),
+                  retired = c(T,F,F)))
+ll$name
+ll$name[1]
+
+*ll[[1]]
+```
+]
+ 
+.panel2-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+]
+
+---
+count: false
+ 
+#Lists
+.panel1-sublist-auto[
+
+```r
+(ll &lt;- list(name = c("George", "Stan", "Carly"),
+                  age  = c(75,15,31),
+                  retired = c(T,F,F)))
+ll$name
+ll$name[1]
+
+ll[[1]]
+*ll[[1]][1]
+```
+]
+ 
+.panel2-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+]
+
+---
+count: false
+ 
+#Lists
+.panel1-sublist-auto[
+
+```r
+(ll &lt;- list(name = c("George", "Stan", "Carly"),
+                  age  = c(75,15,31),
+                  retired = c(T,F,F)))
+ll$name
+ll$name[1]
+
+ll[[1]]
+ll[[1]][1]
+
+*ll[['name']][1]
+```
+]
+ 
+.panel2-sublist-auto[
+
+```
+$name
+[1] "George" "Stan"   "Carly" 
+
+$age
+[1] 75 15 31
+
+$retired
+[1]  TRUE FALSE FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] "George"
+```
+
+```
+[1] "George"
+```
+]
+
+&lt;style&gt;
+.panel1-sublist-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-sublist-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-sublist-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+# Lists are not Matrices
+
+
+```r
+# The name "Stan"
+ll[1,2]
+```
+
+```
+Error in ll[1, 2]: incorrect number of dimensions
+```
+
+```r
+# Stans Information
+ll[2,]
+```
+
+```
+Error in ll[2, ]: incorrect number of dimensions
+```
+
+---
+
+A data frame is a table or a two-dimensional array-like structure in which each column contains values of one variable and each row contains one set of values from each column. ... The data stored in a data frame can be of numeric, factor or character type.
+
+---
+count: false
+ 
+#data.frames
+.panel1-subdf-auto[
+
+```r
+*(df &lt;- data.frame(name = c("George", "Stan", "Carly"),
+*                 age  = c(75,15,31),
+*                 retired = c(T,F,F)))
+```
+]
+ 
+.panel2-subdf-auto[
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+]
+
+---
+count: false
+ 
+#data.frames
+.panel1-subdf-auto[
+
+```r
+(df &lt;- data.frame(name = c("George", "Stan", "Carly"),
+                  age  = c(75,15,31),
+                  retired = c(T,F,F)))
+
+# Like a Matrix!
+*df[1,2]
+```
+]
+ 
+.panel2-subdf-auto[
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+
+```
+[1] 75
+```
+]
+
+---
+count: false
+ 
+#data.frames
+.panel1-subdf-auto[
+
+```r
+(df &lt;- data.frame(name = c("George", "Stan", "Carly"),
+                  age  = c(75,15,31),
+                  retired = c(T,F,F)))
+
+# Like a Matrix!
+df[1,2]
+*df[2,]
+```
+]
+ 
+.panel2-subdf-auto[
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+
+```
+[1] 75
+```
+
+```
+  name age retired
+2 Stan  15   FALSE
+```
+]
+
+---
+count: false
+ 
+#data.frames
+.panel1-subdf-auto[
+
+```r
+(df &lt;- data.frame(name = c("George", "Stan", "Carly"),
+                  age  = c(75,15,31),
+                  retired = c(T,F,F)))
+
+# Like a Matrix!
+df[1,2]
+df[2,]
+
+# Like a list!
+*df[[1]]
+```
+]
+ 
+.panel2-subdf-auto[
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+
+```
+[1] 75
+```
+
+```
+  name age retired
+2 Stan  15   FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+]
+
+---
+count: false
+ 
+#data.frames
+.panel1-subdf-auto[
+
+```r
+(df &lt;- data.frame(name = c("George", "Stan", "Carly"),
+                  age  = c(75,15,31),
+                  retired = c(T,F,F)))
+
+# Like a Matrix!
+df[1,2]
+df[2,]
+
+# Like a list!
+df[[1]]
+
+# Like a vector
+*df$age[2]
+```
+]
+ 
+.panel2-subdf-auto[
+
+```
+    name age retired
+1 George  75    TRUE
+2   Stan  15   FALSE
+3  Carly  31   FALSE
+```
+
+```
+[1] 75
+```
+
+```
+  name age retired
+2 Stan  15   FALSE
+```
+
+```
+[1] "George" "Stan"   "Carly" 
+```
+
+```
+[1] 15
+```
+]
+
+&lt;style&gt;
+.panel1-subdf-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-subdf-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-subdf-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+# R Packages
+
+- In R, the fundamental unit of shareable code is the package. 
+
+--
+
+- Bundles together code, data, documentation, and tests, in a way that is easy to share. 
+&lt;center&gt;
+&lt;img src="lec-img/05-r-package.jpg" width = "75%"&gt;
+&lt;/center&gt;
+---
+
+# CRAN 
+
+ - The “Comprehensive R Archive Network” (CRAN) is a collection of sites which carry identical material, consisting of the R distribution(s) and contributed packages
+ 
+&lt;center&gt;
+&lt;img src="lec-img/05-CRAN.png" width = "75%"&gt;
+&lt;/center&gt;
+---
+
+# CRAN
+
+ - CRAN enforces a Repository Policy that ensures contributed code is safe and works (meaning it works not necessarily that its good :))
+ 
+--
+
+ - This huge variety of packages is one of the reasons that R is so successful: the chances are that someone has already solved a problem that you’re working on, and you can benefit from their work by downloading their package.
+ 
+--
+
+You already know how to use packages:
+
+--
+
+You install them from CRAN with 
+
+ - You install them from CRAN with install.packages("XXX").
+
+ - You use them in R with library("XXX").
+
+ - You get help on them with package ?XXX 
+
+---
+
+# Install vs Attach
+
+&lt;center&gt;
+&lt;img src="lec-img/05-r-package.jpg" width = "50%"&gt;
+&lt;img src="lec-img/05-install_vs_library.jpeg" width = "50%"&gt;
+&lt;/center&gt;
+
+---
+
+# What is a function:
+
+A function is a set of statements (directions) organized together to perform a specific task. R has a large number of in-built functions and the user can create their own functions.
+
+
+```r
+library(tidyverse)
+lsf.str("package:dplyr")
+```
+
+```
+%&gt;% : function (lhs, rhs)  
+across : function (.cols = everything(), .fns = NULL, ..., .names = NULL)  
+add_count : function (x, ..., wt = NULL, sort = FALSE, name = NULL, 
+    .drop = deprecated())  
+add_count_ : function (x, vars, wt = NULL, sort = FALSE)  
+add_row : function (.data, ..., .before = NULL, .after = NULL)  
+add_rownames : function (df, var = "rowname")  
+add_tally : function (x, wt = NULL, sort = FALSE, name = NULL)  
+add_tally_ : function (x, wt, sort = FALSE)  
+all_equal : function (target, current, ignore_col_order = TRUE, ignore_row_order = TRUE, 
+    convert = FALSE, ...)  
+all_of : function (x)  
+all_vars : function (expr)  
+anti_join : function (x, y, by = NULL, copy = FALSE, ...)  
+any_of : function (x, ..., vars = NULL)  
+any_vars : function (expr)  
+arrange : function (.data, ..., .by_group = FALSE)  
+arrange_ : function (.data, ..., .dots = list())  
+arrange_all : function (.tbl, .funs = list(), ..., .by_group = FALSE)  
+arrange_at : function (.tbl, .vars, .funs = list(), ..., .by_group = FALSE)  
+arrange_if : function (.tbl, .predicate, .funs = list(), ..., .by_group = FALSE)  
+as_data_frame : function (x, ...)  
+as_label : function (x)  
+as_tibble : function (x, ..., .rows = NULL, .name_repair = c("check_unique", 
+    "unique", "universal", "minimal"), rownames = pkgconfig::get_config("tibble::rownames", 
+    NULL))  
+as.tbl : function (x, ...)  
+auto_copy : function (x, y, copy = FALSE, ...)  
+bench_tbls : function (tbls, op, ..., times = 10)  
+between : function (x, left, right)  
+bind_cols : function (..., .name_repair = c("unique", "universal", "check_unique", 
+    "minimal"))  
+bind_rows : function (..., .id = NULL)  
+c_across : function (cols = everything())  
+case_when : function (...)  
+changes : function (x, y)  
+check_dbplyr : function ()  
+coalesce : function (...)  
+collapse : function (x, ...)  
+collect : function (x, ...)  
+combine : function (...)  
+common_by : function (by = NULL, x, y)  
+compare_tbls : function (tbls, op, ref = NULL, compare = equal_data_frame, 
+    ...)  
+compare_tbls2 : function (tbls_x, tbls_y, op, ref = NULL, compare = equal_data_frame, 
+    ...)  
+compute : function (x, ...)  
+contains : function (match, ignore.case = TRUE, vars = NULL)  
+copy_to : function (dest, df, name = deparse(substitute(df)), overwrite = FALSE, 
+    ...)  
+count : function (x, ..., wt = NULL, sort = FALSE, name = NULL)  
+count_ : function (x, vars, wt = NULL, sort = FALSE, .drop = group_by_drop_default(x))  
+cumall : function (x)  
+cumany : function (x)  
+cume_dist : function (x)  
+cummean : function (x)  
+cur_column : function ()  
+cur_data : function ()  
+cur_data_all : function ()  
+cur_group : function ()  
+cur_group_id : function ()  
+cur_group_rows : function ()  
+current_vars : function (...)  
+data_frame : function (...)  
+data_frame_ : function (xs)  
+db_analyze : function (con, table, ...)  
+db_begin : function (con, ...)  
+db_commit : function (con, ...)  
+db_create_index : function (con, table, columns, name = NULL, unique = FALSE, 
+    ...)  
+db_create_indexes : function (con, table, indexes = NULL, unique = FALSE, ...)  
+db_create_table : function (con, table, types, temporary = FALSE, ...)  
+db_data_type : function (con, fields)  
+db_desc : function (x)  
+db_drop_table : function (con, table, force = FALSE, ...)  
+db_explain : function (con, sql, ...)  
+db_has_table : function (con, table)  
+db_insert_into : function (con, table, values, ...)  
+db_list_tables : function (con)  
+db_query_fields : function (con, sql, ...)  
+db_query_rows : function (con, sql, ...)  
+db_rollback : function (con, ...)  
+db_save_query : function (con, sql, name, temporary = TRUE, ...)  
+db_write_table : function (con, table, types, values, temporary = FALSE, 
+    ...)  
+dense_rank : function (x)  
+desc : function (x)  
+dim_desc : function (x)  
+distinct : function (.data, ..., .keep_all = FALSE)  
+distinct_ : function (.data, ..., .dots, .keep_all = FALSE)  
+distinct_all : function (.tbl, .funs = list(), ..., .keep_all = FALSE)  
+distinct_at : function (.tbl, .vars, .funs = list(), ..., .keep_all = FALSE)  
+distinct_if : function (.tbl, .predicate, .funs = list(), ..., .keep_all = FALSE)  
+distinct_prepare : function (.data, vars, group_vars = character(), .keep_all = FALSE, 
+    caller_env = caller_env(2))  
+do : function (.data, ...)  
+do_ : function (.data, ..., .dots = list())  
+dplyr_col_modify : function (data, cols)  
+dplyr_reconstruct : function (data, template)  
+dplyr_row_slice : function (data, i, ...)  
+ends_with : function (match, ignore.case = TRUE, vars = NULL)  
+enexpr : function (arg)  
+enexprs : function (..., .named = FALSE, .ignore_empty = c("trailing", 
+    "none", "all"), .unquote_names = TRUE, .homonyms = c("keep", 
+    "first", "last", "error"), .check_assign = FALSE)  
+enquo : function (arg)  
+enquos : function (..., .named = FALSE, .ignore_empty = c("trailing", 
+    "none", "all"), .unquote_names = TRUE, .homonyms = c("keep", 
+    "first", "last", "error"), .check_assign = FALSE)  
+ensym : function (arg)  
+ensyms : function (..., .named = FALSE, .ignore_empty = c("trailing", 
+    "none", "all"), .unquote_names = TRUE, .homonyms = c("keep", 
+    "first", "last", "error"), .check_assign = FALSE)  
+eval_tbls : function (tbls, op)  
+eval_tbls2 : function (tbls_x, tbls_y, op)  
+everything : function (vars = NULL)  
+explain : function (x, ...)  
+expr : function (expr)  
+failwith : function (default = NULL, f, quiet = FALSE)  
+filter : function (.data, ..., .preserve = FALSE)  
+filter_ : function (.data, ..., .dots = list())  
+filter_all : function (.tbl, .vars_predicate, .preserve = FALSE)  
+filter_at : function (.tbl, .vars, .vars_predicate, .preserve = FALSE)  
+filter_if : function (.tbl, .predicate, .vars_predicate, .preserve = FALSE)  
+first : function (x, order_by = NULL, default = default_missing(x))  
+frame_data : function (...)  
+full_join : function (x, y, by = NULL, copy = FALSE, suffix = c(".x", 
+    ".y"), ..., keep = FALSE)  
+funs : function (..., .args = list())  
+funs_ : function (dots, args = list(), env = base_env())  
+glimpse : function (x, width = NULL, ...)  
+group_by : function (.data, ..., .add = FALSE, .drop = group_by_drop_default(.data))  
+group_by_ : function (.data, ..., .dots = list(), add = FALSE)  
+group_by_all : function (.tbl, .funs = list(), ..., .add = FALSE, .drop = group_by_drop_default(.tbl))  
+group_by_at : function (.tbl, .vars, .funs = list(), ..., .add = FALSE, 
+    .drop = group_by_drop_default(.tbl))  
+group_by_drop_default : function (.tbl)  
+group_by_if : function (.tbl, .predicate, .funs = list(), ..., .add = FALSE, 
+    .drop = group_by_drop_default(.tbl))  
+group_by_prepare : function (.data, ..., caller_env = caller_env(2), .add = FALSE, 
+    .dots = deprecated(), add = deprecated())  
+group_cols : function (vars = NULL, data = NULL)  
+group_data : function (.data)  
+group_indices : function (.data, ...)  
+group_indices_ : function (.data, ..., .dots = list())  
+group_keys : function (.tbl, ...)  
+group_map : function (.data, .f, ..., .keep = FALSE)  
+group_modify : function (.data, .f, ..., .keep = FALSE)  
+group_nest : function (.tbl, ..., .key = "data", keep = FALSE)  
+group_rows : function (.data)  
+group_size : function (x)  
+group_split : function (.tbl, ..., .keep = TRUE)  
+group_trim : function (.tbl, .drop = group_by_drop_default(.tbl))  
+group_vars : function (x)  
+group_walk : function (.data, .f, ...)  
+grouped_df : function (data, vars, drop = group_by_drop_default(data))  
+groups : function (x)  
+id : function (.variables, drop = FALSE)  
+ident : function (...)  
+if_all : function (.cols = everything(), .fns = NULL, ..., .names = NULL)  
+if_any : function (.cols = everything(), .fns = NULL, ..., .names = NULL)  
+if_else : function (condition, true, false, missing = NULL)  
+inner_join : function (x, y, by = NULL, copy = FALSE, suffix = c(".x", 
+    ".y"), ..., keep = FALSE)  
+intersect : function (x, y, ...)  
+is_grouped_df : function (x)  
+is.grouped_df : function (x)  
+is.src : function (x)  
+is.tbl : function (x)  
+lag : function (x, n = 1L, default = NA, order_by = NULL, ...)  
+last : function (x, order_by = NULL, default = default_missing(x))  
+last_col : function (offset = 0L, vars = NULL)  
+lead : function (x, n = 1L, default = NA, order_by = NULL, ...)  
+left_join : function (x, y, by = NULL, copy = FALSE, suffix = c(".x", 
+    ".y"), ..., keep = FALSE)  
+location : function (df)  
+lst : function (...)  
+lst_ : function (xs)  
+make_tbl : function (subclass, ...)  
+matches : function (match, ignore.case = TRUE, perl = FALSE, vars = NULL)  
+min_rank : function (x)  
+mutate : function (.data, ...)  
+mutate_ : function (.data, ..., .dots = list())  
+mutate_all : function (.tbl, .funs, ...)  
+mutate_at : function (.tbl, .vars, .funs, ..., .cols = NULL)  
+mutate_each : function (tbl, funs, ...)  
+mutate_each_ : function (tbl, funs, vars)  
+mutate_if : function (.tbl, .predicate, .funs, ...)  
+n : function ()  
+n_distinct : function (..., na.rm = FALSE)  
+n_groups : function (x)  
+na_if : function (x, y)  
+near : function (x, y, tol = .Machine$double.eps^0.5)  
+nest_by : function (.data, ..., .key = "data", .keep = FALSE)  
+nest_join : function (x, y, by = NULL, copy = FALSE, keep = FALSE, name = NULL, 
+    ...)  
+new_grouped_df : function (x, groups, ..., class = character())  
+nth : function (x, n, order_by = NULL, default = default_missing(x))  
+ntile : function (x = row_number(), n)  
+num_range : function (prefix, range, width = NULL, vars = NULL)  
+one_of : function (..., .vars = NULL)  
+order_by : function (order_by, call)  
+percent_rank : function (x)  
+progress_estimated : function (n, min_time = 0)  
+pull : function (.data, var = -1, name = NULL, ...)  
+quo : function (expr)  
+quo_name : function (quo)  
+quos : function (..., .named = FALSE, .ignore_empty = c("trailing", 
+    "none", "all"), .unquote_names = TRUE)  
+recode : function (.x, ..., .default = NULL, .missing = NULL)  
+recode_factor : function (.x, ..., .default = NULL, .missing = NULL, .ordered = FALSE)  
+relocate : function (.data, ..., .before = NULL, .after = NULL)  
+rename : function (.data, ...)  
+rename_ : function (.data, ..., .dots = list())  
+rename_all : function (.tbl, .funs = list(), ...)  
+rename_at : function (.tbl, .vars, .funs = list(), ...)  
+rename_if : function (.tbl, .predicate, .funs = list(), ...)  
+rename_vars : function (vars = chr(), ..., strict = TRUE)  
+rename_vars_ : function (vars, args)  
+rename_with : function (.data, .fn, .cols = everything(), ...)  
+right_join : function (x, y, by = NULL, copy = FALSE, suffix = c(".x", 
+    ".y"), ..., keep = FALSE)  
+row_number : function (x)  
+rows_delete : function (x, y, by = NULL, ..., copy = FALSE, in_place = FALSE)  
+rows_insert : function (x, y, by = NULL, ..., copy = FALSE, in_place = FALSE)  
+rows_patch : function (x, y, by = NULL, ..., copy = FALSE, in_place = FALSE)  
+rows_update : function (x, y, by = NULL, ..., copy = FALSE, in_place = FALSE)  
+rows_upsert : function (x, y, by = NULL, ..., copy = FALSE, in_place = FALSE)  
+rowwise : function (data, ...)  
+same_src : function (x, y)  
+sample_frac : function (tbl, size = 1, replace = FALSE, weight = NULL, 
+    .env = NULL, ...)  
+sample_n : function (tbl, size, replace = FALSE, weight = NULL, .env = NULL, 
+    ...)  
+select : function (.data, ...)  
+select_ : function (.data, ..., .dots = list())  
+select_all : function (.tbl, .funs = list(), ...)  
+select_at : function (.tbl, .vars, .funs = list(), ...)  
+select_if : function (.tbl, .predicate, .funs = list(), ...)  
+select_var : function (vars, var = -1)  
+select_vars : function (vars = chr(), ..., include = chr(), exclude = chr())  
+select_vars_ : function (vars, args, include = chr(), exclude = chr())  
+semi_join : function (x, y, by = NULL, copy = FALSE, ...)  
+setdiff : function (x, y, ...)  
+setequal : function (x, y, ...)  
+show_query : function (x, ...)  
+slice : function (.data, ..., .preserve = FALSE)  
+slice_ : function (.data, ..., .dots = list())  
+slice_head : function (.data, ..., n, prop)  
+slice_max : function (.data, order_by, ..., n, prop, with_ties = TRUE)  
+slice_min : function (.data, order_by, ..., n, prop, with_ties = TRUE)  
+slice_sample : function (.data, ..., n, prop, weight_by = NULL, replace = FALSE)  
+slice_tail : function (.data, ..., n, prop)  
+sql : function (...)  
+sql_escape_ident : function (con, x)  
+sql_escape_string : function (con, x)  
+sql_join : function (con, x, y, vars, type = "inner", by = NULL, ...)  
+sql_select : function (con, select, from, where = NULL, group_by = NULL, 
+    having = NULL, order_by = NULL, limit = NULL, distinct = FALSE, 
+    ...)  
+sql_semi_join : function (con, x, y, anti = FALSE, by = NULL, ...)  
+sql_set_op : function (con, x, y, method)  
+sql_subquery : function (con, from, name = random_table_name(), ...)  
+sql_translate_env : function (con)  
+src : function (subclass, ...)  
+src_df : function (pkg = NULL, env = NULL)  
+src_local : function (tbl, pkg = NULL, env = NULL)  
+src_mysql : function (dbname, host = NULL, port = 0L, username = "root", 
+    password = "", ...)  
+src_postgres : function (dbname = NULL, host = NULL, port = NULL, user = NULL, 
+    password = NULL, ...)  
+src_sqlite : function (path, create = FALSE)  
+src_tbls : function (x, ...)  
+starts_with : function (match, ignore.case = TRUE, vars = NULL)  
+summarise : function (.data, ..., .groups = NULL)  
+summarise_ : function (.data, ..., .dots = list())  
+summarise_all : function (.tbl, .funs, ...)  
+summarise_at : function (.tbl, .vars, .funs, ..., .cols = NULL)  
+summarise_each : function (tbl, funs, ...)  
+summarise_each_ : function (tbl, funs, vars)  
+summarise_if : function (.tbl, .predicate, .funs, ...)  
+summarize : function (.data, ..., .groups = NULL)  
+summarize_ : function (.data, ..., .dots = list())  
+summarize_all : function (.tbl, .funs, ...)  
+summarize_at : function (.tbl, .vars, .funs, ..., .cols = NULL)  
+summarize_each : function (tbl, funs, ...)  
+summarize_each_ : function (tbl, funs, vars)  
+summarize_if : function (.tbl, .predicate, .funs, ...)  
+sym : function (x)  
+syms : function (x)  
+tally : function (x, wt = NULL, sort = FALSE, name = NULL)  
+tally_ : function (x, wt, sort = FALSE)  
+tbl : function (src, ...)  
+tbl_df : function (data)  
+tbl_nongroup_vars : function (x)  
+tbl_ptype : function (.data)  
+tbl_sum : function (x)  
+tbl_vars : function (x)  
+tibble : function (..., .rows = NULL, .name_repair = c("check_unique", 
+    "unique", "universal", "minimal"))  
+top_frac : function (x, n, wt)  
+top_n : function (x, n, wt)  
+transmute : function (.data, ...)  
+transmute_ : function (.data, ..., .dots = list())  
+transmute_all : function (.tbl, .funs, ...)  
+transmute_at : function (.tbl, .vars, .funs, ..., .cols = NULL)  
+transmute_if : function (.tbl, .predicate, .funs, ...)  
+tribble : function (...)  
+trunc_mat : function (x, n = NULL, width = NULL, n_extra = NULL)  
+type_sum : function (x)  
+ungroup : function (x, ...)  
+union : function (x, y, ...)  
+union_all : function (x, y, ...)  
+validate_grouped_df : function (x, check_bounds = FALSE)  
+vars : function (...)  
+with_groups : function (.data, .groups, .f, ...)  
+with_order : function (order_by, fun, x, ...)  
+wrap_dbplyr_obj : function (obj_name)  
+```
+---
+
+## Signature
+
+- What is the name, what are the inputs.
+
+`add_count_ : function (x, vars, wt = NULL, sort = FALSE) `
+
+--
+
+## Access
+
+We can access the functions that come with a package in 2 ways:
+
+1. By attaching the package to the working session (library)
+ 
+2. By referencing the package directly (`rmarkdown::render_site()`)
+
+-- 
+
+## Help
+
+- We can get help about a function by placing a ? in front of of the function 
+
+`?dplyr::select`
+
+---
+class: inverse, middle, center
+# Data Manipulation
+### dplyr
+### data wrangling
+---
+
+# Grammar of Data Manipulation
+
+- `dplyr` is a package for data manipulation
+
+--
+
+- It is built to be fast, flexible and generic  about how your data is stored. 
+
+--
+
+- It is installed as part of the tidyverse meta-package and, is among those loaded via:
+
+
+```r
+library(tidyverse)
+tidyverse::tidyverse_packages()
+```
+
+```
+ [1] "broom"         "cli"           "crayon"       
+ [4] "dbplyr"        "dplyr"         "dtplyr"       
+ [7] "forcats"       "googledrive"   "googlesheets4"
+[10] "ggplot2"       "haven"         "hms"          
+[13] "httr"          "jsonlite"      "lubridate"    
+[16] "magrittr"      "modelr"        "pillar"       
+[19] "purrr"         "readr"         "readxl"       
+[22] "reprex"        "rlang"         "rstudioapi"   
+[25] "rvest"         "stringr"       "tibble"       
+[28] "tidyr"         "xml2"          "tidyverse"    
+```
+
+---
+
+# Grammar of Data Manipulation
+
+- `dplyr` provides a *grammar* of data manipulation
+
+--
+
+- Think of this as a consistent set of *verbs* that help you solve common data manipulation challenges
+
+--
+
+The idea of data science **grammar(s)** is something we will see through out this class... 
+
+--
+
+We will cover two "pure" verbs:
+
+- `select()` 
+  - picks variables based on their names.
+- `filter()` 
+ - picks cases based on their values.
+
+--
+
+And three "manipulation" verbs
+- `mutate()` 
+  - adds new variables that are functions of existing variables
+- `summarise()` 
+  - reduces multiple values down to a single summary.
+- `arrange()` 
+  - changes the ordering of the rows.
+
+--
+
+These all combine naturally with `group_by()` which allows you to perform any operation “by group”.
+
+---
+
+#  Gapminder Data
+
+"Gapminder Foundation is a non-profit venture registered in Stockholm, Sweden, that promotes sustainable global development and achievement of the United Nations Millennium Development Goals by increased use and understanding of statistics and other information about social, economic and environmental development at local, national and global levels."
+
+
+```r
+head(gapminder)
+```
+
+```
+# A tibble: 6 x 6
+  country     continent  year lifeExp      pop gdpPercap
+  &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+1 Afghanistan Asia       1952    28.8  8425333      779.
+2 Afghanistan Asia       1957    30.3  9240934      821.
+3 Afghanistan Asia       1962    32.0 10267083      853.
+4 Afghanistan Asia       1967    34.0 11537966      836.
+5 Afghanistan Asia       1972    36.1 13079460      740.
+6 Afghanistan Asia       1977    38.4 14880372      786.
+```
+
+```r
+class(gapminder)
+```
+
+```
+[1] "tbl_df"     "tbl"        "data.frame"
+```
+
+---
+
+# Use `filter()` to subset data by conditions
+
+- `filter()` takes logical (binary) expressions and returns the rows in which all conditions are TRUE.
+
+--
+
+- `filter()` does NOT impact columns
+
+--
+
+- the `data.frame` is ALWAYS the fist argument
+
+--
+
+- Lets find all rows in `gapminder` that in which the life expectancy is less then 35
+
+
+```r
+filter(gapminder, lifeExp &lt; 40)
+```
+
+```
+# A tibble: 124 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Angola      Africa     1952    30.0  4232095     3521.
+ 9 Angola      Africa     1957    32.0  4561361     3828.
+10 Angola      Africa     1962    34    4826015     4269.
+# … with 114 more rows
+```
+
+---
+
+# Use `filter()` to subset data by conditions
+
+- Lets find all observations in `gapminder` where the year is 2007, and the life expectancy is less then 40
+
+
+```r
+filter(gapminder, lifeExp &lt; 40, year == 2007)
+```
+
+```
+# A tibble: 1 x 6
+  country   continent  year lifeExp     pop gdpPercap
+  &lt;fct&gt;     &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
+1 Swaziland Africa     2007    39.6 1133066     4513.
+```
+
+---
+
+# Use `filter()` to subset data by conditions
+
+- Lets find all rows in `gapminder` that document Iraq, Iran, and Afghanistan  (%in%) and have a year greater then 2005 
+
+
+```r
+filter(gapminder, country %in% c("Iraq", "Iran", "Afghanistan"), year &gt; 2005)
+```
+
+```
+# A tibble: 3 x 6
+  country     continent  year lifeExp      pop gdpPercap
+  &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+1 Afghanistan Asia       2007    43.8 31889923      975.
+2 Iran        Asia       2007    71.0 69453570    11606.
+3 Iraq        Asia       2007    59.5 27499638     4471.
+```
+
+---
+
+# Base Alternative
+
+Compare with some base R code to accomplish the same things:
+
+
+```r
+gapminder[gapminder$lifeExp &lt; 40 &amp; gapminder$year == 2007, ] 
+```
+
+```
+# A tibble: 1 x 6
+  country   continent  year lifeExp     pop gdpPercap
+  &lt;fct&gt;     &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
+1 Swaziland Africa     2007    39.6 1133066     4513.
+```
+
+---
+
+You should never subset your data like this:
+
+
+```r
+gapminder[19:70, ]
+```
+
+```
+# A tibble: 52 x 6
+   country continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Albania Europe     1982    70.4  2780097     3631.
+ 2 Albania Europe     1987    72    3075321     3739.
+ 3 Albania Europe     1992    71.6  3326498     2497.
+ 4 Albania Europe     1997    73.0  3428038     3193.
+ 5 Albania Europe     2002    75.7  3508512     4604.
+ 6 Albania Europe     2007    76.4  3600523     5937.
+ 7 Algeria Africa     1952    43.1  9279525     2449.
+ 8 Algeria Africa     1957    45.7 10270856     3014.
+ 9 Algeria Africa     1962    48.3 11000948     2551.
+10 Algeria Africa     1967    51.4 12760499     3247.
+# … with 42 more rows
+```
+
+Why?
+
+1. It's not self-documenting. Why rows 241 through 252?
+2. fragile. This line of code will produce different results if someone changes the raw data
+
+---
+
+## Use `select()` to subset by variables or columns.
+
+- Use `select()` to subset the variables or columns you want.
+
+- the `data.frame` is ALWAYS the fist argument
+
+
+```r
+select(gapminder, country, lifeExp)
+```
+
+```
+# A tibble: 1,704 x 2
+   country     lifeExp
+   &lt;fct&gt;         &lt;dbl&gt;
+ 1 Afghanistan    28.8
+ 2 Afghanistan    30.3
+ 3 Afghanistan    32.0
+ 4 Afghanistan    34.0
+ 5 Afghanistan    36.1
+ 6 Afghanistan    38.4
+ 7 Afghanistan    39.9
+ 8 Afghanistan    40.8
+ 9 Afghanistan    41.7
+10 Afghanistan    41.8
+# … with 1,694 more rows
+```
+
+---
+
+## Use `select()` to subset by variables or columns.
+
+`select()` can also be used to rename existing columns
+
+
+```r
+select(gapminder, country, life_exp = lifeExp)
+```
+
+```
+# A tibble: 1,704 x 2
+   country     life_exp
+   &lt;fct&gt;          &lt;dbl&gt;
+ 1 Afghanistan     28.8
+ 2 Afghanistan     30.3
+ 3 Afghanistan     32.0
+ 4 Afghanistan     34.0
+ 5 Afghanistan     36.1
+ 6 Afghanistan     38.4
+ 7 Afghanistan     39.9
+ 8 Afghanistan     40.8
+ 9 Afghanistan     41.7
+10 Afghanistan     41.8
+# … with 1,694 more rows
+```
+
+---
+
+## Use `select()` to subset by variables or columns.
+
+select() can be used to remove columns. The ! negates a selection
+
+
+```r
+select(gapminder, !country)
+```
+
+```
+# A tibble: 1,704 x 5
+   continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Asia       1952    28.8  8425333      779.
+ 2 Asia       1957    30.3  9240934      821.
+ 3 Asia       1962    32.0 10267083      853.
+ 4 Asia       1967    34.0 11537966      836.
+ 5 Asia       1972    36.1 13079460      740.
+ 6 Asia       1977    38.4 14880372      786.
+ 7 Asia       1982    39.9 12881816      978.
+ 8 Asia       1987    40.8 13867957      852.
+ 9 Asia       1992    41.7 16317921      649.
+10 Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+
+---
+
+# The `%&gt;%` (pipe) operator
+ 
+The pipe operator will change your data data workflow in R. 
+This new syntax leads to code that is much easier to write and to read.
+
+Here’s what it looks like: `%&gt;%`. 
+
+The RStudio keyboard shortcut: Ctrl+Shift+M (Windows), Cmd+Shift+M (Mac).
+
+The pipe passes the object on the left hand side of the pipe into the first argument of the right hand function:
+
+.pull-left[
+
+### So this: 
+
+
+```r
+select(gapminder, country, lifeExp)
+```
+
+```
+# A tibble: 1,704 x 2
+   country     lifeExp
+   &lt;fct&gt;         &lt;dbl&gt;
+ 1 Afghanistan    28.8
+ 2 Afghanistan    30.3
+ 3 Afghanistan    32.0
+ 4 Afghanistan    34.0
+ 5 Afghanistan    36.1
+ 6 Afghanistan    38.4
+ 7 Afghanistan    39.9
+ 8 Afghanistan    40.8
+ 9 Afghanistan    41.7
+10 Afghanistan    41.8
+# … with 1,694 more rows
+```
+]
+
+.pull-right[
+
+### ...is the same as this:
+
+
+```r
+gapminder %&gt;% 
+  select(country, lifeExp)
+```
+
+```
+# A tibble: 1,704 x 2
+   country     lifeExp
+   &lt;fct&gt;         &lt;dbl&gt;
+ 1 Afghanistan    28.8
+ 2 Afghanistan    30.3
+ 3 Afghanistan    32.0
+ 4 Afghanistan    34.0
+ 5 Afghanistan    36.1
+ 6 Afghanistan    38.4
+ 7 Afghanistan    39.9
+ 8 Afghanistan    40.8
+ 9 Afghanistan    41.7
+10 Afghanistan    41.8
+# … with 1,694 more rows
+```
+
+]
+---
+
+count: false
+ 
+# %&gt;%  across verbs
+.panel1-plot-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-plot-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+# %&gt;%  across verbs
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+* select(pop, gdpPercap, year, country)
+```
+]
+ 
+.panel2-plot-auto[
+
+```
+# A tibble: 1,704 x 4
+        pop gdpPercap  year country    
+      &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;      
+ 1  8425333      779.  1952 Afghanistan
+ 2  9240934      821.  1957 Afghanistan
+ 3 10267083      853.  1962 Afghanistan
+ 4 11537966      836.  1967 Afghanistan
+ 5 13079460      740.  1972 Afghanistan
+ 6 14880372      786.  1977 Afghanistan
+ 7 12881816      978.  1982 Afghanistan
+ 8 13867957      852.  1987 Afghanistan
+ 9 16317921      649.  1992 Afghanistan
+10 22227415      635.  1997 Afghanistan
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+# %&gt;%  across verbs
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  select(pop, gdpPercap, year, country) %&gt;%
+* filter(pop &gt; 100000000 &amp; gdpPercap &gt; 5000)
+```
+]
+ 
+.panel2-plot-auto[
+
+```
+# A tibble: 30 x 4
+         pop gdpPercap  year country
+       &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;  
+ 1 114313951     6660.  1977 Brazil 
+ 2 128962939     7031.  1982 Brazil 
+ 3 142938076     7807.  1987 Brazil 
+ 4 155975974     6950.  1992 Brazil 
+ 5 168546719     7958.  1997 Brazil 
+ 6 179914212     8131.  2002 Brazil 
+ 7 190010647     9066.  2007 Brazil 
+ 8 100825279     9848.  1967 Japan  
+ 9 107188273    14779.  1972 Japan  
+10 113872473    16610.  1977 Japan  
+# … with 20 more rows
+```
+]
+
+---
+count: false
+ 
+# %&gt;%  across verbs
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  select(pop, gdpPercap, year, country) %&gt;%
+  filter(pop &gt; 100000000 &amp; gdpPercap &gt; 5000) %&gt;%
+* filter(year &gt; 1995)
+```
+]
+ 
+.panel2-plot-auto[
+
+```
+# A tibble: 11 x 4
+         pop gdpPercap  year country      
+       &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;        
+ 1 168546719     7958.  1997 Brazil       
+ 2 179914212     8131.  2002 Brazil       
+ 3 190010647     9066.  2007 Brazil       
+ 4 125956499    28817.  1997 Japan        
+ 5 127065841    28605.  2002 Japan        
+ 6 127467972    31656.  2007 Japan        
+ 7 102479927    10742.  2002 Mexico       
+ 8 108700891    11978.  2007 Mexico       
+ 9 272911760    35767.  1997 United States
+10 287675526    39097.  2002 United States
+11 301139947    42952.  2007 United States
+```
+]
+
+---
+count: false
+ 
+# %&gt;%  across verbs
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  select(pop, gdpPercap, year, country) %&gt;%
+  filter(pop &gt; 100000000 &amp; gdpPercap &gt; 5000) %&gt;%
+  filter(year &gt; 1995) %&gt;%
+* filter(country %in% c("United States", "Mexico"))
+```
+]
+ 
+.panel2-plot-auto[
+
+```
+# A tibble: 5 x 4
+        pop gdpPercap  year country      
+      &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;        
+1 102479927    10742.  2002 Mexico       
+2 108700891    11978.  2007 Mexico       
+3 272911760    35767.  1997 United States
+4 287675526    39097.  2002 United States
+5 301139947    42952.  2007 United States
+```
+]
+
+&lt;style&gt;
+.panel1-plot-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-plot-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-plot-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+class: inverse, center, middle
+# Single Table Verbs 
+---
+
+# Use mutate() to add new variables
+
+--
+
+- `mutate()` defines and inserts new variables into a existing `data.frame`
+
+--
+
+- `mutate()` builds new variables sequentially so you can reference earlier ones  when defining later ones 
+
+--
+
+- In the `gapminder` dataset we have a population and gdp per capita variable. Lets calculate the GDP of each county
+
+---
+
+count: false
+ 
+#Mutate
+.panel1-mutate-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-mutate-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Mutate
+.panel1-mutate-auto[
+
+```r
+gapminder %&gt;%
+* mutate(gdp = pop * gdpPercap)
+```
+]
+ 
+.panel2-mutate-auto[
+
+```
+# A tibble: 1,704 x 7
+   country    continent  year lifeExp     pop gdpPercap       gdp
+   &lt;fct&gt;      &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+ 1 Afghanist… Asia       1952    28.8  8.43e6      779.   6.57e 9
+ 2 Afghanist… Asia       1957    30.3  9.24e6      821.   7.59e 9
+ 3 Afghanist… Asia       1962    32.0  1.03e7      853.   8.76e 9
+ 4 Afghanist… Asia       1967    34.0  1.15e7      836.   9.65e 9
+ 5 Afghanist… Asia       1972    36.1  1.31e7      740.   9.68e 9
+ 6 Afghanist… Asia       1977    38.4  1.49e7      786.   1.17e10
+ 7 Afghanist… Asia       1982    39.9  1.29e7      978.   1.26e10
+ 8 Afghanist… Asia       1987    40.8  1.39e7      852.   1.18e10
+ 9 Afghanist… Asia       1992    41.7  1.63e7      649.   1.06e10
+10 Afghanist… Asia       1997    41.8  2.22e7      635.   1.41e10
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Mutate
+.panel1-mutate-auto[
+
+```r
+gapminder %&gt;%
+  mutate(gdp = pop * gdpPercap) %&gt;%
+* mutate(gdpPercap = NULL)
+```
+]
+ 
+.panel2-mutate-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop          gdp
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;        &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333  6567086330.
+ 2 Afghanistan Asia       1957    30.3  9240934  7585448670.
+ 3 Afghanistan Asia       1962    32.0 10267083  8758855797.
+ 4 Afghanistan Asia       1967    34.0 11537966  9648014150.
+ 5 Afghanistan Asia       1972    36.1 13079460  9678553274.
+ 6 Afghanistan Asia       1977    38.4 14880372 11697659231.
+ 7 Afghanistan Asia       1982    39.9 12881816 12598563401.
+ 8 Afghanistan Asia       1987    40.8 13867957 11820990309.
+ 9 Afghanistan Asia       1992    41.7 16317921 10595901589.
+10 Afghanistan Asia       1997    41.8 22227415 14121995875.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Mutate
+.panel1-mutate-auto[
+
+```r
+gapminder %&gt;%
+  mutate(gdp = pop * gdpPercap) %&gt;%
+  mutate(gdpPercap = NULL)
+
+*gapminder
+```
+]
+ 
+.panel2-mutate-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop          gdp
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;        &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333  6567086330.
+ 2 Afghanistan Asia       1957    30.3  9240934  7585448670.
+ 3 Afghanistan Asia       1962    32.0 10267083  8758855797.
+ 4 Afghanistan Asia       1967    34.0 11537966  9648014150.
+ 5 Afghanistan Asia       1972    36.1 13079460  9678553274.
+ 6 Afghanistan Asia       1977    38.4 14880372 11697659231.
+ 7 Afghanistan Asia       1982    39.9 12881816 12598563401.
+ 8 Afghanistan Asia       1987    40.8 13867957 11820990309.
+ 9 Afghanistan Asia       1992    41.7 16317921 10595901589.
+10 Afghanistan Asia       1997    41.8 22227415 14121995875.
+# … with 1,694 more rows
+```
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Mutate
+.panel1-mutate-auto[
+
+```r
+gapminder %&gt;%
+  mutate(gdp = pop * gdpPercap) %&gt;%
+  mutate(gdpPercap = NULL)
+
+gapminder %&gt;%
+* mutate(gdp = pop * gdpPercap,
+*        gdpPercap = NULL)
+```
+]
+ 
+.panel2-mutate-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop          gdp
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;        &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333  6567086330.
+ 2 Afghanistan Asia       1957    30.3  9240934  7585448670.
+ 3 Afghanistan Asia       1962    32.0 10267083  8758855797.
+ 4 Afghanistan Asia       1967    34.0 11537966  9648014150.
+ 5 Afghanistan Asia       1972    36.1 13079460  9678553274.
+ 6 Afghanistan Asia       1977    38.4 14880372 11697659231.
+ 7 Afghanistan Asia       1982    39.9 12881816 12598563401.
+ 8 Afghanistan Asia       1987    40.8 13867957 11820990309.
+ 9 Afghanistan Asia       1992    41.7 16317921 10595901589.
+10 Afghanistan Asia       1997    41.8 22227415 14121995875.
+# … with 1,694 more rows
+```
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop          gdp
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;        &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333  6567086330.
+ 2 Afghanistan Asia       1957    30.3  9240934  7585448670.
+ 3 Afghanistan Asia       1962    32.0 10267083  8758855797.
+ 4 Afghanistan Asia       1967    34.0 11537966  9648014150.
+ 5 Afghanistan Asia       1972    36.1 13079460  9678553274.
+ 6 Afghanistan Asia       1977    38.4 14880372 11697659231.
+ 7 Afghanistan Asia       1982    39.9 12881816 12598563401.
+ 8 Afghanistan Asia       1987    40.8 13867957 11820990309.
+ 9 Afghanistan Asia       1992    41.7 16317921 10595901589.
+10 Afghanistan Asia       1997    41.8 22227415 14121995875.
+# … with 1,694 more rows
+```
+]
+
+&lt;style&gt;
+.panel1-mutate-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-mutate-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-mutate-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# Arrange 
+
+- orders the rows of a `data.frame` rows by the values of selected columns.
+---
+
+count: false
+ 
+#Decreasing or Increasing?
+.panel1-arrange-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-arrange-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Decreasing or Increasing?
+.panel1-arrange-auto[
+
+```r
+gapminder %&gt;%
+* filter(year == 2007)
+```
+]
+ 
+.panel2-arrange-auto[
+
+```
+# A tibble: 142 x 6
+   country     continent  year lifeExp       pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       2007    43.8  31889923      975.
+ 2 Albania     Europe     2007    76.4   3600523     5937.
+ 3 Algeria     Africa     2007    72.3  33333216     6223.
+ 4 Angola      Africa     2007    42.7  12420476     4797.
+ 5 Argentina   Americas   2007    75.3  40301927    12779.
+ 6 Australia   Oceania    2007    81.2  20434176    34435.
+ 7 Austria     Europe     2007    79.8   8199783    36126.
+ 8 Bahrain     Asia       2007    75.6    708573    29796.
+ 9 Bangladesh  Asia       2007    64.1 150448339     1391.
+10 Belgium     Europe     2007    79.4  10392226    33693.
+# … with 132 more rows
+```
+]
+
+---
+count: false
+ 
+#Decreasing or Increasing?
+.panel1-arrange-auto[
+
+```r
+gapminder %&gt;%
+  filter(year == 2007) %&gt;%
+* arrange(lifeExp)
+```
+]
+ 
+.panel2-arrange-auto[
+
+```
+# A tibble: 142 x 6
+   country              continent  year lifeExp     pop gdpPercap
+   &lt;fct&gt;                &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
+ 1 Swaziland            Africa     2007    39.6  1.13e6     4513.
+ 2 Mozambique           Africa     2007    42.1  2.00e7      824.
+ 3 Zambia               Africa     2007    42.4  1.17e7     1271.
+ 4 Sierra Leone         Africa     2007    42.6  6.14e6      863.
+ 5 Lesotho              Africa     2007    42.6  2.01e6     1569.
+ 6 Angola               Africa     2007    42.7  1.24e7     4797.
+ 7 Zimbabwe             Africa     2007    43.5  1.23e7      470.
+ 8 Afghanistan          Asia       2007    43.8  3.19e7      975.
+ 9 Central African Rep… Africa     2007    44.7  4.37e6      706.
+10 Liberia              Africa     2007    45.7  3.19e6      415.
+# … with 132 more rows
+```
+]
+
+---
+count: false
+ 
+#Decreasing or Increasing?
+.panel1-arrange-auto[
+
+```r
+gapminder %&gt;%
+  filter(year == 2007) %&gt;%
+  arrange(lifeExp) %&gt;%
+* arrange(-lifeExp)
+```
+]
+ 
+.panel2-arrange-auto[
+
+```
+# A tibble: 142 x 6
+   country          continent  year lifeExp       pop gdpPercap
+   &lt;fct&gt;            &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;
+ 1 Japan            Asia       2007    82.6 127467972    31656.
+ 2 Hong Kong, China Asia       2007    82.2   6980412    39725.
+ 3 Iceland          Europe     2007    81.8    301931    36181.
+ 4 Switzerland      Europe     2007    81.7   7554661    37506.
+ 5 Australia        Oceania    2007    81.2  20434176    34435.
+ 6 Spain            Europe     2007    80.9  40448191    28821.
+ 7 Sweden           Europe     2007    80.9   9031088    33860.
+ 8 Israel           Asia       2007    80.7   6426679    25523.
+ 9 France           Europe     2007    80.7  61083916    30470.
+10 Canada           Americas   2007    80.7  33390141    36319.
+# … with 132 more rows
+```
+]
+
+&lt;style&gt;
+.panel1-arrange-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-arrange-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-arrange-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+#Multi sort (order matters)
+.panel1-arrange2-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-arrange2-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Multi sort (order matters)
+.panel1-arrange2-auto[
+
+```r
+gapminder %&gt;%
+* select(country, year, pop)
+```
+]
+ 
+.panel2-arrange2-auto[
+
+```
+# A tibble: 1,704 x 3
+   country      year      pop
+   &lt;fct&gt;       &lt;int&gt;    &lt;int&gt;
+ 1 Afghanistan  1952  8425333
+ 2 Afghanistan  1957  9240934
+ 3 Afghanistan  1962 10267083
+ 4 Afghanistan  1967 11537966
+ 5 Afghanistan  1972 13079460
+ 6 Afghanistan  1977 14880372
+ 7 Afghanistan  1982 12881816
+ 8 Afghanistan  1987 13867957
+ 9 Afghanistan  1992 16317921
+10 Afghanistan  1997 22227415
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Multi sort (order matters)
+.panel1-arrange2-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, pop) %&gt;%
+* arrange(year, country)
+```
+]
+ 
+.panel2-arrange2-auto[
+
+```
+# A tibble: 1,704 x 3
+   country      year      pop
+   &lt;fct&gt;       &lt;int&gt;    &lt;int&gt;
+ 1 Afghanistan  1952  8425333
+ 2 Albania      1952  1282697
+ 3 Algeria      1952  9279525
+ 4 Angola       1952  4232095
+ 5 Argentina    1952 17876956
+ 6 Australia    1952  8691212
+ 7 Austria      1952  6927772
+ 8 Bahrain      1952   120447
+ 9 Bangladesh   1952 46886859
+10 Belgium      1952  8730405
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Multi sort (order matters)
+.panel1-arrange2-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, pop) %&gt;%
+  arrange(year, country) %&gt;%
+* arrange(country, year)
+```
+]
+ 
+.panel2-arrange2-auto[
+
+```
+# A tibble: 1,704 x 3
+   country      year      pop
+   &lt;fct&gt;       &lt;int&gt;    &lt;int&gt;
+ 1 Afghanistan  1952  8425333
+ 2 Afghanistan  1957  9240934
+ 3 Afghanistan  1962 10267083
+ 4 Afghanistan  1967 11537966
+ 5 Afghanistan  1972 13079460
+ 6 Afghanistan  1977 14880372
+ 7 Afghanistan  1982 12881816
+ 8 Afghanistan  1987 13867957
+ 9 Afghanistan  1992 16317921
+10 Afghanistan  1997 22227415
+# … with 1,694 more rows
+```
+]
+
+&lt;style&gt;
+.panel1-arrange2-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-arrange2-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-arrange2-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+#Combining operations
+.panel1-mutate2-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-mutate2-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Combining operations
+.panel1-mutate2-auto[
+
+```r
+gapminder %&gt;%
+* select(year, country, gdpPercap)
+```
+]
+ 
+.panel2-mutate2-auto[
+
+```
+# A tibble: 1,704 x 3
+    year country     gdpPercap
+   &lt;int&gt; &lt;fct&gt;           &lt;dbl&gt;
+ 1  1952 Afghanistan      779.
+ 2  1957 Afghanistan      821.
+ 3  1962 Afghanistan      853.
+ 4  1967 Afghanistan      836.
+ 5  1972 Afghanistan      740.
+ 6  1977 Afghanistan      786.
+ 7  1982 Afghanistan      978.
+ 8  1987 Afghanistan      852.
+ 9  1992 Afghanistan      649.
+10  1997 Afghanistan      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Combining operations
+.panel1-mutate2-auto[
+
+```r
+gapminder %&gt;%
+  select(year, country, gdpPercap) %&gt;%
+* filter(year == max(year))
+```
+]
+ 
+.panel2-mutate2-auto[
+
+```
+# A tibble: 142 x 3
+    year country     gdpPercap
+   &lt;int&gt; &lt;fct&gt;           &lt;dbl&gt;
+ 1  2007 Afghanistan      975.
+ 2  2007 Albania         5937.
+ 3  2007 Algeria         6223.
+ 4  2007 Angola          4797.
+ 5  2007 Argentina      12779.
+ 6  2007 Australia      34435.
+ 7  2007 Austria        36126.
+ 8  2007 Bahrain        29796.
+ 9  2007 Bangladesh      1391.
+10  2007 Belgium        33693.
+# … with 132 more rows
+```
+]
+
+---
+count: false
+ 
+#Combining operations
+.panel1-mutate2-auto[
+
+```r
+gapminder %&gt;%
+  select(year, country, gdpPercap) %&gt;%
+  filter(year == max(year)) %&gt;%
+* arrange(-gdpPercap)
+```
+]
+ 
+.panel2-mutate2-auto[
+
+```
+# A tibble: 142 x 3
+    year country          gdpPercap
+   &lt;int&gt; &lt;fct&gt;                &lt;dbl&gt;
+ 1  2007 Norway              49357.
+ 2  2007 Kuwait              47307.
+ 3  2007 Singapore           47143.
+ 4  2007 United States       42952.
+ 5  2007 Ireland             40676.
+ 6  2007 Hong Kong, China    39725.
+ 7  2007 Switzerland         37506.
+ 8  2007 Netherlands         36798.
+ 9  2007 Canada              36319.
+10  2007 Iceland             36181.
+# … with 132 more rows
+```
+]
+
+---
+count: false
+ 
+#Combining operations
+.panel1-mutate2-auto[
+
+```r
+gapminder %&gt;%
+  select(year, country, gdpPercap) %&gt;%
+  filter(year == max(year)) %&gt;%
+  arrange(-gdpPercap) %&gt;%
+* mutate(rank = 1:n())
+```
+]
+ 
+.panel2-mutate2-auto[
+
+```
+# A tibble: 142 x 4
+    year country          gdpPercap  rank
+   &lt;int&gt; &lt;fct&gt;                &lt;dbl&gt; &lt;int&gt;
+ 1  2007 Norway              49357.     1
+ 2  2007 Kuwait              47307.     2
+ 3  2007 Singapore           47143.     3
+ 4  2007 United States       42952.     4
+ 5  2007 Ireland             40676.     5
+ 6  2007 Hong Kong, China    39725.     6
+ 7  2007 Switzerland         37506.     7
+ 8  2007 Netherlands         36798.     8
+ 9  2007 Canada              36319.     9
+10  2007 Iceland             36181.    10
+# … with 132 more rows
+```
+]
+
+&lt;style&gt;
+.panel1-mutate2-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-mutate2-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-mutate2-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+class: inverse, middle, center
+# Data Manipulation
+### dplyr
+### data wrangling
+---
+
+# Group By
+
+Have you ever had questions like: 
+
+--
+
+- “what is the mean wind speed of tropical storm types?”
+
+--
+
+- "what is the average weight of `starwars` characters by species?"
+
+--
+
+- "what are COVID cases counts at the state level?"
+
+--
+
+These are common questions that are important to data science but are incredibly annoying question to answer in base code...
+
+******
+
+--
+
+`dplyr` offers powerful tools to solve this class of problem:
+
+- `group_by()` adds extra structure to your dataset by grouping information 
+
+- `summarize()` takes a dataset with n observations, computes requested values, and returns a dataset with 1 observation.
+
+--
+
+- `mutate()` and `summarize()` honor groupings.
+
+--
+
+Combined with the verbs like `select`, `filter`, and `arrange` these new tools allow you to solve an extremely diverse set of problems with relative ease.
+
+---
+
+count: false
+ 
+#group_by/summarize
+.panel1-starwars-auto[
+
+```r
+*dplyr::starwars
+```
+]
+ 
+.panel2-starwars-auto[
+
+```
+# A tibble: 87 x 14
+   name   height  mass hair_color skin_color eye_color birth_year
+   &lt;chr&gt;   &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt;
+ 1 Luke …    172    77 blond      fair       blue            19  
+ 2 C-3PO     167    75 &lt;NA&gt;       gold       yellow         112  
+ 3 R2-D2      96    32 &lt;NA&gt;       white, bl… red             33  
+ 4 Darth…    202   136 none       white      yellow          41.9
+ 5 Leia …    150    49 brown      light      brown           19  
+ 6 Owen …    178   120 brown, gr… light      blue            52  
+ 7 Beru …    165    75 brown      light      blue            47  
+ 8 R5-D4      97    32 &lt;NA&gt;       white, red red             NA  
+ 9 Biggs…    183    84 black      light      brown           24  
+10 Obi-W…    182    77 auburn, w… fair       blue-gray       57  
+# … with 77 more rows, and 7 more variables: sex &lt;chr&gt;,
+#   gender &lt;chr&gt;, homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+#   vehicles &lt;list&gt;, starships &lt;list&gt;
+```
+]
+
+---
+count: false
+ 
+#group_by/summarize
+.panel1-starwars-auto[
+
+```r
+dplyr::starwars %&gt;%
+* group_by(species)
+```
+]
+ 
+.panel2-starwars-auto[
+
+```
+# A tibble: 87 x 14
+# Groups:   species [38]
+   name   height  mass hair_color skin_color eye_color birth_year
+   &lt;chr&gt;   &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt;
+ 1 Luke …    172    77 blond      fair       blue            19  
+ 2 C-3PO     167    75 &lt;NA&gt;       gold       yellow         112  
+ 3 R2-D2      96    32 &lt;NA&gt;       white, bl… red             33  
+ 4 Darth…    202   136 none       white      yellow          41.9
+ 5 Leia …    150    49 brown      light      brown           19  
+ 6 Owen …    178   120 brown, gr… light      blue            52  
+ 7 Beru …    165    75 brown      light      blue            47  
+ 8 R5-D4      97    32 &lt;NA&gt;       white, red red             NA  
+ 9 Biggs…    183    84 black      light      brown           24  
+10 Obi-W…    182    77 auburn, w… fair       blue-gray       57  
+# … with 77 more rows, and 7 more variables: sex &lt;chr&gt;,
+#   gender &lt;chr&gt;, homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+#   vehicles &lt;list&gt;, starships &lt;list&gt;
+```
+]
+
+---
+count: false
+ 
+#group_by/summarize
+.panel1-starwars-auto[
+
+```r
+dplyr::starwars %&gt;%
+  group_by(species) %&gt;%
+* summarize(meanMass = mean(mass, na.rm = TRUE),
+*           n = n())
+```
+]
+ 
+.panel2-starwars-auto[
+
+```
+# A tibble: 38 x 3
+   species   meanMass     n
+   &lt;chr&gt;        &lt;dbl&gt; &lt;int&gt;
+ 1 Aleena        15       1
+ 2 Besalisk     102       1
+ 3 Cerean        82       1
+ 4 Chagrian     NaN       1
+ 5 Clawdite      55       1
+ 6 Droid         69.8     6
+ 7 Dug           40       1
+ 8 Ewok          20       1
+ 9 Geonosian     80       1
+10 Gungan        74       3
+# … with 28 more rows
+```
+]
+
+---
+count: false
+ 
+#group_by/summarize
+.panel1-starwars-auto[
+
+```r
+dplyr::starwars %&gt;%
+  group_by(species) %&gt;%
+  summarize(meanMass = mean(mass, na.rm = TRUE),
+            n = n()) %&gt;%
+* arrange(meanMass)
+```
+]
+ 
+.panel2-starwars-auto[
+
+```
+# A tibble: 38 x 3
+   species        meanMass     n
+   &lt;chr&gt;             &lt;dbl&gt; &lt;int&gt;
+ 1 Aleena             15       1
+ 2 Yoda's species     17       1
+ 3 Ewok               20       1
+ 4 Dug                40       1
+ 5 Vulptereen         45       1
+ 6 Skakoan            48       1
+ 7 &lt;NA&gt;               48       4
+ 8 Tholothian         50       1
+ 9 Mirialan           53.1     2
+10 Clawdite           55       1
+# … with 28 more rows
+```
+]
+
+---
+count: false
+ 
+#group_by/summarize
+.panel1-starwars-auto[
+
+```r
+dplyr::starwars %&gt;%
+  group_by(species) %&gt;%
+  summarize(meanMass = mean(mass, na.rm = TRUE),
+            n = n()) %&gt;%
+  arrange(meanMass) %&gt;%
+* arrange(-meanMass)
+```
+]
+ 
+.panel2-starwars-auto[
+
+```
+# A tibble: 38 x 3
+   species      meanMass     n
+   &lt;chr&gt;           &lt;dbl&gt; &lt;int&gt;
+ 1 Hutt           1358       1
+ 2 Kaleesh         159       1
+ 3 Wookiee         124       2
+ 4 Trandoshan      113       1
+ 5 Besalisk        102       1
+ 6 Neimodian        90       1
+ 7 Kaminoan         88       2
+ 8 Nautolan         87       1
+ 9 Mon Calamari     83       1
+10 Human            82.8    35
+# … with 28 more rows
+```
+]
+
+---
+count: false
+ 
+#group_by/summarize
+.panel1-starwars-auto[
+
+```r
+dplyr::starwars %&gt;%
+  group_by(species) %&gt;%
+  summarize(meanMass = mean(mass, na.rm = TRUE),
+            n = n()) %&gt;%
+  arrange(meanMass) %&gt;%
+  arrange(-meanMass) %&gt;%
+* arrange(-n)
+```
+]
+ 
+.panel2-starwars-auto[
+
+```
+# A tibble: 38 x 3
+   species  meanMass     n
+   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;
+ 1 Human        82.8    35
+ 2 Droid        69.8     6
+ 3 &lt;NA&gt;         48       4
+ 4 Gungan       74       3
+ 5 Wookiee     124       2
+ 6 Kaminoan     88       2
+ 7 Zabrak       80       2
+ 8 Twi'lek      55       2
+ 9 Mirialan     53.1     2
+10 Hutt       1358       1
+# … with 28 more rows
+```
+]
+
+---
+count: false
+ 
+#group_by/summarize
+.panel1-starwars-auto[
+
+```r
+dplyr::starwars %&gt;%
+  group_by(species) %&gt;%
+  summarize(meanMass = mean(mass, na.rm = TRUE),
+            n = n()) %&gt;%
+  arrange(meanMass) %&gt;%
+  arrange(-meanMass) %&gt;%
+  arrange(-n)
+```
+]
+ 
+.panel2-starwars-auto[
+
+```
+# A tibble: 38 x 3
+   species  meanMass     n
+   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;
+ 1 Human        82.8    35
+ 2 Droid        69.8     6
+ 3 &lt;NA&gt;         48       4
+ 4 Gungan       74       3
+ 5 Wookiee     124       2
+ 6 Kaminoan     88       2
+ 7 Zabrak       80       2
+ 8 Twi'lek      55       2
+ 9 Mirialan     53.1     2
+10 Hutt       1358       1
+# … with 28 more rows
+```
+]
+
+&lt;style&gt;
+.panel1-starwars-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-starwars-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-starwars-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+#Life Expectancy
+.panel1-life-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-life-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy
+.panel1-life-auto[
+
+```r
+gapminder %&gt;%
+* filter(continent == "Europe")
+```
+]
+ 
+.panel2-life-auto[
+
+```
+# A tibble: 360 x 6
+   country continent  year lifeExp     pop gdpPercap
+   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
+ 1 Albania Europe     1952    55.2 1282697     1601.
+ 2 Albania Europe     1957    59.3 1476505     1942.
+ 3 Albania Europe     1962    64.8 1728137     2313.
+ 4 Albania Europe     1967    66.2 1984060     2760.
+ 5 Albania Europe     1972    67.7 2263554     3313.
+ 6 Albania Europe     1977    68.9 2509048     3533.
+ 7 Albania Europe     1982    70.4 2780097     3631.
+ 8 Albania Europe     1987    72   3075321     3739.
+ 9 Albania Europe     1992    71.6 3326498     2497.
+10 Albania Europe     1997    73.0 3428038     3193.
+# … with 350 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy
+.panel1-life-auto[
+
+```r
+gapminder %&gt;%
+  filter(continent == "Europe") %&gt;%
+* group_by(year)
+```
+]
+ 
+.panel2-life-auto[
+
+```
+# A tibble: 360 x 6
+# Groups:   year [12]
+   country continent  year lifeExp     pop gdpPercap
+   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
+ 1 Albania Europe     1952    55.2 1282697     1601.
+ 2 Albania Europe     1957    59.3 1476505     1942.
+ 3 Albania Europe     1962    64.8 1728137     2313.
+ 4 Albania Europe     1967    66.2 1984060     2760.
+ 5 Albania Europe     1972    67.7 2263554     3313.
+ 6 Albania Europe     1977    68.9 2509048     3533.
+ 7 Albania Europe     1982    70.4 2780097     3631.
+ 8 Albania Europe     1987    72   3075321     3739.
+ 9 Albania Europe     1992    71.6 3326498     2497.
+10 Albania Europe     1997    73.0 3428038     3193.
+# … with 350 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy
+.panel1-life-auto[
+
+```r
+gapminder %&gt;%
+  filter(continent == "Europe") %&gt;%
+  group_by(year) %&gt;%
+* summarize(min_lifeExp = min(lifeExp), max_lifeExp = max(lifeExp))
+```
+]
+ 
+.panel2-life-auto[
+
+```
+# A tibble: 12 x 3
+    year min_lifeExp max_lifeExp
+   &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+ 1  1952        43.6        72.7
+ 2  1957        48.1        73.5
+ 3  1962        52.1        73.7
+ 4  1967        54.3        74.2
+ 5  1972        57.0        74.7
+ 6  1977        59.5        76.1
+ 7  1982        61.0        77.0
+ 8  1987        63.1        77.4
+ 9  1992        66.1        78.8
+10  1997        68.8        79.4
+11  2002        70.8        80.6
+12  2007        71.8        81.8
+```
+]
+
+&lt;style&gt;
+.panel1-life-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-life-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-life-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+#Life Expectancy Gain
+.panel1-lifegain-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-lifegain-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Gain
+.panel1-lifegain-auto[
+
+```r
+gapminder %&gt;%
+* filter(continent == "Europe")
+```
+]
+ 
+.panel2-lifegain-auto[
+
+```
+# A tibble: 360 x 6
+   country continent  year lifeExp     pop gdpPercap
+   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
+ 1 Albania Europe     1952    55.2 1282697     1601.
+ 2 Albania Europe     1957    59.3 1476505     1942.
+ 3 Albania Europe     1962    64.8 1728137     2313.
+ 4 Albania Europe     1967    66.2 1984060     2760.
+ 5 Albania Europe     1972    67.7 2263554     3313.
+ 6 Albania Europe     1977    68.9 2509048     3533.
+ 7 Albania Europe     1982    70.4 2780097     3631.
+ 8 Albania Europe     1987    72   3075321     3739.
+ 9 Albania Europe     1992    71.6 3326498     2497.
+10 Albania Europe     1997    73.0 3428038     3193.
+# … with 350 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Gain
+.panel1-lifegain-auto[
+
+```r
+gapminder %&gt;%
+  filter(continent == "Europe") %&gt;%
+* group_by(country)
+```
+]
+ 
+.panel2-lifegain-auto[
+
+```
+# A tibble: 360 x 6
+# Groups:   country [30]
+   country continent  year lifeExp     pop gdpPercap
+   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
+ 1 Albania Europe     1952    55.2 1282697     1601.
+ 2 Albania Europe     1957    59.3 1476505     1942.
+ 3 Albania Europe     1962    64.8 1728137     2313.
+ 4 Albania Europe     1967    66.2 1984060     2760.
+ 5 Albania Europe     1972    67.7 2263554     3313.
+ 6 Albania Europe     1977    68.9 2509048     3533.
+ 7 Albania Europe     1982    70.4 2780097     3631.
+ 8 Albania Europe     1987    72   3075321     3739.
+ 9 Albania Europe     1992    71.6 3326498     2497.
+10 Albania Europe     1997    73.0 3428038     3193.
+# … with 350 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Gain
+.panel1-lifegain-auto[
+
+```r
+gapminder %&gt;%
+  filter(continent == "Europe") %&gt;%
+  group_by(country) %&gt;%
+* select(country, year, lifeExp)
+```
+]
+ 
+.panel2-lifegain-auto[
+
+```
+# A tibble: 360 x 3
+# Groups:   country [30]
+   country  year lifeExp
+   &lt;fct&gt;   &lt;int&gt;   &lt;dbl&gt;
+ 1 Albania  1952    55.2
+ 2 Albania  1957    59.3
+ 3 Albania  1962    64.8
+ 4 Albania  1967    66.2
+ 5 Albania  1972    67.7
+ 6 Albania  1977    68.9
+ 7 Albania  1982    70.4
+ 8 Albania  1987    72  
+ 9 Albania  1992    71.6
+10 Albania  1997    73.0
+# … with 350 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Gain
+.panel1-lifegain-auto[
+
+```r
+gapminder %&gt;%
+  filter(continent == "Europe") %&gt;%
+  group_by(country) %&gt;%
+  select(country, year, lifeExp) %&gt;%
+* mutate(lifeExp_gain = lifeExp - first(lifeExp),
+*        lifeExp = NULL)
+```
+]
+ 
+.panel2-lifegain-auto[
+
+```
+# A tibble: 360 x 3
+# Groups:   country [30]
+   country  year lifeExp_gain
+   &lt;fct&gt;   &lt;int&gt;        &lt;dbl&gt;
+ 1 Albania  1952         0   
+ 2 Albania  1957         4.05
+ 3 Albania  1962         9.59
+ 4 Albania  1967        11.0 
+ 5 Albania  1972        12.5 
+ 6 Albania  1977        13.7 
+ 7 Albania  1982        15.2 
+ 8 Albania  1987        16.8 
+ 9 Albania  1992        16.4 
+10 Albania  1997        17.7 
+# … with 350 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Gain
+.panel1-lifegain-auto[
+
+```r
+gapminder %&gt;%
+  filter(continent == "Europe") %&gt;%
+  group_by(country) %&gt;%
+  select(country, year, lifeExp) %&gt;%
+  mutate(lifeExp_gain = lifeExp - first(lifeExp),
+         lifeExp = NULL) %&gt;%
+* filter(year == max(year))
+```
+]
+ 
+.panel2-lifegain-auto[
+
+```
+# A tibble: 30 x 3
+# Groups:   country [30]
+   country                 year lifeExp_gain
+   &lt;fct&gt;                  &lt;int&gt;        &lt;dbl&gt;
+ 1 Albania                 2007        21.2 
+ 2 Austria                 2007        13.0 
+ 3 Belgium                 2007        11.4 
+ 4 Bosnia and Herzegovina  2007        21.0 
+ 5 Bulgaria                2007        13.4 
+ 6 Croatia                 2007        14.5 
+ 7 Czech Republic          2007         9.62
+ 8 Denmark                 2007         7.55
+ 9 Finland                 2007        12.8 
+10 France                  2007        13.2 
+# … with 20 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Gain
+.panel1-lifegain-auto[
+
+```r
+gapminder %&gt;%
+  filter(continent == "Europe") %&gt;%
+  group_by(country) %&gt;%
+  select(country, year, lifeExp) %&gt;%
+  mutate(lifeExp_gain = lifeExp - first(lifeExp),
+         lifeExp = NULL) %&gt;%
+  filter(year == max(year)) %&gt;%
+* arrange(-lifeExp_gain)
+```
+]
+ 
+.panel2-lifegain-auto[
+
+```
+# A tibble: 30 x 3
+# Groups:   country [30]
+   country                 year lifeExp_gain
+   &lt;fct&gt;                  &lt;int&gt;        &lt;dbl&gt;
+ 1 Turkey                  2007         28.2
+ 2 Albania                 2007         21.2
+ 3 Bosnia and Herzegovina  2007         21.0
+ 4 Portugal                2007         18.3
+ 5 Serbia                  2007         16.0
+ 6 Spain                   2007         16.0
+ 7 Montenegro              2007         15.4
+ 8 Italy                   2007         14.6
+ 9 Croatia                 2007         14.5
+10 Poland                  2007         14.3
+# … with 20 more rows
+```
+]
+
+&lt;style&gt;
+.panel1-lifegain-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-lifegain-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-lifegain-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+#Life Expectancy Improvement
+.panel1-lifegain2-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-lifegain2-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement
+.panel1-lifegain2-auto[
+
+```r
+gapminder %&gt;%
+* select(country, year, lifeExp)
+```
+]
+ 
+.panel2-lifegain2-auto[
+
+```
+# A tibble: 1,704 x 3
+   country      year lifeExp
+   &lt;fct&gt;       &lt;int&gt;   &lt;dbl&gt;
+ 1 Afghanistan  1952    28.8
+ 2 Afghanistan  1957    30.3
+ 3 Afghanistan  1962    32.0
+ 4 Afghanistan  1967    34.0
+ 5 Afghanistan  1972    36.1
+ 6 Afghanistan  1977    38.4
+ 7 Afghanistan  1982    39.9
+ 8 Afghanistan  1987    40.8
+ 9 Afghanistan  1992    41.7
+10 Afghanistan  1997    41.8
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement
+.panel1-lifegain2-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, lifeExp) %&gt;%
+* group_by(country)
+```
+]
+ 
+.panel2-lifegain2-auto[
+
+```
+# A tibble: 1,704 x 3
+# Groups:   country [142]
+   country      year lifeExp
+   &lt;fct&gt;       &lt;int&gt;   &lt;dbl&gt;
+ 1 Afghanistan  1952    28.8
+ 2 Afghanistan  1957    30.3
+ 3 Afghanistan  1962    32.0
+ 4 Afghanistan  1967    34.0
+ 5 Afghanistan  1972    36.1
+ 6 Afghanistan  1977    38.4
+ 7 Afghanistan  1982    39.9
+ 8 Afghanistan  1987    40.8
+ 9 Afghanistan  1992    41.7
+10 Afghanistan  1997    41.8
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement
+.panel1-lifegain2-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, lifeExp) %&gt;%
+  group_by(country) %&gt;%
+* mutate(le_delta = lifeExp - lag(lifeExp))
+```
+]
+ 
+.panel2-lifegain2-auto[
+
+```
+# A tibble: 1,704 x 4
+# Groups:   country [142]
+   country      year lifeExp le_delta
+   &lt;fct&gt;       &lt;int&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Afghanistan  1952    28.8  NA     
+ 2 Afghanistan  1957    30.3   1.53  
+ 3 Afghanistan  1962    32.0   1.66  
+ 4 Afghanistan  1967    34.0   2.02  
+ 5 Afghanistan  1972    36.1   2.07  
+ 6 Afghanistan  1977    38.4   2.35  
+ 7 Afghanistan  1982    39.9   1.42  
+ 8 Afghanistan  1987    40.8   0.968 
+ 9 Afghanistan  1992    41.7   0.852 
+10 Afghanistan  1997    41.8   0.0890
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement
+.panel1-lifegain2-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, lifeExp) %&gt;%
+  group_by(country) %&gt;%
+  mutate(le_delta = lifeExp - lag(lifeExp)) %&gt;%
+* summarize(worst_le_delta = min(le_delta, na.rm = TRUE))
+```
+]
+ 
+.panel2-lifegain2-auto[
+
+```
+# A tibble: 142 x 2
+   country     worst_le_delta
+   &lt;fct&gt;                &lt;dbl&gt;
+ 1 Afghanistan         0.0890
+ 2 Albania            -0.419 
+ 3 Algeria             1.31  
+ 4 Angola             -0.0360
+ 5 Argentina           0.492 
+ 6 Australia           0.170 
+ 7 Austria             0.490 
+ 8 Bahrain             0.840 
+ 9 Bangladesh          1.67  
+10 Belgium             0.5   
+# … with 132 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement
+.panel1-lifegain2-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, lifeExp) %&gt;%
+  group_by(country) %&gt;%
+  mutate(le_delta = lifeExp - lag(lifeExp)) %&gt;%
+  summarize(worst_le_delta = min(le_delta, na.rm = TRUE)) %&gt;%
+* top_n(-1, wt = worst_le_delta)
+```
+]
+ 
+.panel2-lifegain2-auto[
+
+```
+# A tibble: 1 x 2
+  country worst_le_delta
+  &lt;fct&gt;            &lt;dbl&gt;
+1 Rwanda           -20.4
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement
+.panel1-lifegain2-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, lifeExp) %&gt;%
+  group_by(country) %&gt;%
+  mutate(le_delta = lifeExp - lag(lifeExp)) %&gt;%
+  summarize(worst_le_delta = min(le_delta, na.rm = TRUE)) %&gt;%
+  top_n(-1, wt = worst_le_delta) %&gt;%
+* arrange(worst_le_delta)
+```
+]
+ 
+.panel2-lifegain2-auto[
+
+```
+# A tibble: 1 x 2
+  country worst_le_delta
+  &lt;fct&gt;            &lt;dbl&gt;
+1 Rwanda           -20.4
+```
+]
+
+&lt;style&gt;
+.panel1-lifegain2-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-lifegain2-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-lifegain2-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+#Life Expectancy Improvement by Continent
+.panel1-lifegain3-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-lifegain3-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement by Continent
+.panel1-lifegain3-auto[
+
+```r
+gapminder %&gt;%
+* select(country, year, continent, lifeExp)
+```
+]
+ 
+.panel2-lifegain3-auto[
+
+```
+# A tibble: 1,704 x 4
+   country      year continent lifeExp
+   &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;
+ 1 Afghanistan  1952 Asia         28.8
+ 2 Afghanistan  1957 Asia         30.3
+ 3 Afghanistan  1962 Asia         32.0
+ 4 Afghanistan  1967 Asia         34.0
+ 5 Afghanistan  1972 Asia         36.1
+ 6 Afghanistan  1977 Asia         38.4
+ 7 Afghanistan  1982 Asia         39.9
+ 8 Afghanistan  1987 Asia         40.8
+ 9 Afghanistan  1992 Asia         41.7
+10 Afghanistan  1997 Asia         41.8
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement by Continent
+.panel1-lifegain3-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, continent, lifeExp) %&gt;%
+* group_by(country, continent)
+```
+]
+ 
+.panel2-lifegain3-auto[
+
+```
+# A tibble: 1,704 x 4
+# Groups:   country, continent [142]
+   country      year continent lifeExp
+   &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;
+ 1 Afghanistan  1952 Asia         28.8
+ 2 Afghanistan  1957 Asia         30.3
+ 3 Afghanistan  1962 Asia         32.0
+ 4 Afghanistan  1967 Asia         34.0
+ 5 Afghanistan  1972 Asia         36.1
+ 6 Afghanistan  1977 Asia         38.4
+ 7 Afghanistan  1982 Asia         39.9
+ 8 Afghanistan  1987 Asia         40.8
+ 9 Afghanistan  1992 Asia         41.7
+10 Afghanistan  1997 Asia         41.8
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement by Continent
+.panel1-lifegain3-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, continent, lifeExp) %&gt;%
+  group_by(country, continent) %&gt;%
+* mutate(le_delta = lifeExp - lag(lifeExp))
+```
+]
+ 
+.panel2-lifegain3-auto[
+
+```
+# A tibble: 1,704 x 5
+# Groups:   country, continent [142]
+   country      year continent lifeExp le_delta
+   &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Afghanistan  1952 Asia         28.8  NA     
+ 2 Afghanistan  1957 Asia         30.3   1.53  
+ 3 Afghanistan  1962 Asia         32.0   1.66  
+ 4 Afghanistan  1967 Asia         34.0   2.02  
+ 5 Afghanistan  1972 Asia         36.1   2.07  
+ 6 Afghanistan  1977 Asia         38.4   2.35  
+ 7 Afghanistan  1982 Asia         39.9   1.42  
+ 8 Afghanistan  1987 Asia         40.8   0.968 
+ 9 Afghanistan  1992 Asia         41.7   0.852 
+10 Afghanistan  1997 Asia         41.8   0.0890
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement by Continent
+.panel1-lifegain3-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, continent, lifeExp) %&gt;%
+  group_by(country, continent) %&gt;%
+  mutate(le_delta = lifeExp - lag(lifeExp)) %&gt;%
+* summarize(worst_le_delta = min(le_delta, na.rm = TRUE))
+```
+]
+ 
+.panel2-lifegain3-auto[
+
+```
+# A tibble: 142 x 3
+# Groups:   country [142]
+   country     continent worst_le_delta
+   &lt;fct&gt;       &lt;fct&gt;              &lt;dbl&gt;
+ 1 Afghanistan Asia              0.0890
+ 2 Albania     Europe           -0.419 
+ 3 Algeria     Africa            1.31  
+ 4 Angola      Africa           -0.0360
+ 5 Argentina   Americas          0.492 
+ 6 Australia   Oceania           0.170 
+ 7 Austria     Europe            0.490 
+ 8 Bahrain     Asia              0.840 
+ 9 Bangladesh  Asia              1.67  
+10 Belgium     Europe            0.5   
+# … with 132 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement by Continent
+.panel1-lifegain3-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, continent, lifeExp) %&gt;%
+  group_by(country, continent) %&gt;%
+  mutate(le_delta = lifeExp - lag(lifeExp)) %&gt;%
+  summarize(worst_le_delta = min(le_delta, na.rm = TRUE)) %&gt;%
+* top_n(-1, wt = worst_le_delta)
+```
+]
+ 
+.panel2-lifegain3-auto[
+
+```
+# A tibble: 142 x 3
+# Groups:   country [142]
+   country     continent worst_le_delta
+   &lt;fct&gt;       &lt;fct&gt;              &lt;dbl&gt;
+ 1 Afghanistan Asia              0.0890
+ 2 Albania     Europe           -0.419 
+ 3 Algeria     Africa            1.31  
+ 4 Angola      Africa           -0.0360
+ 5 Argentina   Americas          0.492 
+ 6 Australia   Oceania           0.170 
+ 7 Austria     Europe            0.490 
+ 8 Bahrain     Asia              0.840 
+ 9 Bangladesh  Asia              1.67  
+10 Belgium     Europe            0.5   
+# … with 132 more rows
+```
+]
+
+---
+count: false
+ 
+#Life Expectancy Improvement by Continent
+.panel1-lifegain3-auto[
+
+```r
+gapminder %&gt;%
+  select(country, year, continent, lifeExp) %&gt;%
+  group_by(country, continent) %&gt;%
+  mutate(le_delta = lifeExp - lag(lifeExp)) %&gt;%
+  summarize(worst_le_delta = min(le_delta, na.rm = TRUE)) %&gt;%
+  top_n(-1, wt = worst_le_delta) %&gt;%
+* arrange(worst_le_delta)
+```
+]
+ 
+.panel2-lifegain3-auto[
+
+```
+# A tibble: 142 x 3
+# Groups:   country [142]
+   country      continent worst_le_delta
+   &lt;fct&gt;        &lt;fct&gt;              &lt;dbl&gt;
+ 1 Rwanda       Africa            -20.4 
+ 2 Zimbabwe     Africa            -13.6 
+ 3 Lesotho      Africa            -11.0 
+ 4 Swaziland    Africa            -10.4 
+ 5 Botswana     Africa            -10.2 
+ 6 Cambodia     Asia               -9.10
+ 7 Namibia      Africa             -7.43
+ 8 South Africa Africa             -6.87
+ 9 China        Asia               -6.05
+10 Zambia       Africa             -5.86
+# … with 132 more rows
+```
+]
+
+&lt;style&gt;
+.panel1-lifegain3-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-lifegain3-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-lifegain3-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+#Average Wind Speed
+.panel1-storms-auto[
+
+```r
+*dplyr::storms
+```
+]
+ 
+.panel2-storms-auto[
+
+```
+# A tibble: 10,010 x 13
+   name   year month   day  hour   lat  long status      category
+   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;ord&gt;   
+ 1 Amy    1975     6    27     0  27.5 -79   tropical d… -1      
+ 2 Amy    1975     6    27     6  28.5 -79   tropical d… -1      
+ 3 Amy    1975     6    27    12  29.5 -79   tropical d… -1      
+ 4 Amy    1975     6    27    18  30.5 -79   tropical d… -1      
+ 5 Amy    1975     6    28     0  31.5 -78.8 tropical d… -1      
+ 6 Amy    1975     6    28     6  32.4 -78.7 tropical d… -1      
+ 7 Amy    1975     6    28    12  33.3 -78   tropical d… -1      
+ 8 Amy    1975     6    28    18  34   -77   tropical d… -1      
+ 9 Amy    1975     6    29     0  34.4 -75.8 tropical s… 0       
+10 Amy    1975     6    29     6  34   -74.8 tropical s… 0       
+# … with 10,000 more rows, and 4 more variables: wind &lt;int&gt;,
+#   pressure &lt;int&gt;, ts_diameter &lt;dbl&gt;, hu_diameter &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Average Wind Speed
+.panel1-storms-auto[
+
+```r
+dplyr::storms %&gt;%
+* group_by(status)
+```
+]
+ 
+.panel2-storms-auto[
+
+```
+# A tibble: 10,010 x 13
+# Groups:   status [3]
+   name   year month   day  hour   lat  long status      category
+   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;ord&gt;   
+ 1 Amy    1975     6    27     0  27.5 -79   tropical d… -1      
+ 2 Amy    1975     6    27     6  28.5 -79   tropical d… -1      
+ 3 Amy    1975     6    27    12  29.5 -79   tropical d… -1      
+ 4 Amy    1975     6    27    18  30.5 -79   tropical d… -1      
+ 5 Amy    1975     6    28     0  31.5 -78.8 tropical d… -1      
+ 6 Amy    1975     6    28     6  32.4 -78.7 tropical d… -1      
+ 7 Amy    1975     6    28    12  33.3 -78   tropical d… -1      
+ 8 Amy    1975     6    28    18  34   -77   tropical d… -1      
+ 9 Amy    1975     6    29     0  34.4 -75.8 tropical s… 0       
+10 Amy    1975     6    29     6  34   -74.8 tropical s… 0       
+# … with 10,000 more rows, and 4 more variables: wind &lt;int&gt;,
+#   pressure &lt;int&gt;, ts_diameter &lt;dbl&gt;, hu_diameter &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Average Wind Speed
+.panel1-storms-auto[
+
+```r
+dplyr::storms %&gt;%
+  group_by(status) %&gt;%
+* summarize(meanWind = mean(wind))
+```
+]
+ 
+.panel2-storms-auto[
+
+```
+# A tibble: 3 x 2
+  status              meanWind
+  &lt;chr&gt;                  &lt;dbl&gt;
+1 hurricane               86.0
+2 tropical depression     27.3
+3 tropical storm          45.8
+```
+]
+
+&lt;style&gt;
+.panel1-storms-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-storms-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-storms-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+## COVID Data you will be using ...
+
+
+```
+# A tibble: 10 x 6
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish   Washington 53061     1      0
+ 2 2020-01-22 Snohomish   Washington 53061     1      0
+ 3 2020-01-23 Snohomish   Washington 53061     1      0
+ 4 2020-01-24 Cook        Illinois   17031     1      0
+ 5 2020-01-24 Snohomish   Washington 53061     1      0
+ 6 2020-01-25 Orange      California 06059     1      0
+ 7 2020-01-25 Cook        Illinois   17031     1      0
+ 8 2020-01-25 Snohomish   Washington 53061     1      0
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0
+10 2020-01-26 Los Angeles California 06037     1      0
+```
+---
+
+## COVID Data you will be using ...
+
+
+```
+# A tibble: 10 x 2
+   state          totalCases
+   &lt;chr&gt;               &lt;dbl&gt;
+ 1 California      809729310
+ 2 Texas           640172411
+ 3 Florida         498770946
+ 4 New York        444370502
+ 5 Illinois        305541617
+ 6 Georgia         240403363
+ 7 Pennsylvania    230057703
+ 8 Ohio            223301123
+ 9 New Jersey      212361319
+10 North Carolina  204521120
+```
+---
+
+# Assignment
+
+- Fork this repo: https://github.com/mikejohnson51/geog13-daily-exercises
+- In the docs folder is a `day-05.Rmd` assignment.
+- Open the Rmd file and read through the background information
+- Answer the 4 Questions using `dplyr` verbs
+- Change the author name
+- knit your file
+- Submit the `Rmd` **and** `HTML` file to the Guachospace dropbox
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
