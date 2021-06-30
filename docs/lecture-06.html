@@ -1,0 +1,3082 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 06: Data Visualization
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+# Picking back up!
+
+---
+
+# Table Functions:
+
+- **select()**  _Select relevant columns of your data_
+- **filter()**	_Filter your data according to logical statements_
+- **arrange()**	_Sort your data on a certain column_
+- **mutate()**	_Create new variables and add them to your dataset_
+- **rename()**	_Rename the columns of your data_
+
+--
+
+# Split-apply
+
+**group_by()** _declare subsets in data_
+**summarize()** _summarize the data, by groups if they have been declared_
+
+--
+
+# The "glue"
+
+The pipe **%&gt;%** is used to feed in the output that precedes it.
+
+---
+
+**Operators**  
+`+`	plus  
+`-`	minus  
+`*`	multiplication  
+`/`	division  
+`^`	exponential  
+
+--
+
+**Logical Operator**  
+`==`	equal, tests equality  
+`!=`	not equal, tests inequality  
+`&gt;` greater than, tests greater than (also &gt;=)  
+`&lt;`	less than, tests less than (also &lt;=)  
+`%in%`	contains, tests inclusion  
+`&amp;`	and, returns true if preceeding and following are both true, else FALSE   
+`|`	or, returns true if either preceeding and following are true, else FALSE    
+
+--
+
+**Function**  
+max()  
+min()  
+sum()  
+custom ...  
+ 
+---
+
+# Yesterdays Assignment
+
+
+```r
+library(tidyverse)
+url = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties-recent.csv'
+covid = read_csv(url)
+head(covid)
+```
+
+```
+# A tibble: 6 x 6
+  date       county  state   fips  cases deaths
+  &lt;date&gt;     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1 2021-05-31 Autauga Alabama 01001  7142    110
+2 2021-05-31 Baldwin Alabama 01003 21620    311
+3 2021-05-31 Barbour Alabama 01005  2334     59
+4 2021-05-31 Bibb    Alabama 01007  2664     64
+5 2021-05-31 Blount  Alabama 01009  6864    139
+6 2021-05-31 Bullock Alabama 01011  1233     42
+```
+
+---
+count: false
+ 
+# Question 1: Counties with most cases
+.panel1-q1-auto[
+
+```r
+*covid
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 97,395 x 6
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-05-31 Autauga  Alabama 01001  7142    110
+ 2 2021-05-31 Baldwin  Alabama 01003 21620    311
+ 3 2021-05-31 Barbour  Alabama 01005  2334     59
+ 4 2021-05-31 Bibb     Alabama 01007  2664     64
+ 5 2021-05-31 Blount   Alabama 01009  6864    139
+ 6 2021-05-31 Bullock  Alabama 01011  1233     42
+ 7 2021-05-31 Butler   Alabama 01013  2219     71
+ 8 2021-05-31 Calhoun  Alabama 01015 14622    324
+ 9 2021-05-31 Chambers Alabama 01017  3665    123
+10 2021-05-31 Cherokee Alabama 01019  1862     45
+# … with 97,385 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 1: Counties with most cases
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+* filter(date == max(date))
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 3,246 x 6
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-29 Autauga  Alabama 01001  7247    113
+ 2 2021-06-29 Baldwin  Alabama 01003 21985    314
+ 3 2021-06-29 Barbour  Alabama 01005  2345     60
+ 4 2021-06-29 Bibb     Alabama 01007  2687     64
+ 5 2021-06-29 Blount   Alabama 01009  6975    139
+ 6 2021-06-29 Bullock  Alabama 01011  1249     42
+ 7 2021-06-29 Butler   Alabama 01013  2255     71
+ 8 2021-06-29 Calhoun  Alabama 01015 14766    330
+ 9 2021-06-29 Chambers Alabama 01017  3734    124
+10 2021-06-29 Cherokee Alabama 01019  1874     45
+# … with 3,236 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 1: Counties with most cases
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+* arrange(-cases)
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 3,246 x 6
+   date       county         state      fips    cases deaths
+   &lt;date&gt;     &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-29 Los Angeles    California 06037 1250503  24496
+ 2 2021-06-29 New York City  New York   &lt;NA&gt;   955505  33415
+ 3 2021-06-29 Maricopa       Arizona    04013  559688  10276
+ 4 2021-06-29 Cook           Illinois   17031  556951  11045
+ 5 2021-06-29 Miami-Dade     Florida    12086  501540   6472
+ 6 2021-06-29 Harris         Texas      48201  403149   6577
+ 7 2021-06-29 Dallas         Texas      48113  306108   4121
+ 8 2021-06-29 Riverside      California 06065  301655   4627
+ 9 2021-06-29 San Bernardino California 06071  299730   4928
+10 2021-06-29 San Diego      California 06073  282480   3780
+# … with 3,236 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 1: Counties with most cases
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  arrange(-cases) %&gt;%
+* select(county, state, cases)
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 3,246 x 3
+   county         state        cases
+   &lt;chr&gt;          &lt;chr&gt;        &lt;dbl&gt;
+ 1 Los Angeles    California 1250503
+ 2 New York City  New York    955505
+ 3 Maricopa       Arizona     559688
+ 4 Cook           Illinois    556951
+ 5 Miami-Dade     Florida     501540
+ 6 Harris         Texas       403149
+ 7 Dallas         Texas       306108
+ 8 Riverside      California  301655
+ 9 San Bernardino California  299730
+10 San Diego      California  282480
+# … with 3,236 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 1: Counties with most cases
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  arrange(-cases) %&gt;%
+  select(county, state, cases) %&gt;%
+* head(5)
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 5 x 3
+  county        state        cases
+  &lt;chr&gt;         &lt;chr&gt;        &lt;dbl&gt;
+1 Los Angeles   California 1250503
+2 New York City New York    955505
+3 Maricopa      Arizona     559688
+4 Cook          Illinois    556951
+5 Miami-Dade    Florida     501540
+```
+]
+
+&lt;style&gt;
+.panel1-q1-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q1-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q1-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+count: false
+ 
+# Question 2: States with most cases
+.panel1-q2-auto[
+
+```r
+*covid
+```
+]
+ 
+.panel2-q2-auto[
+
+```
+# A tibble: 97,395 x 6
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-05-31 Autauga  Alabama 01001  7142    110
+ 2 2021-05-31 Baldwin  Alabama 01003 21620    311
+ 3 2021-05-31 Barbour  Alabama 01005  2334     59
+ 4 2021-05-31 Bibb     Alabama 01007  2664     64
+ 5 2021-05-31 Blount   Alabama 01009  6864    139
+ 6 2021-05-31 Bullock  Alabama 01011  1233     42
+ 7 2021-05-31 Butler   Alabama 01013  2219     71
+ 8 2021-05-31 Calhoun  Alabama 01015 14622    324
+ 9 2021-05-31 Chambers Alabama 01017  3665    123
+10 2021-05-31 Cherokee Alabama 01019  1862     45
+# … with 97,385 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 2: States with most cases
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+* filter(date == max(date))
+```
+]
+ 
+.panel2-q2-auto[
+
+```
+# A tibble: 3,246 x 6
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-29 Autauga  Alabama 01001  7247    113
+ 2 2021-06-29 Baldwin  Alabama 01003 21985    314
+ 3 2021-06-29 Barbour  Alabama 01005  2345     60
+ 4 2021-06-29 Bibb     Alabama 01007  2687     64
+ 5 2021-06-29 Blount   Alabama 01009  6975    139
+ 6 2021-06-29 Bullock  Alabama 01011  1249     42
+ 7 2021-06-29 Butler   Alabama 01013  2255     71
+ 8 2021-06-29 Calhoun  Alabama 01015 14766    330
+ 9 2021-06-29 Chambers Alabama 01017  3734    124
+10 2021-06-29 Cherokee Alabama 01019  1874     45
+# … with 3,236 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 2: States with most cases
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+* group_by(state)
+```
+]
+ 
+.panel2-q2-auto[
+
+```
+# A tibble: 3,246 x 6
+# Groups:   state [55]
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-29 Autauga  Alabama 01001  7247    113
+ 2 2021-06-29 Baldwin  Alabama 01003 21985    314
+ 3 2021-06-29 Barbour  Alabama 01005  2345     60
+ 4 2021-06-29 Bibb     Alabama 01007  2687     64
+ 5 2021-06-29 Blount   Alabama 01009  6975    139
+ 6 2021-06-29 Bullock  Alabama 01011  1249     42
+ 7 2021-06-29 Butler   Alabama 01013  2255     71
+ 8 2021-06-29 Calhoun  Alabama 01015 14766    330
+ 9 2021-06-29 Chambers Alabama 01017  3734    124
+10 2021-06-29 Cherokee Alabama 01019  1874     45
+# … with 3,236 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 2: States with most cases
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+* summarize(cases = sum(cases, na.rm = TRUE))
+```
+]
+ 
+.panel2-q2-auto[
+
+```
+# A tibble: 55 x 2
+   state                  cases
+   &lt;chr&gt;                  &lt;dbl&gt;
+ 1 Alabama               550451
+ 2 Alaska                 70581
+ 3 Arizona               894106
+ 4 Arkansas              348699
+ 5 California           3818219
+ 6 Colorado              560407
+ 7 Connecticut           349301
+ 8 Delaware              109712
+ 9 District of Columbia   49347
+10 Florida              2321929
+# … with 45 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 2: States with most cases
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+* ungroup()
+```
+]
+ 
+.panel2-q2-auto[
+
+```
+# A tibble: 55 x 2
+   state                  cases
+   &lt;chr&gt;                  &lt;dbl&gt;
+ 1 Alabama               550451
+ 2 Alaska                 70581
+ 3 Arizona               894106
+ 4 Arkansas              348699
+ 5 California           3818219
+ 6 Colorado              560407
+ 7 Connecticut           349301
+ 8 Delaware              109712
+ 9 District of Columbia   49347
+10 Florida              2321929
+# … with 45 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 2: States with most cases
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+* slice_max(cases, n = 5)
+```
+]
+ 
+.panel2-q2-auto[
+
+```
+# A tibble: 5 x 2
+  state        cases
+  &lt;chr&gt;        &lt;dbl&gt;
+1 California 3818219
+2 Texas      2991200
+3 Florida    2321929
+4 New York   2112872
+5 Illinois   1395442
+```
+]
+
+&lt;style&gt;
+.panel1-q2-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q2-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q2-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+# The hidden need for ungrouping
+
+- `ungroup()` should always be  applied after the grouping calcuations.. 
+- If you forget to `ungroup()` data, future data management will likely produce errors.
+-  Even if you do not plan on performing additional calculations, it’s a good habit to keep. 
+- `ungroup()` is especially important when creating objects!!
+
+--
+
+- Think about the dimision of your data structure!
+
+--
+
+.pull-left[
+
+```r
+gapminder %&gt;% 
+  filter(year == 2007) %&gt;% 
+  group_by(continent) %&gt;% 
+  mutate(mp = mean(pop)) %&gt;%   
+  mutate(mle = mean(lifeExp)) %&gt;% 
+* ungroup()  %&gt;%
+  select(country, year, mp, mle) 
+```
+
+```
+# A tibble: 142 x 4
+   country      year         mp   mle
+   &lt;fct&gt;       &lt;int&gt;      &lt;dbl&gt; &lt;dbl&gt;
+ 1 Afghanistan  2007 115513752.  70.7
+ 2 Albania      2007  19536618.  77.6
+ 3 Algeria      2007  17875763.  54.8
+ 4 Angola       2007  17875763.  54.8
+ 5 Argentina    2007  35954847.  73.6
+ 6 Australia    2007  12274974.  80.7
+ 7 Austria      2007  19536618.  77.6
+ 8 Bahrain      2007 115513752.  70.7
+ 9 Bangladesh   2007 115513752.  70.7
+10 Belgium      2007  19536618.  77.6
+# … with 132 more rows
+```
+]
+
+.pull-right[
+
+```r
+gapminder %&gt;% 
+  filter(year == 2007) %&gt;% 
+  group_by(continent) %&gt;%  
+  mutate(mp = mean(pop)) %&gt;%  
+* ungroup() %&gt;%
+  mutate(mle = mean(lifeExp))  %&gt;% 
+  select(country, year, mp, mle)
+```
+
+```
+# A tibble: 142 x 4
+   country      year         mp   mle
+   &lt;fct&gt;       &lt;int&gt;      &lt;dbl&gt; &lt;dbl&gt;
+ 1 Afghanistan  2007 115513752.  67.0
+ 2 Albania      2007  19536618.  67.0
+ 3 Algeria      2007  17875763.  67.0
+ 4 Angola       2007  17875763.  67.0
+ 5 Argentina    2007  35954847.  67.0
+ 6 Australia    2007  12274974.  67.0
+ 7 Austria      2007  19536618.  67.0
+ 8 Bahrain      2007 115513752.  67.0
+ 9 Bangladesh   2007 115513752.  67.0
+10 Belgium      2007  19536618.  67.0
+# … with 132 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 3 (1): County death ratio
+.panel1-q31-auto[
+
+```r
+*covid
+```
+]
+ 
+.panel2-q31-auto[
+
+```
+# A tibble: 97,395 x 6
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-05-31 Autauga  Alabama 01001  7142    110
+ 2 2021-05-31 Baldwin  Alabama 01003 21620    311
+ 3 2021-05-31 Barbour  Alabama 01005  2334     59
+ 4 2021-05-31 Bibb     Alabama 01007  2664     64
+ 5 2021-05-31 Blount   Alabama 01009  6864    139
+ 6 2021-05-31 Bullock  Alabama 01011  1233     42
+ 7 2021-05-31 Butler   Alabama 01013  2219     71
+ 8 2021-05-31 Calhoun  Alabama 01015 14622    324
+ 9 2021-05-31 Chambers Alabama 01017  3665    123
+10 2021-05-31 Cherokee Alabama 01019  1862     45
+# … with 97,385 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 3 (1): County death ratio
+.panel1-q31-auto[
+
+```r
+covid %&gt;%
+* filter(date == max(date), county != "Unknown", cases != 0)
+```
+]
+ 
+.panel2-q31-auto[
+
+```
+# A tibble: 3,221 x 6
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-29 Autauga  Alabama 01001  7247    113
+ 2 2021-06-29 Baldwin  Alabama 01003 21985    314
+ 3 2021-06-29 Barbour  Alabama 01005  2345     60
+ 4 2021-06-29 Bibb     Alabama 01007  2687     64
+ 5 2021-06-29 Blount   Alabama 01009  6975    139
+ 6 2021-06-29 Bullock  Alabama 01011  1249     42
+ 7 2021-06-29 Butler   Alabama 01013  2255     71
+ 8 2021-06-29 Calhoun  Alabama 01015 14766    330
+ 9 2021-06-29 Chambers Alabama 01017  3734    124
+10 2021-06-29 Cherokee Alabama 01019  1874     45
+# … with 3,211 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 3 (1): County death ratio
+.panel1-q31-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date), county != "Unknown", cases != 0) %&gt;%
+* mutate(ratio = 100*(deaths/cases))
+```
+]
+ 
+.panel2-q31-auto[
+
+```
+# A tibble: 3,221 x 7
+   date       county   state   fips  cases deaths ratio
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+ 1 2021-06-29 Autauga  Alabama 01001  7247    113  1.56
+ 2 2021-06-29 Baldwin  Alabama 01003 21985    314  1.43
+ 3 2021-06-29 Barbour  Alabama 01005  2345     60  2.56
+ 4 2021-06-29 Bibb     Alabama 01007  2687     64  2.38
+ 5 2021-06-29 Blount   Alabama 01009  6975    139  1.99
+ 6 2021-06-29 Bullock  Alabama 01011  1249     42  3.36
+ 7 2021-06-29 Butler   Alabama 01013  2255     71  3.15
+ 8 2021-06-29 Calhoun  Alabama 01015 14766    330  2.23
+ 9 2021-06-29 Chambers Alabama 01017  3734    124  3.32
+10 2021-06-29 Cherokee Alabama 01019  1874     45  2.40
+# … with 3,211 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 3 (1): County death ratio
+.panel1-q31-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date), county != "Unknown", cases != 0) %&gt;%
+  mutate(ratio = 100*(deaths/cases)) %&gt;%
+* slice_max(ratio, n = 5)
+```
+]
+ 
+.panel2-q31-auto[
+
+```
+# A tibble: 5 x 7
+  date       county    state      fips  cases deaths ratio
+  &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+1 2021-06-29 Grant     Nebraska   31075    36      4 11.1 
+2 2021-06-29 Sabine    Texas      48403   525     45  8.57
+3 2021-06-29 Petroleum Montana    30069    12      1  8.33
+4 2021-06-29 Foard     Texas      48155   124     10  8.06
+5 2021-06-29 Harding   New Mexico 35021    13      1  7.69
+```
+]
+
+&lt;style&gt;
+.panel1-q31-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q31-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q31-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+count: false
+ 
+# Question 3 (2): County death ratio
+.panel1-q32-auto[
+
+```r
+*covid
+```
+]
+ 
+.panel2-q32-auto[
+
+```
+# A tibble: 97,395 x 6
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-05-31 Autauga  Alabama 01001  7142    110
+ 2 2021-05-31 Baldwin  Alabama 01003 21620    311
+ 3 2021-05-31 Barbour  Alabama 01005  2334     59
+ 4 2021-05-31 Bibb     Alabama 01007  2664     64
+ 5 2021-05-31 Blount   Alabama 01009  6864    139
+ 6 2021-05-31 Bullock  Alabama 01011  1233     42
+ 7 2021-05-31 Butler   Alabama 01013  2219     71
+ 8 2021-05-31 Calhoun  Alabama 01015 14622    324
+ 9 2021-05-31 Chambers Alabama 01017  3665    123
+10 2021-05-31 Cherokee Alabama 01019  1862     45
+# … with 97,385 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 3 (2): County death ratio
+.panel1-q32-auto[
+
+```r
+covid %&gt;%
+* filter(date == max(date), cases &gt; 0, county != "Unknown")
+```
+]
+ 
+.panel2-q32-auto[
+
+```
+# A tibble: 3,221 x 6
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-29 Autauga  Alabama 01001  7247    113
+ 2 2021-06-29 Baldwin  Alabama 01003 21985    314
+ 3 2021-06-29 Barbour  Alabama 01005  2345     60
+ 4 2021-06-29 Bibb     Alabama 01007  2687     64
+ 5 2021-06-29 Blount   Alabama 01009  6975    139
+ 6 2021-06-29 Bullock  Alabama 01011  1249     42
+ 7 2021-06-29 Butler   Alabama 01013  2255     71
+ 8 2021-06-29 Calhoun  Alabama 01015 14766    330
+ 9 2021-06-29 Chambers Alabama 01017  3734    124
+10 2021-06-29 Cherokee Alabama 01019  1874     45
+# … with 3,211 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 3 (2): County death ratio
+.panel1-q32-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date), cases &gt; 0, county != "Unknown") %&gt;%
+* slice_max(100*(deaths/cases), n = 5)
+```
+]
+ 
+.panel2-q32-auto[
+
+```
+# A tibble: 5 x 6
+  date       county    state      fips  cases deaths
+  &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1 2021-06-29 Grant     Nebraska   31075    36      4
+2 2021-06-29 Sabine    Texas      48403   525     45
+3 2021-06-29 Petroleum Montana    30069    12      1
+4 2021-06-29 Foard     Texas      48155   124     10
+5 2021-06-29 Harding   New Mexico 35021    13      1
+```
+]
+
+&lt;style&gt;
+.panel1-q32-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q32-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q32-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+# Question 4: State death ratio
+.panel1-q4-auto[
+
+```r
+*filter(covid, date == max(date))
+```
+]
+ 
+.panel2-q4-auto[
+
+```
+# A tibble: 3,246 x 6
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-29 Autauga  Alabama 01001  7247    113
+ 2 2021-06-29 Baldwin  Alabama 01003 21985    314
+ 3 2021-06-29 Barbour  Alabama 01005  2345     60
+ 4 2021-06-29 Bibb     Alabama 01007  2687     64
+ 5 2021-06-29 Blount   Alabama 01009  6975    139
+ 6 2021-06-29 Bullock  Alabama 01011  1249     42
+ 7 2021-06-29 Butler   Alabama 01013  2255     71
+ 8 2021-06-29 Calhoun  Alabama 01015 14766    330
+ 9 2021-06-29 Chambers Alabama 01017  3734    124
+10 2021-06-29 Cherokee Alabama 01019  1874     45
+# … with 3,236 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 4: State death ratio
+.panel1-q4-auto[
+
+```r
+filter(covid, date == max(date)) %&gt;%
+* group_by(state)
+```
+]
+ 
+.panel2-q4-auto[
+
+```
+# A tibble: 3,246 x 6
+# Groups:   state [55]
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-29 Autauga  Alabama 01001  7247    113
+ 2 2021-06-29 Baldwin  Alabama 01003 21985    314
+ 3 2021-06-29 Barbour  Alabama 01005  2345     60
+ 4 2021-06-29 Bibb     Alabama 01007  2687     64
+ 5 2021-06-29 Blount   Alabama 01009  6975    139
+ 6 2021-06-29 Bullock  Alabama 01011  1249     42
+ 7 2021-06-29 Butler   Alabama 01013  2255     71
+ 8 2021-06-29 Calhoun  Alabama 01015 14766    330
+ 9 2021-06-29 Chambers Alabama 01017  3734    124
+10 2021-06-29 Cherokee Alabama 01019  1874     45
+# … with 3,236 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 4: State death ratio
+.panel1-q4-auto[
+
+```r
+filter(covid, date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+* summarize(totCases = sum(cases),
+*           totDeaths = sum(deaths),
+*           ratio = 100 * (totDeaths/totCases))
+```
+]
+ 
+.panel2-q4-auto[
+
+```
+# A tibble: 55 x 4
+   state                totCases totDeaths ratio
+   &lt;chr&gt;                   &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
+ 1 Alabama                550451     11338 2.06 
+ 2 Alaska                  70581       357 0.506
+ 3 Arizona                894106     17930 2.01 
+ 4 Arkansas               348699      5905 1.69 
+ 5 California            3818219     63606 1.67 
+ 6 Colorado               560407      6940 1.24 
+ 7 Connecticut            349301      8276 2.37 
+ 8 Delaware               109712      1694 1.54 
+ 9 District of Columbia    49347      1141 2.31 
+10 Florida               2321929     37772 1.63 
+# … with 45 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 4: State death ratio
+.panel1-q4-auto[
+
+```r
+filter(covid, date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(totCases = sum(cases),
+            totDeaths = sum(deaths),
+            ratio = 100 * (totDeaths/totCases)) %&gt;%
+* ungroup()
+```
+]
+ 
+.panel2-q4-auto[
+
+```
+# A tibble: 55 x 4
+   state                totCases totDeaths ratio
+   &lt;chr&gt;                   &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
+ 1 Alabama                550451     11338 2.06 
+ 2 Alaska                  70581       357 0.506
+ 3 Arizona                894106     17930 2.01 
+ 4 Arkansas               348699      5905 1.69 
+ 5 California            3818219     63606 1.67 
+ 6 Colorado               560407      6940 1.24 
+ 7 Connecticut            349301      8276 2.37 
+ 8 Delaware               109712      1694 1.54 
+ 9 District of Columbia    49347      1141 2.31 
+10 Florida               2321929     37772 1.63 
+# … with 45 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 4: State death ratio
+.panel1-q4-auto[
+
+```r
+filter(covid, date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(totCases = sum(cases),
+            totDeaths = sum(deaths),
+            ratio = 100 * (totDeaths/totCases)) %&gt;%
+  ungroup() %&gt;%
+* slice_max(ratio, n = 5)
+```
+]
+ 
+.panel2-q4-auto[
+
+```
+# A tibble: 5 x 4
+  state                totCases totDeaths ratio
+  &lt;chr&gt;                   &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
+1 New Jersey            1023200     26444  2.58
+2 Massachusetts          709873     17993  2.53
+3 New York              2112872     53093  2.51
+4 Connecticut            349301      8276  2.37
+5 District of Columbia    49347      1141  2.31
+```
+]
+
+&lt;style&gt;
+.panel1-q4-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q4-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q4-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+class: center, middle
+
+&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/jbkSRLYSojo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+
+---
+class: middle, center, inverse
+# Data Visualization
+---
+# ggplot
+
+- `ggplot2` is a library is based on the **grammar of graphics**
+
+--
+
+- the idea is you can build every graph from the same
+few components: 
+  1. a data set 
+  2. geom(s)
+  3. a coordinate system
+
+--
+
+- `ggplot2` provides a programmatic interface for specifying
+ - what variables to plot, 
+ - how they are displayed, 
+ - general visual properties. 
+ 
+--
+
+- Therefore, we only need _minimal_ changes if the underlying data changes or if we decide to change our visual.
+
+- This helps create publication quality plots with minimal amounts of adjustments and tweaking.
+
+--
+
+- ggplot likes data in the ‘long’ format: i.e., a column for every dimension, and a row for every observation. (more on this tommorrow!!)
+
+---
+
+# Components of a ggplot:
+
+- ggplot graphics are built step by step by adding new elements and layers
+
+--
+
+  1. Data
+  2. Geometry (geom)
+  3. Aesthetic mapping
+  4. Theme
+
+--
+
+- Elements of a plot are layered by iteritavly adding elements 
+
+--
+
+- These can be added in a series of 5 steps:
+
+1. Setup
+2. Layers
+3. Labels
+4. Facets
+5. Themes
+
+---
+
+# Example Data for today ...
+
+
+```r
+(gm2007 = filter(gapminder, year == 2007))
+```
+
+```
+# A tibble: 142 x 6
+   country     continent  year lifeExp       pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       2007    43.8  31889923      975.
+ 2 Albania     Europe     2007    76.4   3600523     5937.
+ 3 Algeria     Africa     2007    72.3  33333216     6223.
+ 4 Angola      Africa     2007    42.7  12420476     4797.
+ 5 Argentina   Americas   2007    75.3  40301927    12779.
+ 6 Australia   Oceania    2007    81.2  20434176    34435.
+ 7 Austria     Europe     2007    79.8   8199783    36126.
+ 8 Bahrain     Asia       2007    75.6    708573    29796.
+ 9 Bangladesh  Asia       2007    64.1 150448339     1391.
+10 Belgium     Europe     2007    79.4  10392226    33693.
+# … with 132 more rows
+```
+
+---
+
+# 1. The Setup: canvas
+
+.pull-left[
+An empty canvas can be initialized with `ggplot()`
+]
+
+.pull-right[
+
+```r
+ggplot()
+```
+
+&lt;img src="lecture-06_files/figure-html/unnamed-chunk-7-1.png" width="432" /&gt;
+]
+
+---
+
+# 1. The Setup: data
+
+.pull-left[
+- Every ggplot requires a data argument (data.frame/tibble)
+]
+
+.pull-right[
+
+```r
+ggplot(data = gm2007)
+```
+
+&lt;img src="lecture-06_files/figure-html/unnamed-chunk-8-1.png" width="432" /&gt;
+]
+
+---
+
+# 1. The Setup: Aesthetic Mappings
+
+.pull-left[
+- Aesthetic mappings describe how variables in the `data` are visualized
+
+- Denoted by the `aes` argument  
+
+- Aesthetic mappings can be set in ggplot() and/or in individual layers.
+
+- Aesthetic mappings in the ggplot() call, can be seen by all geom layers. 
+
+- The X and Y axis of the plot as well colors, sizes, shapes, fills are all aesthetic. 
+
+- If you want to have an aesthetic fixed (that is **not** vary based on a variable) you need to specify it _outside_ the aes()
+]
+
+.pull-right[
+
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp))
+```
+
+&lt;img src="lecture-06_files/figure-html/unnamed-chunk-9-1.png" width="432" /&gt;
+]
+
+---
+
+# 2. Layers
+
+- The `+` sign is used to add layers to a `ggplot` setup
+
+--
+
+- Layers can define geometries, compute summary statistics, define what scales to use, or even change styles. 
+
+--
+
+- In general a plot construction will look like this:
+
+
+```r
+DATA %&gt;% 
+  ggplot(aes(x, y)) + 
+  LAYER 1 + 
+  LAYER 2 + 
+  … 
+```
+
+---
+
+# 2. Layers: Geometry
+
+- Many layers in `ggplot2` are called ‘geoms’. 
+
+--
+
+- `geoms` are the geometric objects (points, lines, bars, etc.) that can be placed on a graph to visualize the `X-Y mapping` of the input `data`
+
+--
+
+- They are called using functions that start with `geom_*`. 
+
+--
+
+- Examples include:
+  - points (`geom_point`, for scatter plots, dot plots, etc)
+  - lines (`geom_line`, for time series, trend lines, etc)
+  - boxplots (`geom_boxplot`)
+  - … and many more!
+  
+
+```
+ [1] "geom_abline"            "geom_area"              "geom_bar"              
+ [4] "geom_bin_2d"            "geom_bin2d"             "geom_blank"            
+ [7] "geom_boxplot"           "geom_col"               "geom_contour"          
+[10] "geom_contour_filled"    "geom_count"             "geom_crossbar"         
+[13] "geom_curve"             "geom_density"           "geom_density_2d"       
+[16] "geom_density_2d_filled" "geom_density2d"         "geom_density2d_filled" 
+[19] "geom_dotplot"           "geom_errorbar"          "geom_errorbarh"        
+[22] "geom_freqpoly"          "geom_function"          "geom_hex"              
+[25] "geom_histogram"         "geom_hline"             "geom_jitter"           
+[28] "geom_label"             "geom_line"              "geom_linerange"        
+[31] "geom_map"               "geom_path"              "geom_point"            
+[34] "geom_pointrange"        "geom_polygon"           "geom_qq"               
+[37] "geom_qq_line"           "geom_quantile"          "geom_raster"           
+[40] "geom_rect"              "geom_ribbon"            "geom_rug"              
+[43] "geom_segment"           "geom_sf"                "geom_sf_label"         
+[46] "geom_sf_text"           "geom_smooth"            "geom_spoke"            
+[49] "geom_step"              "geom_text"              "geom_tile"             
+[52] "geom_violin"            "geom_vline"            
+```
+  
+  
+---
+
+# 2. Layers: Geometry
+
+- A plot **must** have at least one geom, but there is no maximum.
+
+--
+
+- Adding geoms to a ggplot follows the pattern:
+
+
+```r
+ggplot(data = &lt;DATA&gt;, aes(X, Y)) + 
+  &lt;GEOM_FUNCTION&gt;(mapping = aes(&lt;MAPPINGS&gt;))
+  &lt;GEOM_FUNCTION&gt;(mapping = aes(&lt;MAPPINGS&gt;))
+```
+
+- Note again that the aesthetics placed in the `ggplot` call are the **global** parameters for the plot, and the aethetics placed in each `geom` are specific to that `geom`.
+
+---
+
+count: false
+ 
+# A first geom_* ...
+.panel1-geom1-auto[
+
+```r
+*ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp))
+```
+]
+ 
+.panel2-geom1-auto[
+&lt;img src="lecture-06_files/figure-html/geom1_auto_01_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# A first geom_* ...
+.panel1-geom1-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+* geom_point()
+```
+]
+ 
+.panel2-geom1-auto[
+&lt;img src="lecture-06_files/figure-html/geom1_auto_02_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-geom1-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-geom1-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-geom1-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# 2. Layers: Geometry
+
+.pull-left[
+Like the set up, `geoms` can be modified with aesthetics (`aes`). Examples include:
+
+- position (i.e., on the x and y axes)
+- color (“outside” color)
+- fill (“inside” color)
+- shape
+- line type
+- size
+
+Each `geom` accepts only a **subset** of these aesthetics
+
+(refer to the `geom` help pages (e.g. `?geom_point`) to see what mappings each `geom` accepts. 
+]
+
+.pull-right[
+&lt;img src="lec-img/06-geom-point.png" width="75%"&gt;
+]
+
+---
+# 2. Layers: data.frame driven or fixed?
+
+.pull-left[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) + 
+  geom_point(col = "red")
+```
+
+&lt;img src="lecture-06_files/figure-html/unnamed-chunk-13-1.png" width="432" /&gt;
+]
+
+.pull-right[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) + 
+  geom_point(aes(col = continent))
+```
+
+&lt;img src="lecture-06_files/figure-html/unnamed-chunk-14-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# For our example...
+.panel1-geoms-auto[
+
+```r
+*ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp))
+```
+]
+ 
+.panel2-geoms-auto[
+&lt;img src="lecture-06_files/figure-html/geoms_auto_01_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# For our example...
+.panel1-geoms-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+* geom_point(aes(color = continent, size = pop))
+```
+]
+ 
+.panel2-geoms-auto[
+&lt;img src="lecture-06_files/figure-html/geoms_auto_02_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# For our example...
+.panel1-geoms-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+* geom_smooth(color = "black")
+```
+]
+ 
+.panel2-geoms-auto[
+&lt;img src="lecture-06_files/figure-html/geoms_auto_03_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# For our example...
+.panel1-geoms-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  geom_smooth(color = "black") +
+* geom_hline(yintercept = mean(gm2007$lifeExp), color = "gray")
+```
+]
+ 
+.panel2-geoms-auto[
+&lt;img src="lecture-06_files/figure-html/geoms_auto_04_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# For our example...
+.panel1-geoms-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  geom_smooth(color = "black") +
+  geom_hline(yintercept = mean(gm2007$lifeExp), color = "gray") +
+* geom_vline(xintercept = mean(gm2007$gdpPercap), color = "gray")
+```
+]
+ 
+.panel2-geoms-auto[
+&lt;img src="lecture-06_files/figure-html/geoms_auto_05_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-geoms-auto {
+  color: black;
+  width: 48.5%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-geoms-auto {
+  color: black;
+  width: 48.5%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-geoms-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+# 3. Labels
+
+- Now that you have drawn the main parts of the graph. You might want to add labs that clarify what is being shown. 
+
+--
+
+- This can be done using the `labs` layer. 
+
+--
+
+- The most typical are: `title`, `x`, and `y` but other options exist!
+
+---
+
+count: false
+ 
+# For our example...
+.panel1-labs-auto[
+
+```r
+*ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp))
+```
+]
+ 
+.panel2-labs-auto[
+&lt;img src="lecture-06_files/figure-html/labs_auto_01_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# For our example...
+.panel1-labs-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+* geom_point(aes(color = continent, size = pop))
+```
+]
+ 
+.panel2-labs-auto[
+&lt;img src="lecture-06_files/figure-html/labs_auto_02_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# For our example...
+.panel1-labs-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+* geom_smooth(color = "black", size = .5)
+```
+]
+ 
+.panel2-labs-auto[
+&lt;img src="lecture-06_files/figure-html/labs_auto_03_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# For our example...
+.panel1-labs-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  geom_smooth(color = "black", size = .5) +
+* geom_hline(yintercept = mean(gm2007$lifeExp), color = "gray")
+```
+]
+ 
+.panel2-labs-auto[
+&lt;img src="lecture-06_files/figure-html/labs_auto_04_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# For our example...
+.panel1-labs-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  geom_smooth(color = "black", size = .5) +
+  geom_hline(yintercept = mean(gm2007$lifeExp), color = "gray") +
+* geom_vline(xintercept = mean(gm2007$gdpPercap), color = "gray")
+```
+]
+ 
+.panel2-labs-auto[
+&lt;img src="lecture-06_files/figure-html/labs_auto_05_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# For our example...
+.panel1-labs-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  geom_smooth(color = "black", size = .5) +
+  geom_hline(yintercept = mean(gm2007$lifeExp), color = "gray") +
+  geom_vline(xintercept = mean(gm2007$gdpPercap), color = "gray") +
+* labs(title = "Per capita GDP versus life expectency in 2007",
+*      x = "Per Capita GDP",
+*      y = "Life Expectancy",
+*      caption = "Based on Hans Rosling Plots",
+*      subtitle = 'Data Source: Gapminder',
+*      color = "",
+*      size = "Population")
+```
+]
+ 
+.panel2-labs-auto[
+&lt;img src="lecture-06_files/figure-html/labs_auto_06_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-labs-auto {
+  color: black;
+  width: 48.5%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-labs-auto {
+  color: black;
+  width: 48.5%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-labs-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+# 4. Facets
+
+- In the previous chart, we showed a scatterplot for all countries plotted in the same chart. What if you want one chart for each continent?
+
+--
+
+- Such separation is called `faceting`
+
+--
+
+- `facet_wrap()` takes in a formula as the argument. 
+
+- Formulas look like this `RHS ~ LHS` (where RHS = right hand side, LHS = left hand side)
+
+The item on the RHS corresponds to the column. The item on the LHS defines the rows.
+
+--
+
+- In `facet_wrap`, the scales of the X and Y axis are fixed to accommodate **all** points by default. 
+
+- This makes the comparison of values more meaningful because they would be in the same scale.
+
+- The scales can be made `free` by setting the argument `scales=free`.
+
+---
+
+count: false
+ 
+# Facet Wrap...
+.panel1-facet-auto[
+
+```r
+*ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp))
+```
+]
+ 
+.panel2-facet-auto[
+&lt;img src="lecture-06_files/figure-html/facet_auto_01_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# Facet Wrap...
+.panel1-facet-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+* geom_point(aes(color = continent, size = pop))
+```
+]
+ 
+.panel2-facet-auto[
+&lt;img src="lecture-06_files/figure-html/facet_auto_02_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# Facet Wrap...
+.panel1-facet-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+* geom_smooth(color = "black", size = .5)
+```
+]
+ 
+.panel2-facet-auto[
+&lt;img src="lecture-06_files/figure-html/facet_auto_03_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# Facet Wrap...
+.panel1-facet-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  geom_smooth(color = "black", size = .5) +
+* geom_hline(yintercept = mean(gm2007$lifeExp), color = "gray")
+```
+]
+ 
+.panel2-facet-auto[
+&lt;img src="lecture-06_files/figure-html/facet_auto_04_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# Facet Wrap...
+.panel1-facet-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  geom_smooth(color = "black", size = .5) +
+  geom_hline(yintercept = mean(gm2007$lifeExp), color = "gray") +
+* geom_vline(xintercept = mean(gm2007$gdpPercap), color = "gray")
+```
+]
+ 
+.panel2-facet-auto[
+&lt;img src="lecture-06_files/figure-html/facet_auto_05_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# Facet Wrap...
+.panel1-facet-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  geom_smooth(color = "black", size = .5) +
+  geom_hline(yintercept = mean(gm2007$lifeExp), color = "gray") +
+  geom_vline(xintercept = mean(gm2007$gdpPercap), color = "gray") +
+* labs(title = "Per capita GDP versus life expectency in 2007",
+*      x = "Per Capita GDP",
+*      y = "Life Expectancy",
+*      caption = "Based on Hans Rosling Plots",
+*      subtitle = 'Data Source: Gapminder',
+*      color = "",
+*      size = "Population")
+```
+]
+ 
+.panel2-facet-auto[
+&lt;img src="lecture-06_files/figure-html/facet_auto_06_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# Facet Wrap...
+.panel1-facet-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  geom_smooth(color = "black", size = .5) +
+  geom_hline(yintercept = mean(gm2007$lifeExp), color = "gray") +
+  geom_vline(xintercept = mean(gm2007$gdpPercap), color = "gray") +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+* facet_wrap(~continent)
+```
+]
+ 
+.panel2-facet-auto[
+&lt;img src="lecture-06_files/figure-html/facet_auto_07_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# Facet Wrap...
+.panel1-facet-auto[
+
+```r
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  geom_smooth(color = "black", size = .5) +
+  geom_hline(yintercept = mean(gm2007$lifeExp), color = "gray") +
+  geom_vline(xintercept = mean(gm2007$gdpPercap), color = "gray") +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  facet_wrap(~continent) +
+* facet_wrap(~continent, scales = "free")
+```
+]
+ 
+.panel2-facet-auto[
+&lt;img src="lecture-06_files/figure-html/facet_auto_08_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-facet-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-facet-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-facet-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+---
+
+count: false
+ 
+#Facet Grids...
+.panel1-grid-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-grid-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Facet Grids...
+.panel1-grid-auto[
+
+```r
+gapminder %&gt;%
+* filter(year %in% c(1952, 1977, 2007))
+```
+]
+ 
+.panel2-grid-auto[
+
+```
+# A tibble: 426 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1977    38.4 14880372      786.
+ 3 Afghanistan Asia       2007    43.8 31889923      975.
+ 4 Albania     Europe     1952    55.2  1282697     1601.
+ 5 Albania     Europe     1977    68.9  2509048     3533.
+ 6 Albania     Europe     2007    76.4  3600523     5937.
+ 7 Algeria     Africa     1952    43.1  9279525     2449.
+ 8 Algeria     Africa     1977    58.0 17152804     4910.
+ 9 Algeria     Africa     2007    72.3 33333216     6223.
+10 Angola      Africa     1952    30.0  4232095     3521.
+# … with 416 more rows
+```
+]
+
+---
+count: false
+ 
+#Facet Grids...
+.panel1-grid-auto[
+
+```r
+gapminder %&gt;%
+  filter(year %in% c(1952, 1977, 2007)) %&gt;%
+* ggplot(aes(x = gdpPercap, y = lifeExp))
+```
+]
+ 
+.panel2-grid-auto[
+&lt;img src="lecture-06_files/figure-html/grid_auto_03_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Facet Grids...
+.panel1-grid-auto[
+
+```r
+gapminder %&gt;%
+  filter(year %in% c(1952, 1977, 2007)) %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+* geom_point(aes(size = pop))
+```
+]
+ 
+.panel2-grid-auto[
+&lt;img src="lecture-06_files/figure-html/grid_auto_04_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Facet Grids...
+.panel1-grid-auto[
+
+```r
+gapminder %&gt;%
+  filter(year %in% c(1952, 1977, 2007)) %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(size = pop)) +
+* labs(title = "Per capita GDP versus life expectency in 2007",
+*      x = "Per Capita GDP",
+*      y = "Life Expectancy",
+*      caption = "Based on Hans Rosling Plots",
+*      subtitle = 'Data Source: Gapminder',
+*      color = "",
+*      size = "Population")
+```
+]
+ 
+.panel2-grid-auto[
+&lt;img src="lecture-06_files/figure-html/grid_auto_05_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Facet Grids...
+.panel1-grid-auto[
+
+```r
+gapminder %&gt;%
+  filter(year %in% c(1952, 1977, 2007)) %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+* facet_wrap(year~continent)
+```
+]
+ 
+.panel2-grid-auto[
+&lt;img src="lecture-06_files/figure-html/grid_auto_06_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Facet Grids...
+.panel1-grid-auto[
+
+```r
+gapminder %&gt;%
+  filter(year %in% c(1952, 1977, 2007)) %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  facet_wrap(year~continent) +
+* facet_grid(year~continent)
+```
+]
+ 
+.panel2-grid-auto[
+&lt;img src="lecture-06_files/figure-html/grid_auto_07_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Facet Grids...
+.panel1-grid-auto[
+
+```r
+gapminder %&gt;%
+  filter(year %in% c(1952, 1977, 2007)) %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  facet_wrap(year~continent) +
+  facet_grid(year~continent) +
+* facet_grid(continent~year)
+```
+]
+ 
+.panel2-grid-auto[
+&lt;img src="lecture-06_files/figure-html/grid_auto_08_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-grid-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-grid-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-grid-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+---
+
+# 5. Theme
+
+- Great! Now we just need to polish our plots...
+
+--
+
+- ggplot offers a themeing system:
+
+--
+
+1.  `elements` specify the non-data elements that you can control. For example, 
+  -  `plot.title` controls the appearance of the plot title; 
+  - ` axis.ticks.x` controls the ticks on the x axis; 
+  - `legend.key.height`, controls the height of the keys in the legend.
+
+--
+
+2. Each `element` is associated with an element function, which describes the visual properties. For example, 
+  - `element_text()` sets the font size, color and face of text elements like `plot.title`.
+
+-- 
+
+3. The `theme()` function which allows you to override  default elements:
+   - For example  `theme(plot.title = element_text(color = "red"))`.
+
+---
+
+# Built in themes
+
+Wow! Thats a lot :) Fortunately, ggplot comes with many default themes that set all of the theme elements to values designed to work together harmoniously.
+
+
+```
+ [1] "theme_bw"       "theme_classic"  "theme_dark"     "theme_get"     
+ [5] "theme_gray"     "theme_grey"     "theme_light"    "theme_linedraw"
+ [9] "theme_minimal"  "theme_replace"  "theme_set"      "theme_test"    
+[13] "theme_update"   "theme_void"    
+```
+
+---
+
+# theme_bw()
+
+
+```r
+theme_bw
+```
+
+```
+function (base_size = 11, base_family = "", base_line_size = base_size/22, 
+    base_rect_size = base_size/22) 
+{
+    theme_grey(base_size = base_size, base_family = base_family, 
+        base_line_size = base_line_size, base_rect_size = base_rect_size) %+replace% 
+        theme(panel.background = element_rect(fill = "white", 
+            colour = NA), panel.border = element_rect(fill = NA, 
+            colour = "grey20"), panel.grid = element_line(colour = "grey92"), 
+            panel.grid.minor = element_line(size = rel(0.5)), 
+            strip.background = element_rect(fill = "grey85", 
+                colour = "grey20"), legend.key = element_rect(fill = "white", 
+                colour = NA), complete = TRUE)
+}
+&lt;bytecode: 0x7f8dc1f9cc38&gt;
+&lt;environment: namespace:ggplot2&gt;
+```
+
+---
+
+count: false
+ 
+#Built in Themes...
+.panel1-theme-auto[
+
+```r
+*gm2007
+```
+]
+ 
+.panel2-theme-auto[
+
+```
+# A tibble: 142 x 6
+   country     continent  year lifeExp       pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       2007    43.8  31889923      975.
+ 2 Albania     Europe     2007    76.4   3600523     5937.
+ 3 Algeria     Africa     2007    72.3  33333216     6223.
+ 4 Angola      Africa     2007    42.7  12420476     4797.
+ 5 Argentina   Americas   2007    75.3  40301927    12779.
+ 6 Australia   Oceania    2007    81.2  20434176    34435.
+ 7 Austria     Europe     2007    79.8   8199783    36126.
+ 8 Bahrain     Asia       2007    75.6    708573    29796.
+ 9 Bangladesh  Asia       2007    64.1 150448339     1391.
+10 Belgium     Europe     2007    79.4  10392226    33693.
+# … with 132 more rows
+```
+]
+
+---
+count: false
+ 
+#Built in Themes...
+.panel1-theme-auto[
+
+```r
+gm2007 %&gt;%
+* ggplot(aes(x = gdpPercap, y = lifeExp))
+```
+]
+ 
+.panel2-theme-auto[
+&lt;img src="lecture-06_files/figure-html/theme_auto_02_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Built in Themes...
+.panel1-theme-auto[
+
+```r
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+* geom_point(aes(color = continent, size = pop))
+```
+]
+ 
+.panel2-theme-auto[
+&lt;img src="lecture-06_files/figure-html/theme_auto_03_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Built in Themes...
+.panel1-theme-auto[
+
+```r
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+* labs(title = "Per capita GDP versus life expectency in 2007",
+*      x = "Per Capita GDP",
+*      y = "Life Expectancy",
+*      caption = "Based on Hans Rosling Plots",
+*      subtitle = 'Data Source: Gapminder',
+*      color = "",
+*      size = "Population")
+```
+]
+ 
+.panel2-theme-auto[
+&lt;img src="lecture-06_files/figure-html/theme_auto_04_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Built in Themes...
+.panel1-theme-auto[
+
+```r
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+* theme_bw()
+```
+]
+ 
+.panel2-theme-auto[
+&lt;img src="lecture-06_files/figure-html/theme_auto_05_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Built in Themes...
+.panel1-theme-auto[
+
+```r
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  theme_bw() +
+* theme_dark()
+```
+]
+ 
+.panel2-theme-auto[
+&lt;img src="lecture-06_files/figure-html/theme_auto_06_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Built in Themes...
+.panel1-theme-auto[
+
+```r
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  theme_bw() +
+  theme_dark() +
+* theme_gray()
+```
+]
+ 
+.panel2-theme-auto[
+&lt;img src="lecture-06_files/figure-html/theme_auto_07_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Built in Themes...
+.panel1-theme-auto[
+
+```r
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  theme_bw() +
+  theme_dark() +
+  theme_gray() +
+* theme_minimal()
+```
+]
+ 
+.panel2-theme-auto[
+&lt;img src="lecture-06_files/figure-html/theme_auto_08_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Built in Themes...
+.panel1-theme-auto[
+
+```r
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  theme_bw() +
+  theme_dark() +
+  theme_gray() +
+  theme_minimal() +
+* theme_light()
+```
+]
+ 
+.panel2-theme-auto[
+&lt;img src="lecture-06_files/figure-html/theme_auto_09_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-theme-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-theme-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-theme-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+*library(ggthemes)
+```
+]
+ 
+.panel2-ggtheme-auto[
+
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+*gm2007
+```
+]
+ 
+.panel2-ggtheme-auto[
+
+```
+# A tibble: 142 x 6
+   country     continent  year lifeExp       pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       2007    43.8  31889923      975.
+ 2 Albania     Europe     2007    76.4   3600523     5937.
+ 3 Algeria     Africa     2007    72.3  33333216     6223.
+ 4 Angola      Africa     2007    42.7  12420476     4797.
+ 5 Argentina   Americas   2007    75.3  40301927    12779.
+ 6 Australia   Oceania    2007    81.2  20434176    34435.
+ 7 Austria     Europe     2007    79.8   8199783    36126.
+ 8 Bahrain     Asia       2007    75.6    708573    29796.
+ 9 Bangladesh  Asia       2007    64.1 150448339     1391.
+10 Belgium     Europe     2007    79.4  10392226    33693.
+# … with 132 more rows
+```
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+gm2007 %&gt;%
+* ggplot(aes(x = gdpPercap, y = lifeExp))
+```
+]
+ 
+.panel2-ggtheme-auto[
+&lt;img src="lecture-06_files/figure-html/ggtheme_auto_03_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+* geom_point(aes(color = continent, size = pop))
+```
+]
+ 
+.panel2-ggtheme-auto[
+&lt;img src="lecture-06_files/figure-html/ggtheme_auto_04_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+* labs(title = "Per capita GDP versus life expectency in 2007",
+*      x = "Per Capita GDP",
+*      y = "Life Expectancy",
+*      caption = "Based on Hans Rosling Plots",
+*      subtitle = 'Data Source: Gapminder',
+*      color = "",
+*      size = "Population")
+```
+]
+ 
+.panel2-ggtheme-auto[
+&lt;img src="lecture-06_files/figure-html/ggtheme_auto_05_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+* ggthemes::theme_stata()
+```
+]
+ 
+.panel2-ggtheme-auto[
+&lt;img src="lecture-06_files/figure-html/ggtheme_auto_06_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  ggthemes::theme_stata() +
+* ggthemes::theme_economist()
+```
+]
+ 
+.panel2-ggtheme-auto[
+&lt;img src="lecture-06_files/figure-html/ggtheme_auto_07_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  ggthemes::theme_stata() +
+  ggthemes::theme_economist() +
+* ggthemes::theme_economist_white()
+```
+]
+ 
+.panel2-ggtheme-auto[
+&lt;img src="lecture-06_files/figure-html/ggtheme_auto_08_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  ggthemes::theme_stata() +
+  ggthemes::theme_economist() +
+  ggthemes::theme_economist_white() +
+* ggthemes::theme_fivethirtyeight()
+```
+]
+ 
+.panel2-ggtheme-auto[
+&lt;img src="lecture-06_files/figure-html/ggtheme_auto_09_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  ggthemes::theme_stata() +
+  ggthemes::theme_economist() +
+  ggthemes::theme_economist_white() +
+  ggthemes::theme_fivethirtyeight() +
+* ggthemes::theme_gdocs()
+```
+]
+ 
+.panel2-ggtheme-auto[
+&lt;img src="lecture-06_files/figure-html/ggtheme_auto_10_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  ggthemes::theme_stata() +
+  ggthemes::theme_economist() +
+  ggthemes::theme_economist_white() +
+  ggthemes::theme_fivethirtyeight() +
+  ggthemes::theme_gdocs() +
+* ggthemes::theme_excel()
+```
+]
+ 
+.panel2-ggtheme-auto[
+&lt;img src="lecture-06_files/figure-html/ggtheme_auto_11_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  ggthemes::theme_stata() +
+  ggthemes::theme_economist() +
+  ggthemes::theme_economist_white() +
+  ggthemes::theme_fivethirtyeight() +
+  ggthemes::theme_gdocs() +
+  ggthemes::theme_excel() +
+* ggthemes::theme_wsj()
+```
+]
+ 
+.panel2-ggtheme-auto[
+&lt;img src="lecture-06_files/figure-html/ggtheme_auto_12_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#ggtheme package...
+.panel1-ggtheme-auto[
+
+```r
+library(ggthemes)
+
+gm2007 %&gt;%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) +
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP",
+       y = "Life Expectancy",
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "",
+       size = "Population") +
+  ggthemes::theme_stata() +
+  ggthemes::theme_economist() +
+  ggthemes::theme_economist_white() +
+  ggthemes::theme_fivethirtyeight() +
+  ggthemes::theme_gdocs() +
+  ggthemes::theme_excel() +
+  ggthemes::theme_wsj() +
+* ggthemes::theme_hc()
+```
+]
+ 
+.panel2-ggtheme-auto[
+&lt;img src="lecture-06_files/figure-html/ggtheme_auto_13_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-ggtheme-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-ggtheme-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-ggtheme-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+# Saving a ggplot element...
+
+ - Remember that in R, we assign object to names. We have seen examples including values, data structures, and functions:
+
+--
+
+```r
+x = 10 
+class(x)
+```
+
+```
+[1] "numeric"
+```
+
+--
+
+ - ggplot outputs are also objects!
+
+
+```r
+gg = ggplot()
+class(gg)
+```
+
+```
+[1] "gg"     "ggplot"
+```
+
+```r
+lobstr::obj_addr(gg)
+```
+
+```
+[1] "0x7f8d9a0e7048"
+```
+
+---
+# ggsave()
+
+- ggplot comes with a function ggsave, that write a gg object to a file path (with path, name, extension)
+
+```r
+ggsave(gg, file = "img/my-beatuiful-plot.png")
+
+# or #
+
+gg %&gt;% 
+  ggsave(file = "img/my-beatuiful-plot.png", 
+         width = 8, 
+         units = c("in"))
+```
+
+---
+
+# Assignment
+
+In your `geog13-daily-exercises`
+1. Make a new `R` directory (`mkdir` R from the parent directory)
+2. Create a new R file called day-06.R (touch R/day-06.R)
+3. Open that file. 
+  - This is an R script. Unlike Rmarkdown it will not knit, but unlike the console, it will save and keep your code. 
+4. In this file add your name, date, and the purpose of the script as comments (preceded by #)
+5. Now, read in the COVID-19 data from the URL like yesterday
+
+***
+
+---
+
+
+**Question 1**: Make a _faceted_ line plot (*geom_line*) of the **6** states with **most** cases. Your X axis should be the _date_ and the y axis _cases_.
+
+We can break this task into 4 steps:
+
+ 1. Identify the six states with the most current cases (yesterdays assignment + `pull`)
+ 2. Filter the raw data to those 6 states (hint: `%in%`)
+ 3. Set up a ggplot --&gt; add layers --&gt; add labels --&gt; add a facet --&gt; add a theme
+ 4. save the image to you `img` directory (hint: `ggsave()`)
+
+***
+&lt;center&gt;
+&lt;img src="lec-img/06-question-01.png" width = "35%"&gt;
+&lt;/center&gt;
+---
+
+**Question 2**: Make a column plot (`geom_col`) of daily total cases in the **USA**. Your X axis should be the _date_ and the y axis _cases_.
+ 
+We can break this task into 3 steps:
+
+ 1. Identify the total cases each day in the whole country (hint: `group_by(date)`)
+ 2. Set up a ggplot --&gt; add layers --&gt; add labels --&gt; add a theme
+ 3. Save the image to your `img` directory (hint: `ggsave()`)
+
+*** 
+
+&lt;center&gt;
+&lt;img src="lec-img/06-question-02.png" width = "35%"&gt;
+&lt;/center&gt;
+
+---
+class: middle, center
+# Submission:
+
+Turn in your Rscript, and 2 images to the Gauchospace dropbox
+
+---
+
+# END
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
