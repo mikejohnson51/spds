@@ -1,0 +1,4262 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 07: Relations &amp; Format
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+# Picking back up!
+
+We’ve covered many topics on how to manipulate and reshape a single data.frame:
+
+--
+
+**Last Week**: Data type and data structures
+
+--
+
+**Tuesday**: `data.frame` manipulation
+
+--
+
+**Wednesday**: `data.frame` visualization
+
+--
+
+**Today**: When one table is not enough (or when its not right)
+
+--
+
+- _Joins_: When 2 is better then 1
+
+--
+
+- _Pivots_: When the format is not ideal for the task
+
+---
+
+# Yesterdays Assignment
+
+1. Make a _faceted_ line plot (*geom_line*) of the **6** states with **most** cases. Your X axis should be the _date_ and the y axis _cases_.
+2. Make a column plot (`geom_col`) of daily total cases in the **USA**. Your X axis should be the _date_ and the y axis _cases_.
+
+
+```r
+library(tidyverse)
+url = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv'
+covid = read_csv(url)
+head(covid)
+```
+
+```
+# A tibble: 6 x 6
+  date       county    state      fips  cases deaths
+  &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1 2020-01-21 Snohomish Washington 53061     1      0
+2 2020-01-22 Snohomish Washington 53061     1      0
+3 2020-01-23 Snohomish Washington 53061     1      0
+4 2020-01-24 Cook      Illinois   17031     1      0
+5 2020-01-24 Snohomish Washington 53061     1      0
+6 2020-01-25 Orange    California 06059     1      0
+```
+
+
+---
+
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+*covid
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 1,472,337 x 6
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish   Washington 53061     1      0
+ 2 2020-01-22 Snohomish   Washington 53061     1      0
+ 3 2020-01-23 Snohomish   Washington 53061     1      0
+ 4 2020-01-24 Cook        Illinois   17031     1      0
+ 5 2020-01-24 Snohomish   Washington 53061     1      0
+ 6 2020-01-25 Orange      California 06059     1      0
+ 7 2020-01-25 Cook        Illinois   17031     1      0
+ 8 2020-01-25 Snohomish   Washington 53061     1      0
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0
+10 2020-01-26 Los Angeles California 06037     1      0
+# … with 1,472,327 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+* filter(date == max(date))
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 3,246 x 6
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-30 Autauga  Alabama 01001  7257    113
+ 2 2021-06-30 Baldwin  Alabama 01003 22027    315
+ 3 2021-06-30 Barbour  Alabama 01005  2346     60
+ 4 2021-06-30 Bibb     Alabama 01007  2693     64
+ 5 2021-06-30 Blount   Alabama 01009  6987    139
+ 6 2021-06-30 Bullock  Alabama 01011  1249     42
+ 7 2021-06-30 Butler   Alabama 01013  2262     71
+ 8 2021-06-30 Calhoun  Alabama 01015 14776    330
+ 9 2021-06-30 Chambers Alabama 01017  3736    123
+10 2021-06-30 Cherokee Alabama 01019  1874     45
+# … with 3,236 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+* group_by(state)
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 3,246 x 6
+# Groups:   state [55]
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-30 Autauga  Alabama 01001  7257    113
+ 2 2021-06-30 Baldwin  Alabama 01003 22027    315
+ 3 2021-06-30 Barbour  Alabama 01005  2346     60
+ 4 2021-06-30 Bibb     Alabama 01007  2693     64
+ 5 2021-06-30 Blount   Alabama 01009  6987    139
+ 6 2021-06-30 Bullock  Alabama 01011  1249     42
+ 7 2021-06-30 Butler   Alabama 01013  2262     71
+ 8 2021-06-30 Calhoun  Alabama 01015 14776    330
+ 9 2021-06-30 Chambers Alabama 01017  3736    123
+10 2021-06-30 Cherokee Alabama 01019  1874     45
+# … with 3,236 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+* summarize(cases = sum(cases, na.rm = TRUE))
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 55 x 2
+   state                  cases
+   &lt;chr&gt;                  &lt;dbl&gt;
+ 1 Alabama               550983
+ 2 Alaska                 70669
+ 3 Arizona               894875
+ 4 Arkansas              349385
+ 5 California           3816704
+ 6 Colorado              560927
+ 7 Connecticut           349352
+ 8 Delaware              109744
+ 9 District of Columbia   49335
+10 Florida              2321929
+# … with 45 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+* ungroup()
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 55 x 2
+   state                  cases
+   &lt;chr&gt;                  &lt;dbl&gt;
+ 1 Alabama               550983
+ 2 Alaska                 70669
+ 3 Arizona               894875
+ 4 Arkansas              349385
+ 5 California           3816704
+ 6 Colorado              560927
+ 7 Connecticut           349352
+ 8 Delaware              109744
+ 9 District of Columbia   49335
+10 Florida              2321929
+# … with 45 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+* slice_max(cases, n = 6)
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 6 x 2
+  state          cases
+  &lt;chr&gt;          &lt;dbl&gt;
+1 California   3816704
+2 Texas        2993964
+3 Florida      2321929
+4 New York     2113147
+5 Illinois     1395863
+6 Pennsylvania 1216579
+```
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+* pull(state)
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+[1] "California"   "Texas"        "Florida"      "New York"     "Illinois"    
+[6] "Pennsylvania"
+```
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state)
+
+*covid
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+[1] "California"   "Texas"        "Florida"      "New York"     "Illinois"    
+[6] "Pennsylvania"
+```
+
+```
+# A tibble: 1,472,337 x 6
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish   Washington 53061     1      0
+ 2 2020-01-22 Snohomish   Washington 53061     1      0
+ 3 2020-01-23 Snohomish   Washington 53061     1      0
+ 4 2020-01-24 Cook        Illinois   17031     1      0
+ 5 2020-01-24 Snohomish   Washington 53061     1      0
+ 6 2020-01-25 Orange      California 06059     1      0
+ 7 2020-01-25 Cook        Illinois   17031     1      0
+ 8 2020-01-25 Snohomish   Washington 53061     1      0
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0
+10 2020-01-26 Los Angeles California 06037     1      0
+# … with 1,472,327 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state)
+
+covid %&gt;%
+* filter(state %in% c("California", "Florida", "Texas", "New York", "Georgia", "Illinois"))
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+[1] "California"   "Texas"        "Florida"      "New York"     "Illinois"    
+[6] "Pennsylvania"
+```
+
+```
+# A tibble: 320,407 x 6
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-24 Cook        Illinois   17031     1      0
+ 2 2020-01-25 Orange      California 06059     1      0
+ 3 2020-01-25 Cook        Illinois   17031     1      0
+ 4 2020-01-26 Los Angeles California 06037     1      0
+ 5 2020-01-26 Orange      California 06059     1      0
+ 6 2020-01-26 Cook        Illinois   17031     1      0
+ 7 2020-01-27 Los Angeles California 06037     1      0
+ 8 2020-01-27 Orange      California 06059     1      0
+ 9 2020-01-27 Cook        Illinois   17031     1      0
+10 2020-01-28 Los Angeles California 06037     1      0
+# … with 320,397 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state)
+
+covid %&gt;%
+  filter(state %in% c("California", "Florida", "Texas", "New York", "Georgia", "Illinois")) %&gt;%
+* ggplot(aes(x = date, y = cases))
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+[1] "California"   "Texas"        "Florida"      "New York"     "Illinois"    
+[6] "Pennsylvania"
+```
+
+&lt;img src="lecture-07_files/figure-html/q11_auto_10_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state)
+
+covid %&gt;%
+  filter(state %in% c("California", "Florida", "Texas", "New York", "Georgia", "Illinois")) %&gt;%
+  ggplot(aes(x = date, y = cases)) +
+* geom_line(aes(color = state))
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+[1] "California"   "Texas"        "Florida"      "New York"     "Illinois"    
+[6] "Pennsylvania"
+```
+
+&lt;img src="lecture-07_files/figure-html/q11_auto_11_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state)
+
+covid %&gt;%
+  filter(state %in% c("California", "Florida", "Texas", "New York", "Georgia", "Illinois")) %&gt;%
+  ggplot(aes(x = date, y = cases)) +
+  geom_line(aes(color = state)) +
+* facet_wrap(~state)
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+[1] "California"   "Texas"        "Florida"      "New York"     "Illinois"    
+[6] "Pennsylvania"
+```
+
+&lt;img src="lecture-07_files/figure-html/q11_auto_12_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Question 1: Close...
+.panel1-q11-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state)
+
+covid %&gt;%
+  filter(state %in% c("California", "Florida", "Texas", "New York", "Georgia", "Illinois")) %&gt;%
+  ggplot(aes(x = date, y = cases)) +
+  geom_line(aes(color = state)) +
+  facet_wrap(~state) +
+* theme_gray()
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+[1] "California"   "Texas"        "Florida"      "New York"     "Illinois"    
+[6] "Pennsylvania"
+```
+
+&lt;img src="lecture-07_files/figure-html/q11_auto_13_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-q11-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q11-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q11-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+*covid
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 1,472,337 x 6
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish   Washington 53061     1      0
+ 2 2020-01-22 Snohomish   Washington 53061     1      0
+ 3 2020-01-23 Snohomish   Washington 53061     1      0
+ 4 2020-01-24 Cook        Illinois   17031     1      0
+ 5 2020-01-24 Snohomish   Washington 53061     1      0
+ 6 2020-01-25 Orange      California 06059     1      0
+ 7 2020-01-25 Cook        Illinois   17031     1      0
+ 8 2020-01-25 Snohomish   Washington 53061     1      0
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0
+10 2020-01-26 Los Angeles California 06037     1      0
+# … with 1,472,327 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+* filter(date == max(date))
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 3,246 x 6
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-30 Autauga  Alabama 01001  7257    113
+ 2 2021-06-30 Baldwin  Alabama 01003 22027    315
+ 3 2021-06-30 Barbour  Alabama 01005  2346     60
+ 4 2021-06-30 Bibb     Alabama 01007  2693     64
+ 5 2021-06-30 Blount   Alabama 01009  6987    139
+ 6 2021-06-30 Bullock  Alabama 01011  1249     42
+ 7 2021-06-30 Butler   Alabama 01013  2262     71
+ 8 2021-06-30 Calhoun  Alabama 01015 14776    330
+ 9 2021-06-30 Chambers Alabama 01017  3736    123
+10 2021-06-30 Cherokee Alabama 01019  1874     45
+# … with 3,236 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+* group_by(state)
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 3,246 x 6
+# Groups:   state [55]
+   date       county   state   fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2021-06-30 Autauga  Alabama 01001  7257    113
+ 2 2021-06-30 Baldwin  Alabama 01003 22027    315
+ 3 2021-06-30 Barbour  Alabama 01005  2346     60
+ 4 2021-06-30 Bibb     Alabama 01007  2693     64
+ 5 2021-06-30 Blount   Alabama 01009  6987    139
+ 6 2021-06-30 Bullock  Alabama 01011  1249     42
+ 7 2021-06-30 Butler   Alabama 01013  2262     71
+ 8 2021-06-30 Calhoun  Alabama 01015 14776    330
+ 9 2021-06-30 Chambers Alabama 01017  3736    123
+10 2021-06-30 Cherokee Alabama 01019  1874     45
+# … with 3,236 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+* summarize(cases = sum(cases, na.rm = TRUE))
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 55 x 2
+   state                  cases
+   &lt;chr&gt;                  &lt;dbl&gt;
+ 1 Alabama               550983
+ 2 Alaska                 70669
+ 3 Arizona               894875
+ 4 Arkansas              349385
+ 5 California           3816704
+ 6 Colorado              560927
+ 7 Connecticut           349352
+ 8 Delaware              109744
+ 9 District of Columbia   49335
+10 Florida              2321929
+# … with 45 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+* ungroup()
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 55 x 2
+   state                  cases
+   &lt;chr&gt;                  &lt;dbl&gt;
+ 1 Alabama               550983
+ 2 Alaska                 70669
+ 3 Arizona               894875
+ 4 Arkansas              349385
+ 5 California           3816704
+ 6 Colorado              560927
+ 7 Connecticut           349352
+ 8 Delaware              109744
+ 9 District of Columbia   49335
+10 Florida              2321929
+# … with 45 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+* slice_max(cases, n = 6)
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 6 x 2
+  state          cases
+  &lt;chr&gt;          &lt;dbl&gt;
+1 California   3816704
+2 Texas        2993964
+3 Florida      2321929
+4 New York     2113147
+5 Illinois     1395863
+6 Pennsylvania 1216579
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+* pull(state)
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+[1] "California"   "Texas"        "Florida"      "New York"     "Illinois"    
+[6] "Pennsylvania"
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+* top_states
+```
+]
+ 
+.panel2-q1-auto[
+
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+  top_states
+
+*covid
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 1,472,337 x 6
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish   Washington 53061     1      0
+ 2 2020-01-22 Snohomish   Washington 53061     1      0
+ 3 2020-01-23 Snohomish   Washington 53061     1      0
+ 4 2020-01-24 Cook        Illinois   17031     1      0
+ 5 2020-01-24 Snohomish   Washington 53061     1      0
+ 6 2020-01-25 Orange      California 06059     1      0
+ 7 2020-01-25 Cook        Illinois   17031     1      0
+ 8 2020-01-25 Snohomish   Washington 53061     1      0
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0
+10 2020-01-26 Los Angeles California 06037     1      0
+# … with 1,472,327 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+  top_states
+
+covid %&gt;%
+* filter(state %in% top_states)
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 277,440 x 6
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-24 Cook        Illinois   17031     1      0
+ 2 2020-01-25 Orange      California 06059     1      0
+ 3 2020-01-25 Cook        Illinois   17031     1      0
+ 4 2020-01-26 Los Angeles California 06037     1      0
+ 5 2020-01-26 Orange      California 06059     1      0
+ 6 2020-01-26 Cook        Illinois   17031     1      0
+ 7 2020-01-27 Los Angeles California 06037     1      0
+ 8 2020-01-27 Orange      California 06059     1      0
+ 9 2020-01-27 Cook        Illinois   17031     1      0
+10 2020-01-28 Los Angeles California 06037     1      0
+# … with 277,430 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+  top_states
+
+covid %&gt;%
+  filter(state %in% top_states) %&gt;%
+* group_by(state, date)
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 277,440 x 6
+# Groups:   state, date [3,008]
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-24 Cook        Illinois   17031     1      0
+ 2 2020-01-25 Orange      California 06059     1      0
+ 3 2020-01-25 Cook        Illinois   17031     1      0
+ 4 2020-01-26 Los Angeles California 06037     1      0
+ 5 2020-01-26 Orange      California 06059     1      0
+ 6 2020-01-26 Cook        Illinois   17031     1      0
+ 7 2020-01-27 Los Angeles California 06037     1      0
+ 8 2020-01-27 Orange      California 06059     1      0
+ 9 2020-01-27 Cook        Illinois   17031     1      0
+10 2020-01-28 Los Angeles California 06037     1      0
+# … with 277,430 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+  top_states
+
+covid %&gt;%
+  filter(state %in% top_states) %&gt;%
+  group_by(state, date) %&gt;%
+* summarise(cases = sum(cases))
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 3,008 x 3
+# Groups:   state [6]
+   state      date       cases
+   &lt;chr&gt;      &lt;date&gt;     &lt;dbl&gt;
+ 1 California 2020-01-25     1
+ 2 California 2020-01-26     2
+ 3 California 2020-01-27     2
+ 4 California 2020-01-28     2
+ 5 California 2020-01-29     2
+ 6 California 2020-01-30     2
+ 7 California 2020-01-31     3
+ 8 California 2020-02-01     3
+ 9 California 2020-02-02     6
+10 California 2020-02-03     6
+# … with 2,998 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+  top_states
+
+covid %&gt;%
+  filter(state %in% top_states) %&gt;%
+  group_by(state, date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+* ungroup()
+```
+]
+ 
+.panel2-q1-auto[
+
+```
+# A tibble: 3,008 x 3
+   state      date       cases
+   &lt;chr&gt;      &lt;date&gt;     &lt;dbl&gt;
+ 1 California 2020-01-25     1
+ 2 California 2020-01-26     2
+ 3 California 2020-01-27     2
+ 4 California 2020-01-28     2
+ 5 California 2020-01-29     2
+ 6 California 2020-01-30     2
+ 7 California 2020-01-31     3
+ 8 California 2020-02-01     3
+ 9 California 2020-02-02     6
+10 California 2020-02-03     6
+# … with 2,998 more rows
+```
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+  top_states
+
+covid %&gt;%
+  filter(state %in% top_states) %&gt;%
+  group_by(state, date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  ungroup() %&gt;%
+* ggplot(aes(x = date, y = cases, color = state))
+```
+]
+ 
+.panel2-q1-auto[
+&lt;img src="lecture-07_files/figure-html/q1_auto_14_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+  top_states
+
+covid %&gt;%
+  filter(state %in% top_states) %&gt;%
+  group_by(state, date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x = date, y = cases, color = state)) +
+* geom_line(size = 2)
+```
+]
+ 
+.panel2-q1-auto[
+&lt;img src="lecture-07_files/figure-html/q1_auto_15_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+  top_states
+
+covid %&gt;%
+  filter(state %in% top_states) %&gt;%
+  group_by(state, date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x = date, y = cases, color = state)) +
+  geom_line(size = 2) +
+* facet_wrap(~state)
+```
+]
+ 
+.panel2-q1-auto[
+&lt;img src="lecture-07_files/figure-html/q1_auto_16_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+  top_states
+
+covid %&gt;%
+  filter(state %in% top_states) %&gt;%
+  group_by(state, date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x = date, y = cases, color = state)) +
+  geom_line(size = 2) +
+  facet_wrap(~state) +
+* ggthemes::theme_gdocs()
+```
+]
+ 
+.panel2-q1-auto[
+&lt;img src="lecture-07_files/figure-html/q1_auto_17_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+  top_states
+
+covid %&gt;%
+  filter(state %in% top_states) %&gt;%
+  group_by(state, date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x = date, y = cases, color = state)) +
+  geom_line(size = 2) +
+  facet_wrap(~state) +
+  ggthemes::theme_gdocs() +
+* theme(legend.position = 'NA')
+```
+]
+ 
+.panel2-q1-auto[
+&lt;img src="lecture-07_files/figure-html/q1_auto_18_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Question 1: State Level
+.panel1-q1-auto[
+
+```r
+covid %&gt;%
+  filter(date == max(date)) %&gt;%
+  group_by(state) %&gt;%
+  summarize(cases = sum(cases, na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  slice_max(cases, n = 6) %&gt;%
+  pull(state) -&gt;
+  top_states
+
+covid %&gt;%
+  filter(state %in% top_states) %&gt;%
+  group_by(state, date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x = date, y = cases, color = state)) +
+  geom_line(size = 2) +
+  facet_wrap(~state) +
+  ggthemes::theme_gdocs() +
+  theme(legend.position = 'NA') +
+* labs(title = "Cummulative Case Counts",
+*      subtitle = "Data Source: NY-Times",
+*      x = "Date",
+*      y = "Cases",
+*      caption = "Daily Exercise 06")
+```
+]
+ 
+.panel2-q1-auto[
+&lt;img src="lecture-07_files/figure-html/q1_auto_19_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-q1-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q1-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q1-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+# Question 2: National Level
+.panel1-q2-auto[
+
+```r
+*covid
+```
+]
+ 
+.panel2-q2-auto[
+
+```
+# A tibble: 1,472,337 x 6
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish   Washington 53061     1      0
+ 2 2020-01-22 Snohomish   Washington 53061     1      0
+ 3 2020-01-23 Snohomish   Washington 53061     1      0
+ 4 2020-01-24 Cook        Illinois   17031     1      0
+ 5 2020-01-24 Snohomish   Washington 53061     1      0
+ 6 2020-01-25 Orange      California 06059     1      0
+ 7 2020-01-25 Cook        Illinois   17031     1      0
+ 8 2020-01-25 Snohomish   Washington 53061     1      0
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0
+10 2020-01-26 Los Angeles California 06037     1      0
+# … with 1,472,327 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 2: National Level
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+* group_by(date)
+```
+]
+ 
+.panel2-q2-auto[
+
+```
+# A tibble: 1,472,337 x 6
+# Groups:   date [527]
+   date       county      state      fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish   Washington 53061     1      0
+ 2 2020-01-22 Snohomish   Washington 53061     1      0
+ 3 2020-01-23 Snohomish   Washington 53061     1      0
+ 4 2020-01-24 Cook        Illinois   17031     1      0
+ 5 2020-01-24 Snohomish   Washington 53061     1      0
+ 6 2020-01-25 Orange      California 06059     1      0
+ 7 2020-01-25 Cook        Illinois   17031     1      0
+ 8 2020-01-25 Snohomish   Washington 53061     1      0
+ 9 2020-01-26 Maricopa    Arizona    04013     1      0
+10 2020-01-26 Los Angeles California 06037     1      0
+# … with 1,472,327 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 2: National Level
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+  group_by(date) %&gt;%
+* summarize(cases = sum(cases))
+```
+]
+ 
+.panel2-q2-auto[
+
+```
+# A tibble: 527 x 2
+   date       cases
+   &lt;date&gt;     &lt;dbl&gt;
+ 1 2020-01-21     1
+ 2 2020-01-22     1
+ 3 2020-01-23     1
+ 4 2020-01-24     2
+ 5 2020-01-25     3
+ 6 2020-01-26     5
+ 7 2020-01-27     5
+ 8 2020-01-28     5
+ 9 2020-01-29     5
+10 2020-01-30     6
+# … with 517 more rows
+```
+]
+
+---
+count: false
+ 
+# Question 2: National Level
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+  group_by(date) %&gt;%
+  summarize(cases = sum(cases)) %&gt;%
+* ggplot(aes(x = date, y = cases))
+```
+]
+ 
+.panel2-q2-auto[
+&lt;img src="lecture-07_files/figure-html/q2_auto_04_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# Question 2: National Level
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+  group_by(date) %&gt;%
+  summarize(cases = sum(cases)) %&gt;%
+  ggplot(aes(x = date, y = cases)) +
+* geom_col(fill = "darkred", color = "darkred", alpha = .25)
+```
+]
+ 
+.panel2-q2-auto[
+&lt;img src="lecture-07_files/figure-html/q2_auto_05_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# Question 2: National Level
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+  group_by(date) %&gt;%
+  summarize(cases = sum(cases)) %&gt;%
+  ggplot(aes(x = date, y = cases)) +
+  geom_col(fill = "darkred", color = "darkred", alpha = .25) +
+* geom_line(color = "darkred", size = 3)
+```
+]
+ 
+.panel2-q2-auto[
+&lt;img src="lecture-07_files/figure-html/q2_auto_06_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# Question 2: National Level
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+  group_by(date) %&gt;%
+  summarize(cases = sum(cases)) %&gt;%
+  ggplot(aes(x = date, y = cases)) +
+  geom_col(fill = "darkred", color = "darkred", alpha = .25) +
+  geom_line(color = "darkred", size = 3) +
+* ggthemes::theme_gdocs()
+```
+]
+ 
+.panel2-q2-auto[
+&lt;img src="lecture-07_files/figure-html/q2_auto_07_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+# Question 2: National Level
+.panel1-q2-auto[
+
+```r
+covid %&gt;%
+  group_by(date) %&gt;%
+  summarize(cases = sum(cases)) %&gt;%
+  ggplot(aes(x = date, y = cases)) +
+  geom_col(fill = "darkred", color = "darkred", alpha = .25) +
+  geom_line(color = "darkred", size = 3) +
+  ggthemes::theme_gdocs() +
+* labs(title = "National Cummulative Case Counts",
+*      x = "Date",
+*      y = "Cases",
+*      caption = "Daily Exercise 06")
+```
+]
+ 
+.panel2-q2-auto[
+&lt;img src="lecture-07_files/figure-html/q2_auto_08_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-q2-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q2-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q2-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+class: middle, center, inverse
+# Joining Data
+---
+
+# Relational Data
+
+- There will come a time when you need data from different sources. 
+
+--
+
+- When this happens we must join -- or merge -- mutliple tables
+
+--
+
+- Multiple tables of data are called *relational data** because the relations are an equal part of the data
+
+--
+
+- To merge data, we have to find a point of _commonality_
+
+--
+
+- That point -- or attribute -- of _commonality_ is the _realtion_
+
+---
+
+# Relational Data
+
+To work with relational data we need "verbs" that work with _pairs_ (**2**) of tables.
+
+--
+
+ - **Mutating joins**: add *new* variables to one table from matching observations in another.
+
+--
+
+ - **Filtering joins**:  filter observations from one table if they match an observation in the other table.
+
+--
+
+ - **Set operations**: treat observations as if they were set elements.
+
+--
+
+The most common place to find relational data is in a relational database management system (or RDBMS)
+
+
+---
+
+# Keys
+
+- The _variables_ used to connect a pair tables are called **keys**.
+
+--
+
+- A key is a variable (or set of variables) that uniquely identifies an observation or "unit". 
+
+--
+
+- Sometimes, a single variable is enough...
+  - For example, each county in the USA is uniquely identified by its FIP code.
+  - Each state is unique identified by its name
+  - ...
+
+--
+
+In other cases, multiple variables may be needed.
+
+---
+
+# Keys
+
+There are two types of keys:
+
+--
+
+- **Primary keys**: *uniquely* identify observations in its own table. 
+
+--
+
+- **Foreign keys**: *uniquely* identify observations in another table. 
+
+--
+
+- A _primary_ key and a corresponding _foreign_ key form a _relation._ 
+
+--
+
+- Relations are typically one-to-many but can be one-to-one
+
+---
+
+# A quick note on surrogate keys
+
+- Sometimes a table doesn’t have an explicit primary key.
+
+--
+
+- If a table lacks a primary key, it’s sometimes useful to add one with mutate() and row_number(). 
+
+--
+
+- Doing this creates a surrogate key.
+
+--
+
+
+```r
+gapminder %&gt;% 
+  slice(1:5) %&gt;% 
+  mutate(surrogate = row_number())
+```
+
+```
+# A tibble: 5 x 7
+  country     continent  year lifeExp      pop gdpPercap surrogate
+  &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;     &lt;int&gt;
+1 Afghanistan Asia       1952    28.8  8425333      779.         1
+2 Afghanistan Asia       1957    30.3  9240934      821.         2
+3 Afghanistan Asia       1962    32.0 10267083      853.         3
+4 Afghanistan Asia       1967    34.0 11537966      836.         4
+5 Afghanistan Asia       1972    36.1 13079460      740.         5
+```
+
+---
+
+# Todays Data:
+
+.pull-left[
+
+```r
+band_members
+```
+
+```
+# A tibble: 3 x 2
+  name  band   
+  &lt;chr&gt; &lt;chr&gt;  
+1 Mick  Stones 
+2 John  Beatles
+3 Paul  Beatles
+```
+]
+
+.pull-right[
+
+```r
+band_instruments
+```
+
+```
+# A tibble: 3 x 2
+  name  plays 
+  &lt;chr&gt; &lt;chr&gt; 
+1 John  guitar
+2 Paul  bass  
+3 Keith guitar
+```
+]
+
+
+---
+class: inverse, center, middle
+# Mutating Joins
+add *new* variables to one table from matching observations in another.
+---
+
+class: center,middle
+# The basics
+&lt;img src="lec-img/07-joins.png"&gt; 
+
+---
+
+# Inner Join
+
+**inner_join(x, y)**: Return all rows from _x_ where there are matching values in _y_, and all columns from x and y. 
+
+If there are multiple matches between x and y, all combination of the matches are returned. This is a mutating join.
+
+--
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+--
+
+****
+
+### inner_join(band_members, band_instruments, by = "name")
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;Beatles&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;guitar&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;Beatles&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;bass&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Left Join
+
+**left_join(x, y)**: Return all rows from _x_, and all columns from _x_ and _y_. 
+
+If there are multiple matches between x and y, all combination of the matches are returned. 
+--
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+--
+
+****
+
+### left_join(band_members, band_instruments, by = "name")
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;Stones&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: red !important;"&gt;NA&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;Beatles&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;guitar&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;Beatles&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;bass&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Right Join
+
+**right_join(x, y)**: Return all rows from _x_ where there are matching values in _y_, and all columns from _x_ and _y_. 
+
+If there are multiple matches between x and y, all combination of the matches are returned.
+
+--
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+--
+
+****
+
+### right_join(band_members, band_instruments, by = "name")
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;Beatles&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;guitar&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;Beatles&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;bass&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: red !important;"&gt;NA&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;guitar&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# Full Join
+
+**full_join(x, y)**: Return all rows and columns from both _x_ and _y_.
+
+--
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+--
+
+****
+
+### full_join(band_members, band_instruments, by = "name")
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: yellow !important;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;Stones&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: red !important;"&gt;NA&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;Beatles&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;guitar&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;Beatles&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;bass&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: red !important;"&gt;NA&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: black !important;"&gt;guitar&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+class: center,middle
+&lt;img src="lec-img/07-joins.png"&gt; 
+---
+class: middle, center, inverse 
+# Filtering Joins
+
+"Filtering" joins keep cases from the LHS
+---
+
+# Semi Join
+
+**semi_join(x, y)**:  Return all rows from _x_ where there are matching values in _ y_, keeping just columns from _x_. 
+
+--
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+--
+
+****
+
+### semi_join(band_members, band_instruments, by = "name")
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: darkred !important;background-color: white !important;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: darkred !important;background-color: white !important;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: darkred !important;background-color: white !important;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: darkred !important;background-color: white !important;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: gray50 !important;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: gray50 !important;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: gray50 !important;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: gray50 !important;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+# Anti Join
+
+**anti_join(x, y)**: Return all rows from _x_ where there are **not** matching values in _y_, keeping just columns from _x_. 
+
+--
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+--
+
+****
+
+### anti_join(band_members, band_instruments, by = "name")
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; float: left; margin-right: 10px;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: darkred !important;background-color: white !important;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: darkred !important;background-color: white !important;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; margin-right: 0; margin-left: auto"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: gray50 !important;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: gray50 !important;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: gray50 !important;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: navy !important;background-color: gray50 !important;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+--
+
+****
+
+&lt;table class="table" style="font-size: 24px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+---
+
+# When keys dont share a name
+
+.pull-left[
+
+```r
+(band_members2 = band_members %&gt;% 
+  select(first_name = name, band))
+```
+
+```
+# A tibble: 3 x 2
+  first_name band   
+  &lt;chr&gt;      &lt;chr&gt;  
+1 Mick       Stones 
+2 John       Beatles
+3 Paul       Beatles
+```
+]
+
+.pull-right[
+
+```r
+inner_join(band_members2, 
+           band_instruments, 
+           by = c('first_name' = 'name'))
+```
+
+```
+# A tibble: 2 x 3
+  first_name band    plays 
+  &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt; 
+1 John       Beatles guitar
+2 Paul       Beatles bass  
+```
+]
+
+---
+class: inverse, center, middle
+# Pivots
+---
+
+# Data **structure** vs Data **format**
+
+data.frames are a list with atomic vecotrs of the same length. 
+
+data.frame (and list and vector) are data structures
+
+The format of the data.frame however can be widely variable....
+
+---
+
+# For example ...
+
+You can represent the same underlying data in multiple ways. Each of these records data for country, population and cases in a different way....
+
+
+
+
+.pull-left[
+
+```
+# A tibble: 8 x 4
+  country  year type       value
+  &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;
+1 Brazil   1952 lifeExp     50.9
+2 Brazil   1952 gdpPercap 2109. 
+3 Brazil   2007 lifeExp     72.4
+4 Brazil   2007 gdpPercap 9066. 
+5 India    1952 lifeExp     37.4
+6 India    1952 gdpPercap  547. 
+7 India    2007 lifeExp     64.7
+8 India    2007 gdpPercap 2452. 
+```
+
+```
+# A tibble: 4 x 3
+  country  year values              
+  &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;               
+1 Brazil   1952 50.917 / 2108.944355
+2 Brazil   2007 72.39 / 9065.800825 
+3 India    1952 37.373 / 546.5657493
+4 India    2007 64.698 / 2452.210407
+```
+
+]
+
+.pull-right[
+
+```
+# A tibble: 4 x 4
+  country  year lifeExp gdpPercap
+  &lt;fct&gt;   &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+1 Brazil   1952    50.9     2109.
+2 Brazil   2007    72.4     9066.
+3 India    1952    37.4      547.
+4 India    2007    64.7     2452.
+```
+
+```
+# A tibble: 2 x 3
+  country `1952` `2007`
+  &lt;fct&gt;    &lt;dbl&gt;  &lt;dbl&gt;
+1 Brazil   2109.  9066.
+2 India     547.  2452.
+```
+
+```
+# A tibble: 2 x 3
+  country `1952` `2007`
+  &lt;fct&gt;    &lt;dbl&gt;  &lt;dbl&gt;
+1 Brazil    50.9   72.4
+2 India     37.4   64.7
+```
+]
+
+---
+
+# Data Format -- the quest for ["tidy data"](https://r4ds.had.co.nz/tidy-data.html)
+
+These are all representations of the same underlying data, but they are not equally easy to use. One dataset, the [tidy dataset](https://www.jstatsoft.org/article/view/v059i10), will be much easier to work with inside the **tidy**verse.
+
+--
+
+Tidy data demands three interrelated rules
+
+--
+
+- Each variable must have its own column.
+
+--
+
+- Each observation must have its own row.
+
+--
+
+- Each value must have its own cell.
+
+--
+
+&lt;img src="lec-img/07-tidy.png" width = "50%"&gt;
+
+--
+
+It’s impossible to only satisfy `\(2/3\)` so ...  an simpler guideline:
+
+--
+
+1. Put each dataset in a tibble.
+
+--
+
+2. Put each variable in a column.
+
+---
+# The world is messy ...
+
+- For most real problems, you’ll need to do some cleaning/tidying 
+
+--
+
+- Once you understand what data you have, you typically have to  resolve one of two common issues:
+
+--
+
+  - One variable might be spread across multiple columns.
+ 
+--
+  - One observation might be scattered across multiple rows.
+
+--
+
+- To fix these, we look at the `tidyr` package (within the tidyverse)
+
+---
+
+# Longer
+
+A common issues is a dataset where some of the column names are not _names_, but rather **values** we want:
+
+
+```
+# A tibble: 2 x 3
+  country `1952` `2007`
+  &lt;fct&gt;    &lt;dbl&gt;  &lt;dbl&gt;
+1 Brazil    50.9   72.4
+2 India     37.4   64.7
+```
+
+---
+# Longer (and narrower)
+
+- To make the column names an attribute of the dataset, we need to pivot the data
+- This pivot will effectively make the data longer and narrower...
+- To do this we look to `tidyr::pivot_longer()`
+
+&lt;center&gt;
+&lt;img src="lec-img/07-longer.png" width="75%"&gt;
+&lt;/center&gt;
+
+---
+
+# Longer
+
+.pull-left[
+
+```r
+lifeExp_tab
+```
+
+```
+# A tibble: 2 x 3
+  country `1952` `2007`
+  &lt;fct&gt;    &lt;dbl&gt;  &lt;dbl&gt;
+1 Brazil    50.9   72.4
+2 India     37.4   64.7
+```
+]
+
+.pull-right[
+
+```r
+lifeExp_tab %&gt;% 
+  pivot_longer(cols = c(`1952`, `2007`), 
+               names_to = "year", 
+               values_to = "lifeExp")
+```
+
+```
+# A tibble: 4 x 3
+  country year  lifeExp
+  &lt;fct&gt;   &lt;chr&gt;   &lt;dbl&gt;
+1 Brazil  1952     50.9
+2 Brazil  2007     72.4
+3 India   1952     37.4
+4 India   2007     64.7
+```
+]
+
+---
+
+# Putting it together ...
+
+
+```r
+long4a = lifeExp_tab %&gt;% 
+  pivot_longer(c(`1952`, `2007`), names_to = "year", values_to = "lifeExp")
+
+long4b = gdpPercap_tab %&gt;% 
+  pivot_longer(c(`1952`, `2007`), names_to = "year", values_to = "gdpPercap")
+
+left_join(long4a, long4b)
+```
+
+```
+# A tibble: 4 x 4
+  country year  lifeExp gdpPercap
+  &lt;fct&gt;   &lt;chr&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+1 Brazil  1952     50.9     2109.
+2 Brazil  2007     72.4     9066.
+3 India   1952     37.4      547.
+4 India   2007     64.7     2452.
+```
+
+
+---
+
+# Wider (and shorter)
+
+- `pivot_wider()` is the opposite of `pivot_longer()`. 
+
+- We use it to solve the opposite problem... when an observation is scattered across multiple rows. 
+
+
+```r
+table2
+```
+
+```
+# A tibble: 8 x 4
+  country  year type       value
+  &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;
+1 Brazil   1952 lifeExp     50.9
+2 Brazil   1952 gdpPercap 2109. 
+3 Brazil   2007 lifeExp     72.4
+4 Brazil   2007 gdpPercap 9066. 
+5 India    1952 lifeExp     37.4
+6 India    1952 gdpPercap  547. 
+7 India    2007 lifeExp     64.7
+8 India    2007 gdpPercap 2452. 
+```
+
+---
+# Wider (and shorter)
+
+- To allow an  attribute to define a variable name, we need to pivot the data
+- This pivot will effectively make the data wider and shorter
+- To do this we look to `tidyr::pivot_wider()`
+
+&lt;center&gt;
+&lt;img src="lec-img/07-wider.png" width="75%"&gt;
+&lt;/center&gt;
+
+---
+# Wider
+
+.pull-left[
+
+```r
+table2
+```
+
+```
+# A tibble: 8 x 4
+  country  year type       value
+  &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;
+1 Brazil   1952 lifeExp     50.9
+2 Brazil   1952 gdpPercap 2109. 
+3 Brazil   2007 lifeExp     72.4
+4 Brazil   2007 gdpPercap 9066. 
+5 India    1952 lifeExp     37.4
+6 India    1952 gdpPercap  547. 
+7 India    2007 lifeExp     64.7
+8 India    2007 gdpPercap 2452. 
+```
+]
+
+.pull-right[
+
+```r
+table2 %&gt;%
+    pivot_wider(names_from = type, values_from = value)
+```
+
+```
+# A tibble: 4 x 4
+  country  year lifeExp gdpPercap
+  &lt;fct&gt;   &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+1 Brazil   1952    50.9     2109.
+2 Brazil   2007    72.4     9066.
+3 India    1952    37.4      547.
+4 India    2007    64.7     2452.
+```
+]
+
+---
+
+# When **wide** is right!
+
+- All `dplyr` data manipulation works on columns and rows
+- So when we are `filtering`, `selecting`, `mutating`,  `grouping`, and `summarizing` wide data is best
+
+--
+
+# When long is right!
+
+- Yesterday we noted that ggplot prefers data to be long.
+- This is because when applying aesthetics or facets we want the variable to be an attribute of the dataset
+
+--
+
+#For example ...
+
+---
+
+.pull-left[
+## Wide
+
+```r
+table1 %&gt;% 
+ggplot(aes(x = year, y = gdpPercap)) +
+geom_line(aes(color = country)) + 
+  facet_wrap(~country) + 
+theme_bw() + 
+  theme(legend.position = "none")
+```
+
+&lt;img src="lecture-07_files/figure-html/unnamed-chunk-37-1.png" width="432" /&gt;
+]
+
+.pull-right[
+# Long
+
+```r
+table2 %&gt;% 
+ggplot(aes(x = year, y = value)) +
+geom_line(aes(color = country)) + 
+  facet_grid(type~country, scales = "free_y") + 
+theme_bw() + 
+  theme(legend.position = "none")
+```
+
+&lt;img src="lecture-07_files/figure-html/unnamed-chunk-38-1.png" width="432" /&gt;
+]
+
+
+---
+
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-pivot-long-auto[
+
+```
+# A tibble: 1,704 x 6
+   country     continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333      779.
+ 2 Afghanistan Asia       1957    30.3  9240934      821.
+ 3 Afghanistan Asia       1962    32.0 10267083      853.
+ 4 Afghanistan Asia       1967    34.0 11537966      836.
+ 5 Afghanistan Asia       1972    36.1 13079460      740.
+ 6 Afghanistan Asia       1977    38.4 14880372      786.
+ 7 Afghanistan Asia       1982    39.9 12881816      978.
+ 8 Afghanistan Asia       1987    40.8 13867957      852.
+ 9 Afghanistan Asia       1992    41.7 16317921      649.
+10 Afghanistan Asia       1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+* filter(country %in%
+*          c("Canada", "United States", "Mexico", "Nicaragua", "Honduras"))
+```
+]
+ 
+.panel2-pivot-long-auto[
+
+```
+# A tibble: 60 x 6
+   country continent  year lifeExp      pop gdpPercap
+   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+ 1 Canada  Americas   1952    68.8 14785584    11367.
+ 2 Canada  Americas   1957    70.0 17010154    12490.
+ 3 Canada  Americas   1962    71.3 18985849    13462.
+ 4 Canada  Americas   1967    72.1 20819767    16077.
+ 5 Canada  Americas   1972    72.9 22284500    18971.
+ 6 Canada  Americas   1977    74.2 23796400    22091.
+ 7 Canada  Americas   1982    75.8 25201900    22899.
+ 8 Canada  Americas   1987    76.9 26549700    26627.
+ 9 Canada  Americas   1992    78.0 28523502    26343.
+10 Canada  Americas   1997    78.6 30305843    28955.
+# … with 50 more rows
+```
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+* select(country, year, lifeExp, gdpPercap)
+```
+]
+ 
+.panel2-pivot-long-auto[
+
+```
+# A tibble: 60 x 4
+   country  year lifeExp gdpPercap
+   &lt;fct&gt;   &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+ 1 Canada   1952    68.8    11367.
+ 2 Canada   1957    70.0    12490.
+ 3 Canada   1962    71.3    13462.
+ 4 Canada   1967    72.1    16077.
+ 5 Canada   1972    72.9    18971.
+ 6 Canada   1977    74.2    22091.
+ 7 Canada   1982    75.8    22899.
+ 8 Canada   1987    76.9    26627.
+ 9 Canada   1992    78.0    26343.
+10 Canada   1997    78.6    28955.
+# … with 50 more rows
+```
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+  select(country, year, lifeExp, gdpPercap) %&gt;%
+* pivot_longer(cols = c('lifeExp', 'gdpPercap'))
+```
+]
+ 
+.panel2-pivot-long-auto[
+
+```
+# A tibble: 120 x 4
+   country  year name        value
+   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;       &lt;dbl&gt;
+ 1 Canada   1952 lifeExp      68.8
+ 2 Canada   1952 gdpPercap 11367. 
+ 3 Canada   1957 lifeExp      70.0
+ 4 Canada   1957 gdpPercap 12490. 
+ 5 Canada   1962 lifeExp      71.3
+ 6 Canada   1962 gdpPercap 13462. 
+ 7 Canada   1967 lifeExp      72.1
+ 8 Canada   1967 gdpPercap 16077. 
+ 9 Canada   1972 lifeExp      72.9
+10 Canada   1972 gdpPercap 18971. 
+# … with 110 more rows
+```
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+  select(country, year, lifeExp, gdpPercap) %&gt;%
+  pivot_longer(cols = c('lifeExp', 'gdpPercap')) %&gt;%
+* ggplot(aes(x = year, y = value))
+```
+]
+ 
+.panel2-pivot-long-auto[
+&lt;img src="lecture-07_files/figure-html/pivot-long_auto_05_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+  select(country, year, lifeExp, gdpPercap) %&gt;%
+  pivot_longer(cols = c('lifeExp', 'gdpPercap')) %&gt;%
+  ggplot(aes(x = year, y = value)) +
+* geom_line(col = 'gray80')
+```
+]
+ 
+.panel2-pivot-long-auto[
+&lt;img src="lecture-07_files/figure-html/pivot-long_auto_06_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+  select(country, year, lifeExp, gdpPercap) %&gt;%
+  pivot_longer(cols = c('lifeExp', 'gdpPercap')) %&gt;%
+  ggplot(aes(x = year, y = value)) +
+  geom_line(col = 'gray80') +
+* geom_point(aes(col = country))
+```
+]
+ 
+.panel2-pivot-long-auto[
+&lt;img src="lecture-07_files/figure-html/pivot-long_auto_07_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+  select(country, year, lifeExp, gdpPercap) %&gt;%
+  pivot_longer(cols = c('lifeExp', 'gdpPercap')) %&gt;%
+  ggplot(aes(x = year, y = value)) +
+  geom_line(col = 'gray80') +
+  geom_point(aes(col = country)) +
+* labs(x = "", y = "Year",
+*      title = "North America: GDP &amp; Life Expectancy",
+*      subtitle = "1950-2007",
+*      caption = "Data: Gapminder R package")
+```
+]
+ 
+.panel2-pivot-long-auto[
+&lt;img src="lecture-07_files/figure-html/pivot-long_auto_08_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+  select(country, year, lifeExp, gdpPercap) %&gt;%
+  pivot_longer(cols = c('lifeExp', 'gdpPercap')) %&gt;%
+  ggplot(aes(x = year, y = value)) +
+  geom_line(col = 'gray80') +
+  geom_point(aes(col = country)) +
+  labs(x = "", y = "Year",
+       title = "North America: GDP &amp; Life Expectancy",
+       subtitle = "1950-2007",
+       caption = "Data: Gapminder R package") +
+* facet_grid(name~country, scales = "free_y")
+```
+]
+ 
+.panel2-pivot-long-auto[
+&lt;img src="lecture-07_files/figure-html/pivot-long_auto_09_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+  select(country, year, lifeExp, gdpPercap) %&gt;%
+  pivot_longer(cols = c('lifeExp', 'gdpPercap')) %&gt;%
+  ggplot(aes(x = year, y = value)) +
+  geom_line(col = 'gray80') +
+  geom_point(aes(col = country)) +
+  labs(x = "", y = "Year",
+       title = "North America: GDP &amp; Life Expectancy",
+       subtitle = "1950-2007",
+       caption = "Data: Gapminder R package") +
+  facet_grid(name~country, scales = "free_y") +
+* theme_linedraw()
+```
+]
+ 
+.panel2-pivot-long-auto[
+&lt;img src="lecture-07_files/figure-html/pivot-long_auto_10_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+  select(country, year, lifeExp, gdpPercap) %&gt;%
+  pivot_longer(cols = c('lifeExp', 'gdpPercap')) %&gt;%
+  ggplot(aes(x = year, y = value)) +
+  geom_line(col = 'gray80') +
+  geom_point(aes(col = country)) +
+  labs(x = "", y = "Year",
+       title = "North America: GDP &amp; Life Expectancy",
+       subtitle = "1950-2007",
+       caption = "Data: Gapminder R package") +
+  facet_grid(name~country, scales = "free_y") +
+  theme_linedraw() +
+* theme(legend.position = "none")
+```
+]
+ 
+.panel2-pivot-long-auto[
+&lt;img src="lecture-07_files/figure-html/pivot-long_auto_11_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+  select(country, year, lifeExp, gdpPercap) %&gt;%
+  pivot_longer(cols = c('lifeExp', 'gdpPercap')) %&gt;%
+  ggplot(aes(x = year, y = value)) +
+  geom_line(col = 'gray80') +
+  geom_point(aes(col = country)) +
+  labs(x = "", y = "Year",
+       title = "North America: GDP &amp; Life Expectancy",
+       subtitle = "1950-2007",
+       caption = "Data: Gapminder R package") +
+  facet_grid(name~country, scales = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "none") +
+* theme(axis.text.x = element_text(angle = 90, face = "bold"))
+```
+]
+ 
+.panel2-pivot-long-auto[
+&lt;img src="lecture-07_files/figure-html/pivot-long_auto_12_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+  select(country, year, lifeExp, gdpPercap) %&gt;%
+  pivot_longer(cols = c('lifeExp', 'gdpPercap')) %&gt;%
+  ggplot(aes(x = year, y = value)) +
+  geom_line(col = 'gray80') +
+  geom_point(aes(col = country)) +
+  labs(x = "", y = "Year",
+       title = "North America: GDP &amp; Life Expectancy",
+       subtitle = "1950-2007",
+       caption = "Data: Gapminder R package") +
+  facet_grid(name~country, scales = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "none") +
+  theme(axis.text.x = element_text(angle = 90, face = "bold")) +
+* theme(plot.subtitle = element_text(color = "navy", face = "bold"))
+```
+]
+ 
+.panel2-pivot-long-auto[
+&lt;img src="lecture-07_files/figure-html/pivot-long_auto_13_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Pivot within workflow...
+.panel1-pivot-long-auto[
+
+```r
+gapminder %&gt;%
+  filter(country %in%
+           c("Canada", "United States", "Mexico", "Nicaragua", "Honduras")) %&gt;%
+  select(country, year, lifeExp, gdpPercap) %&gt;%
+  pivot_longer(cols = c('lifeExp', 'gdpPercap')) %&gt;%
+  ggplot(aes(x = year, y = value)) +
+  geom_line(col = 'gray80') +
+  geom_point(aes(col = country)) +
+  labs(x = "", y = "Year",
+       title = "North America: GDP &amp; Life Expectancy",
+       subtitle = "1950-2007",
+       caption = "Data: Gapminder R package") +
+  facet_grid(name~country, scales = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "none") +
+  theme(axis.text.x = element_text(angle = 90, face = "bold")) +
+  theme(plot.subtitle = element_text(color = "navy", face = "bold")) +
+* theme(plot.caption  = element_text(color = "gray50", face = "italic"))
+```
+]
+ 
+.panel2-pivot-long-auto[
+&lt;img src="lecture-07_files/figure-html/pivot-long_auto_14_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-pivot-long-auto {
+  color: black;
+  width: 48.5%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-pivot-long-auto {
+  color: black;
+  width: 48.5%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-pivot-long-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+class: center, middle, inverse
+# Returning to a Day 2 example...
+---
+
+#Region/State windmills per km2...
+
+
+```r
+library(sf)
+
+us_wind &lt;- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-11-06/us_wind.csv" %&gt;% 
+  read_csv()  %&gt;% 
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;% 
+  select(case_id, t_state)
+
+states = USAboundaries::us_states(resolution = "low")  %&gt;% 
+  select('state_abbr')
+
+region = data.frame(state_abbr = state.abb, region = state.region)
+```
+
+---
+
+# Our 3 datasets...
+  
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;State Spatial File&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; state_abbr &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; geometry &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; ME &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MULTIPOLYGON (((-68.92401 4... &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; HI &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MULTIPOLYGON (((-156.0497 1... &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AZ &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MULTIPOLYGON (((-114.7997 3... &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AR &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MULTIPOLYGON (((-94.61792 3... &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; DE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MULTIPOLYGON (((-75.77379 3... &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; GA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MULTIPOLYGON (((-85.60516 3... &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;br&gt;&lt;br&gt;
+
+&lt;table class="table" style="float: left; margin-right: 10px;"&gt;
+&lt;caption&gt;Wind Turbines&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; case_id &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; t_state &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3073429 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3071522 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3073425 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3071569 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3005252 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3003862 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="margin-right: 0; margin-left: auto"&gt;
+&lt;caption&gt;Region Classification&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; state_abbr &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; region &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AL &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; South &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AK &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; West &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AZ &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; West &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AR &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; South &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; West &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CO &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; West &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+*us_wind
+```
+]
+ 
+.panel2-wind4-auto[
+
+```
+# A tibble: 57,856 x 2
+   case_id t_state
+     &lt;dbl&gt; &lt;chr&gt;  
+ 1 3073429 CA     
+ 2 3071522 CA     
+ 3 3073425 CA     
+ 4 3071569 CA     
+ 5 3005252 CA     
+ 6 3003862 CA     
+ 7 3073370 CA     
+ 8 3010101 CA     
+ 9 3073324 CA     
+10 3072659 CA     
+# … with 57,846 more rows
+```
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+* filter(!t_state %in% c("AK", "PR", "HI", "GU"))
+```
+]
+ 
+.panel2-wind4-auto[
+
+```
+# A tibble: 57,856 x 2
+   case_id t_state
+     &lt;dbl&gt; &lt;chr&gt;  
+ 1 3073429 CA     
+ 2 3071522 CA     
+ 3 3073425 CA     
+ 4 3071569 CA     
+ 5 3005252 CA     
+ 6 3003862 CA     
+ 7 3073370 CA     
+ 8 3010101 CA     
+ 9 3073324 CA     
+10 3072659 CA     
+# … with 57,846 more rows
+```
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+* select(t_state)
+```
+]
+ 
+.panel2-wind4-auto[
+
+```
+# A tibble: 57,856 x 1
+   t_state
+   &lt;chr&gt;  
+ 1 CA     
+ 2 CA     
+ 3 CA     
+ 4 CA     
+ 5 CA     
+ 6 CA     
+ 7 CA     
+ 8 CA     
+ 9 CA     
+10 CA     
+# … with 57,846 more rows
+```
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+* group_by(t_state)
+```
+]
+ 
+.panel2-wind4-auto[
+
+```
+# A tibble: 57,856 x 1
+# Groups:   t_state [41]
+   t_state
+   &lt;chr&gt;  
+ 1 CA     
+ 2 CA     
+ 3 CA     
+ 4 CA     
+ 5 CA     
+ 6 CA     
+ 7 CA     
+ 8 CA     
+ 9 CA     
+10 CA     
+# … with 57,846 more rows
+```
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+* summarise(n = n())
+```
+]
+ 
+.panel2-wind4-auto[
+
+```
+# A tibble: 41 x 2
+   t_state     n
+   &lt;chr&gt;   &lt;int&gt;
+ 1 AR          1
+ 2 AZ        144
+ 3 CA       9037
+ 4 CO       2278
+ 5 CT          3
+ 6 DE          1
+ 7 FL          1
+ 8 IA       4280
+ 9 ID        541
+10 IL       2602
+# … with 31 more rows
+```
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+* ungroup()
+```
+]
+ 
+.panel2-wind4-auto[
+
+```
+# A tibble: 41 x 2
+   t_state     n
+   &lt;chr&gt;   &lt;int&gt;
+ 1 AR          1
+ 2 AZ        144
+ 3 CA       9037
+ 4 CO       2278
+ 5 CT          3
+ 6 DE          1
+ 7 FL          1
+ 8 IA       4280
+ 9 ID        541
+10 IL       2602
+# … with 31 more rows
+```
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+* inner_join(states, by = c("t_state" = "state_abbr" ))
+```
+]
+ 
+.panel2-wind4-auto[
+
+```
+# A tibble: 41 x 3
+   t_state     n                                                      geometry
+   &lt;chr&gt;   &lt;int&gt;                                            &lt;MULTIPOLYGON [°]&gt;
+ 1 AR          1 (((-94.61792 36.49941, -94.3612 36.4996, -94.07709 36.49898,…
+ 2 AZ        144 (((-114.7997 32.59362, -114.8094 32.61712, -114.7649 32.6493…
+ 3 CA       9037 (((-118.594 33.4672, -118.4848 33.48748, -118.3703 33.40928,…
+ 4 CO       2278 (((-109.06 38.49999, -109.06 38.49999, -109.0515 39.12609, -…
+ 5 CT          3 (((-73.69594 41.11526, -73.48271 41.21276, -73.55096 41.2954…
+ 6 DE          1 (((-75.77379 39.7222, -75.75323 39.75799, -75.71706 39.79232…
+ 7 FL          1 (((-81.81169 24.56874, -81.75127 24.65352, -81.67234 24.6995…
+ 8 IA       4280 (((-96.62187 42.77925, -96.57794 42.82764, -96.53785 42.8784…
+ 9 ID        541 (((-117.243 44.39097, -117.2151 44.42716, -117.2259 44.47939…
+10 IL       2602 (((-91.50617 40.20064, -91.49696 40.2487, -91.49289 40.26992…
+# … with 31 more rows
+```
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%
+* inner_join(region, by = c("t_state" = "state_abbr" ))
+```
+]
+ 
+.panel2-wind4-auto[
+
+```
+# A tibble: 41 x 4
+   t_state     n                                            geometry region   
+   &lt;chr&gt;   &lt;int&gt;                                  &lt;MULTIPOLYGON [°]&gt; &lt;fct&gt;    
+ 1 AR          1 (((-94.61792 36.49941, -94.3612 36.4996, -94.07709… South    
+ 2 AZ        144 (((-114.7997 32.59362, -114.8094 32.61712, -114.76… West     
+ 3 CA       9037 (((-118.594 33.4672, -118.4848 33.48748, -118.3703… West     
+ 4 CO       2278 (((-109.06 38.49999, -109.06 38.49999, -109.0515 3… West     
+ 5 CT          3 (((-73.69594 41.11526, -73.48271 41.21276, -73.550… Northeast
+ 6 DE          1 (((-75.77379 39.7222, -75.75323 39.75799, -75.7170… South    
+ 7 FL          1 (((-81.81169 24.56874, -81.75127 24.65352, -81.672… South    
+ 8 IA       4280 (((-96.62187 42.77925, -96.57794 42.82764, -96.537… North Ce…
+ 9 ID        541 (((-117.243 44.39097, -117.2151 44.42716, -117.225… West     
+10 IL       2602 (((-91.50617 40.20064, -91.49696 40.2487, -91.4928… North Ce…
+# … with 31 more rows
+```
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%
+  inner_join(region, by = c("t_state" = "state_abbr" )) %&gt;%
+* st_as_sf()
+```
+]
+ 
+.panel2-wind4-auto[
+
+```
+Simple feature collection with 41 features and 3 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+Geodetic CRS:  WGS 84
+# A tibble: 41 x 4
+   t_state     n                                            geometry region   
+   &lt;chr&gt;   &lt;int&gt;                                  &lt;MULTIPOLYGON [°]&gt; &lt;fct&gt;    
+ 1 AR          1 (((-94.61792 36.49941, -94.3612 36.4996, -94.07709… South    
+ 2 AZ        144 (((-114.7997 32.59362, -114.8094 32.61712, -114.76… West     
+ 3 CA       9037 (((-118.594 33.4672, -118.4848 33.48748, -118.3703… West     
+ 4 CO       2278 (((-109.06 38.49999, -109.06 38.49999, -109.0515 3… West     
+ 5 CT          3 (((-73.69594 41.11526, -73.48271 41.21276, -73.550… Northeast
+ 6 DE          1 (((-75.77379 39.7222, -75.75323 39.75799, -75.7170… South    
+ 7 FL          1 (((-81.81169 24.56874, -81.75127 24.65352, -81.672… South    
+ 8 IA       4280 (((-96.62187 42.77925, -96.57794 42.82764, -96.537… North Ce…
+ 9 ID        541 (((-117.243 44.39097, -117.2151 44.42716, -117.225… West     
+10 IL       2602 (((-91.50617 40.20064, -91.49696 40.2487, -91.4928… North Ce…
+# … with 31 more rows
+```
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%
+  inner_join(region, by = c("t_state" = "state_abbr" )) %&gt;%
+  st_as_sf() %&gt;%
+* mutate(area = as.numeric(st_area(.) / 1e6),
+*        perArea = n / area)
+```
+]
+ 
+.panel2-wind4-auto[
+
+```
+Simple feature collection with 41 features and 5 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+Geodetic CRS:  WGS 84
+# A tibble: 41 x 6
+   t_state     n                              geometry region     area perArea
+ * &lt;chr&gt;   &lt;int&gt;                    &lt;MULTIPOLYGON [°]&gt; &lt;fct&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+ 1 AR          1 (((-94.61792 36.49941, -94.3612 36.4… South    1.38e5 7.26e-6
+ 2 AZ        144 (((-114.7997 32.59362, -114.8094 32.… West     2.95e5 4.88e-4
+ 3 CA       9037 (((-118.594 33.4672, -118.4848 33.48… West     4.10e5 2.20e-2
+ 4 CO       2278 (((-109.06 38.49999, -109.06 38.4999… West     2.69e5 8.46e-3
+ 5 CT          3 (((-73.69594 41.11526, -73.48271 41.… Northea… 1.29e4 2.32e-4
+ 6 DE          1 (((-75.77379 39.7222, -75.75323 39.7… South    5.32e3 1.88e-4
+ 7 FL          1 (((-81.81169 24.56874, -81.75127 24.… South    1.54e5 6.48e-6
+ 8 IA       4280 (((-96.62187 42.77925, -96.57794 42.… North C… 1.45e5 2.94e-2
+ 9 ID        541 (((-117.243 44.39097, -117.2151 44.4… West     2.16e5 2.50e-3
+10 IL       2602 (((-91.50617 40.20064, -91.49696 40.… North C… 1.46e5 1.78e-2
+# … with 31 more rows
+```
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%
+  inner_join(region, by = c("t_state" = "state_abbr" )) %&gt;%
+  st_as_sf() %&gt;%
+  mutate(area = as.numeric(st_area(.) / 1e6),
+         perArea = n / area) %&gt;%
+* ggplot(aes(x = reorder(t_state, -perArea), y = perArea))
+```
+]
+ 
+.panel2-wind4-auto[
+&lt;img src="lecture-07_files/figure-html/wind4_auto_11_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%
+  inner_join(region, by = c("t_state" = "state_abbr" )) %&gt;%
+  st_as_sf() %&gt;%
+  mutate(area = as.numeric(st_area(.) / 1e6),
+         perArea = n / area) %&gt;%
+  ggplot(aes(x = reorder(t_state, -perArea), y = perArea)) +
+* geom_col(aes(fill = region))
+```
+]
+ 
+.panel2-wind4-auto[
+&lt;img src="lecture-07_files/figure-html/wind4_auto_12_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%
+  inner_join(region, by = c("t_state" = "state_abbr" )) %&gt;%
+  st_as_sf() %&gt;%
+  mutate(area = as.numeric(st_area(.) / 1e6),
+         perArea = n / area) %&gt;%
+  ggplot(aes(x = reorder(t_state, -perArea), y = perArea)) +
+  geom_col(aes(fill = region)) +
+* facet_wrap(~region)
+```
+]
+ 
+.panel2-wind4-auto[
+&lt;img src="lecture-07_files/figure-html/wind4_auto_13_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%
+  inner_join(region, by = c("t_state" = "state_abbr" )) %&gt;%
+  st_as_sf() %&gt;%
+  mutate(area = as.numeric(st_area(.) / 1e6),
+         perArea = n / area) %&gt;%
+  ggplot(aes(x = reorder(t_state, -perArea), y = perArea)) +
+  geom_col(aes(fill = region)) +
+  facet_wrap(~region) +
+* facet_wrap(~region, scales = "free_x")
+```
+]
+ 
+.panel2-wind4-auto[
+&lt;img src="lecture-07_files/figure-html/wind4_auto_14_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%
+  inner_join(region, by = c("t_state" = "state_abbr" )) %&gt;%
+  st_as_sf() %&gt;%
+  mutate(area = as.numeric(st_area(.) / 1e6),
+         perArea = n / area) %&gt;%
+  ggplot(aes(x = reorder(t_state, -perArea), y = perArea)) +
+  geom_col(aes(fill = region)) +
+  facet_wrap(~region) +
+  facet_wrap(~region, scales = "free_x") +
+* labs(title = "Wind turbines per km2 by state",
+*      x = "State",
+*      y = "Turbines per km2")
+```
+]
+ 
+.panel2-wind4-auto[
+&lt;img src="lecture-07_files/figure-html/wind4_auto_15_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%
+  inner_join(region, by = c("t_state" = "state_abbr" )) %&gt;%
+  st_as_sf() %&gt;%
+  mutate(area = as.numeric(st_area(.) / 1e6),
+         perArea = n / area) %&gt;%
+  ggplot(aes(x = reorder(t_state, -perArea), y = perArea)) +
+  geom_col(aes(fill = region)) +
+  facet_wrap(~region) +
+  facet_wrap(~region, scales = "free_x") +
+  labs(title = "Wind turbines per km2 by state",
+       x = "State",
+       y = "Turbines per km2") +
+* theme_bw()
+```
+]
+ 
+.panel2-wind4-auto[
+&lt;img src="lecture-07_files/figure-html/wind4_auto_16_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%
+  inner_join(region, by = c("t_state" = "state_abbr" )) %&gt;%
+  st_as_sf() %&gt;%
+  mutate(area = as.numeric(st_area(.) / 1e6),
+         perArea = n / area) %&gt;%
+  ggplot(aes(x = reorder(t_state, -perArea), y = perArea)) +
+  geom_col(aes(fill = region)) +
+  facet_wrap(~region) +
+  facet_wrap(~region, scales = "free_x") +
+  labs(title = "Wind turbines per km2 by state",
+       x = "State",
+       y = "Turbines per km2") +
+  theme_bw() +
+* theme(axis.text.x = element_text(angle = 90))
+```
+]
+ 
+.panel2-wind4-auto[
+&lt;img src="lecture-07_files/figure-html/wind4_auto_17_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Region/State windmills per km2...
+.panel1-wind4-auto[
+
+```r
+us_wind %&gt;%
+  filter(!t_state %in% c("AK", "PR", "HI", "GU")) %&gt;%
+  select(t_state) %&gt;%
+  group_by(t_state) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  inner_join(states, by = c("t_state" = "state_abbr" )) %&gt;%
+  inner_join(region, by = c("t_state" = "state_abbr" )) %&gt;%
+  st_as_sf() %&gt;%
+  mutate(area = as.numeric(st_area(.) / 1e6),
+         perArea = n / area) %&gt;%
+  ggplot(aes(x = reorder(t_state, -perArea), y = perArea)) +
+  geom_col(aes(fill = region)) +
+  facet_wrap(~region) +
+  facet_wrap(~region, scales = "free_x") +
+  labs(title = "Wind turbines per km2 by state",
+       x = "State",
+       y = "Turbines per km2") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90)) +
+* theme(legend.position  = 'none')
+```
+]
+ 
+.panel2-wind4-auto[
+&lt;img src="lecture-07_files/figure-html/wind4_auto_18_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-wind4-auto {
+  color: black;
+  width: 48.5%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-wind4-auto {
+  color: black;
+  width: 48.5%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-wind4-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# Assignment
+
+In your `geog13-daily-exercises/R` directory
+
+1. Create a new file called `day-07.R`
+2. Open that file. 
+3. Add your name, date, and the purpose of the script as comments (preceded by #)
+
+***
+
+---
+
+
+**Question 1**: Make a _faceted_ plot of the cumulative cases &amp; deaths by USA region. Your _x_ axis should be the _date_ and the _y_ axis value/count. To do this you will need to join and pivot the COVID-19 data.
+
+We can break this task into 6 steps:
+
+.pull-left[
+
+1. **Read** in the COVID-19 data  
+2. **Create** a new data.frame using the available `state.abb`, `state.name`, `state.region` data. Be intentional about creating a primary key to match to the COVID data!
+3. **Join** your new data.frame to the raw COVID data. Think about `right`, `inner`, `left`, or `full` join...
+4. **split-apply** the joined data to determine the daily, cummulative, cases and deaths for each region
+5. **Pivot** your data from wide format to long
+6. **Plot** your data in a compelling way (setup, layers, labels, facets, themes)
+7. **Save** the image to your `img` directory with a good file name and extension!
+ 
+]
+
+&lt;center&gt;
+&lt;img src="lec-img/07-daily-exercise.png" width = "45%"&gt;
+&lt;/center&gt;
+
+---
+class: middle, center
+# Submission:
+
+Push your work to Github
+
+Turn in your Rscript, image, and repo URL to the Gauchospace dropbox
+---
+class: middle, center, inverse
+# END
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
