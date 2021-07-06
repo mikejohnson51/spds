@@ -1,0 +1,3910 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 08: Working with Tables Wrap Up
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+# Picking back up!
+
+We’ve covered many topics on how to manipulate and reshape a single data.frame:
+
+--
+
+**Last Week**: Data type and data structures
+
+--
+
+**Monday**: `data.frame` manipulation
+
+--
+
+**Tuesday**: `data.frame` visualization
+
+--
+
+**Wednesday**: Joining and pivoting `data.frames`
+
+---
+
+# Yesterdays Assignment
+
+**Question 1**: Make a _faceted_ plot of the cumulative cases &amp; deaths by USA region. Your _x_ axis should be the _date_ and the _y_ axis value/count. To do this you will need to join and pivot the COVID-19 data.
+
+.pull-left[
+## COVID data from NY-Times
+
+```r
+library(tidyverse)
+url = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv'
+covid = read_csv(url)
+head(covid)
+```
+
+```
+# A tibble: 6 x 6
+  date       county    state     fips  cases deaths
+  &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1 2020-01-21 Snohomish Washingt… 53061     1      0
+2 2020-01-22 Snohomish Washingt… 53061     1      0
+3 2020-01-23 Snohomish Washingt… 53061     1      0
+4 2020-01-24 Cook      Illinois  17031     1      0
+5 2020-01-24 Snohomish Washingt… 53061     1      0
+6 2020-01-25 Orange    Californ… 06059     1      0
+```
+]
+
+.pull-right[
+## State/Region classifier
+
+```r
+region = data.frame(state = state.name, region = state.region)
+head(region)
+```
+
+```
+       state region
+1    Alabama  South
+2     Alaska   West
+3    Arizona   West
+4   Arkansas  South
+5 California   West
+6   Colorado   West
+```
+]
+
+---
+
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q11-auto[
+
+```r
+*inner_join(covid, region, by = "state")
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 1,451,491 x 7
+   date       county    state    fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish Washing… 53061     1      0
+ 2 2020-01-22 Snohomish Washing… 53061     1      0
+ 3 2020-01-23 Snohomish Washing… 53061     1      0
+ 4 2020-01-24 Cook      Illinois 17031     1      0
+ 5 2020-01-24 Snohomish Washing… 53061     1      0
+ 6 2020-01-25 Orange    Califor… 06059     1      0
+ 7 2020-01-25 Cook      Illinois 17031     1      0
+ 8 2020-01-25 Snohomish Washing… 53061     1      0
+ 9 2020-01-26 Maricopa  Arizona  04013     1      0
+10 2020-01-26 Los Ange… Califor… 06037     1      0
+# … with 1,451,481 more rows, and 1 more variable:
+#   region &lt;fct&gt;
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q11-auto[
+
+```r
+inner_join(covid, region, by = "state") %&gt;%
+* count(region)
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 4 x 2
+  region             n
+  &lt;fct&gt;          &lt;int&gt;
+1 Northeast     104137
+2 South         661480
+3 North Central 482878
+4 West          202996
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q11-auto[
+
+```r
+inner_join(covid, region, by = "state") %&gt;%
+  count(region) %&gt;%
+* mutate(tot = sum(n))
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 4 x 3
+  region             n     tot
+  &lt;fct&gt;          &lt;int&gt;   &lt;int&gt;
+1 Northeast     104137 1451491
+2 South         661480 1451491
+3 North Central 482878 1451491
+4 West          202996 1451491
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q11-auto[
+
+```r
+inner_join(covid, region, by = "state") %&gt;%
+  count(region) %&gt;%
+  mutate(tot = sum(n))
+
+*full_join(covid, region, by = "state")
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 4 x 3
+  region             n     tot
+  &lt;fct&gt;          &lt;int&gt;   &lt;int&gt;
+1 Northeast     104137 1451491
+2 South         661480 1451491
+3 North Central 482878 1451491
+4 West          202996 1451491
+```
+
+```
+# A tibble: 1,488,568 x 7
+   date       county    state    fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish Washing… 53061     1      0
+ 2 2020-01-22 Snohomish Washing… 53061     1      0
+ 3 2020-01-23 Snohomish Washing… 53061     1      0
+ 4 2020-01-24 Cook      Illinois 17031     1      0
+ 5 2020-01-24 Snohomish Washing… 53061     1      0
+ 6 2020-01-25 Orange    Califor… 06059     1      0
+ 7 2020-01-25 Cook      Illinois 17031     1      0
+ 8 2020-01-25 Snohomish Washing… 53061     1      0
+ 9 2020-01-26 Maricopa  Arizona  04013     1      0
+10 2020-01-26 Los Ange… Califor… 06037     1      0
+# … with 1,488,558 more rows, and 1 more variable:
+#   region &lt;fct&gt;
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q11-auto[
+
+```r
+inner_join(covid, region, by = "state") %&gt;%
+  count(region) %&gt;%
+  mutate(tot = sum(n))
+
+full_join(covid, region, by = "state") %&gt;%
+* count(region)
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 4 x 3
+  region             n     tot
+  &lt;fct&gt;          &lt;int&gt;   &lt;int&gt;
+1 Northeast     104137 1451491
+2 South         661480 1451491
+3 North Central 482878 1451491
+4 West          202996 1451491
+```
+
+```
+# A tibble: 5 x 2
+  region             n
+  &lt;fct&gt;          &lt;int&gt;
+1 Northeast     104137
+2 South         661480
+3 North Central 482878
+4 West          202996
+5 &lt;NA&gt;           37077
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q11-auto[
+
+```r
+inner_join(covid, region, by = "state") %&gt;%
+  count(region) %&gt;%
+  mutate(tot = sum(n))
+
+full_join(covid, region, by = "state") %&gt;%
+  count(region) %&gt;%
+* mutate(tot = sum(n))
+```
+]
+ 
+.panel2-q11-auto[
+
+```
+# A tibble: 4 x 3
+  region             n     tot
+  &lt;fct&gt;          &lt;int&gt;   &lt;int&gt;
+1 Northeast     104137 1451491
+2 South         661480 1451491
+3 North Central 482878 1451491
+4 West          202996 1451491
+```
+
+```
+# A tibble: 5 x 3
+  region             n     tot
+  &lt;fct&gt;          &lt;int&gt;   &lt;int&gt;
+1 Northeast     104137 1488568
+2 South         661480 1488568
+3 North Central 482878 1488568
+4 West          202996 1488568
+5 &lt;NA&gt;           37077 1488568
+```
+]
+
+&lt;style&gt;
+.panel1-q11-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q11-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q11-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q12-auto[
+
+```r
+*left_join(covid, region, by = "state")
+```
+]
+ 
+.panel2-q12-auto[
+
+```
+# A tibble: 1,488,568 x 7
+   date       county    state    fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish Washing… 53061     1      0
+ 2 2020-01-22 Snohomish Washing… 53061     1      0
+ 3 2020-01-23 Snohomish Washing… 53061     1      0
+ 4 2020-01-24 Cook      Illinois 17031     1      0
+ 5 2020-01-24 Snohomish Washing… 53061     1      0
+ 6 2020-01-25 Orange    Califor… 06059     1      0
+ 7 2020-01-25 Cook      Illinois 17031     1      0
+ 8 2020-01-25 Snohomish Washing… 53061     1      0
+ 9 2020-01-26 Maricopa  Arizona  04013     1      0
+10 2020-01-26 Los Ange… Califor… 06037     1      0
+# … with 1,488,558 more rows, and 1 more variable:
+#   region &lt;fct&gt;
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q12-auto[
+
+```r
+left_join(covid, region, by = "state") %&gt;%
+* count(region)
+```
+]
+ 
+.panel2-q12-auto[
+
+```
+# A tibble: 5 x 2
+  region             n
+  &lt;fct&gt;          &lt;int&gt;
+1 Northeast     104137
+2 South         661480
+3 North Central 482878
+4 West          202996
+5 &lt;NA&gt;           37077
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q12-auto[
+
+```r
+left_join(covid, region, by = "state") %&gt;%
+  count(region) %&gt;%
+* mutate(tot = sum(n))
+```
+]
+ 
+.panel2-q12-auto[
+
+```
+# A tibble: 5 x 3
+  region             n     tot
+  &lt;fct&gt;          &lt;int&gt;   &lt;int&gt;
+1 Northeast     104137 1488568
+2 South         661480 1488568
+3 North Central 482878 1488568
+4 West          202996 1488568
+5 &lt;NA&gt;           37077 1488568
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q12-auto[
+
+```r
+left_join(covid, region, by = "state") %&gt;%
+  count(region) %&gt;%
+  mutate(tot = sum(n))
+
+*right_join(covid, region, by = "state")
+```
+]
+ 
+.panel2-q12-auto[
+
+```
+# A tibble: 5 x 3
+  region             n     tot
+  &lt;fct&gt;          &lt;int&gt;   &lt;int&gt;
+1 Northeast     104137 1488568
+2 South         661480 1488568
+3 North Central 482878 1488568
+4 West          202996 1488568
+5 &lt;NA&gt;           37077 1488568
+```
+
+```
+# A tibble: 1,451,491 x 7
+   date       county    state    fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish Washing… 53061     1      0
+ 2 2020-01-22 Snohomish Washing… 53061     1      0
+ 3 2020-01-23 Snohomish Washing… 53061     1      0
+ 4 2020-01-24 Cook      Illinois 17031     1      0
+ 5 2020-01-24 Snohomish Washing… 53061     1      0
+ 6 2020-01-25 Orange    Califor… 06059     1      0
+ 7 2020-01-25 Cook      Illinois 17031     1      0
+ 8 2020-01-25 Snohomish Washing… 53061     1      0
+ 9 2020-01-26 Maricopa  Arizona  04013     1      0
+10 2020-01-26 Los Ange… Califor… 06037     1      0
+# … with 1,451,481 more rows, and 1 more variable:
+#   region &lt;fct&gt;
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q12-auto[
+
+```r
+left_join(covid, region, by = "state") %&gt;%
+  count(region) %&gt;%
+  mutate(tot = sum(n))
+
+right_join(covid, region, by = "state") %&gt;%
+* count(region)
+```
+]
+ 
+.panel2-q12-auto[
+
+```
+# A tibble: 5 x 3
+  region             n     tot
+  &lt;fct&gt;          &lt;int&gt;   &lt;int&gt;
+1 Northeast     104137 1488568
+2 South         661480 1488568
+3 North Central 482878 1488568
+4 West          202996 1488568
+5 &lt;NA&gt;           37077 1488568
+```
+
+```
+# A tibble: 4 x 2
+  region             n
+  &lt;fct&gt;          &lt;int&gt;
+1 Northeast     104137
+2 South         661480
+3 North Central 482878
+4 West          202996
+```
+]
+
+---
+count: false
+ 
+##Question 1: Joins (the right tool for the job)
+.panel1-q12-auto[
+
+```r
+left_join(covid, region, by = "state") %&gt;%
+  count(region) %&gt;%
+  mutate(tot = sum(n))
+
+right_join(covid, region, by = "state") %&gt;%
+  count(region) %&gt;%
+* mutate(tot = sum(n))
+```
+]
+ 
+.panel2-q12-auto[
+
+```
+# A tibble: 5 x 3
+  region             n     tot
+  &lt;fct&gt;          &lt;int&gt;   &lt;int&gt;
+1 Northeast     104137 1488568
+2 South         661480 1488568
+3 North Central 482878 1488568
+4 West          202996 1488568
+5 &lt;NA&gt;           37077 1488568
+```
+
+```
+# A tibble: 4 x 3
+  region             n     tot
+  &lt;fct&gt;          &lt;int&gt;   &lt;int&gt;
+1 Northeast     104137 1451491
+2 South         661480 1451491
+3 North Central 482878 1451491
+4 West          202996 1451491
+```
+]
+
+&lt;style&gt;
+.panel1-q12-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q12-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q12-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+# Whats causing the NAs? 
+
+- We know there are non-matching keys between COVID and region
+- We know that the "extras" are in the covid data.frame (NAs produced in `left_join(covid, region)`)
+
+
+```r
+covid %&gt;% 
+  filter(!state %in% state.name) %&gt;% 
+  filter(date == max(date)) %&gt;% 
+  count(state)
+```
+
+```
+# A tibble: 5 x 2
+  state                        n
+  &lt;chr&gt;                    &lt;int&gt;
+1 District of Columbia         1
+2 Guam                         1
+3 Northern Mariana Islands     2
+4 Puerto Rico                 79
+5 Virgin Islands               3
+```
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.panel1-q13-auto[
+
+```r
+*covid
+```
+]
+ 
+.panel2-q13-auto[
+
+```
+# A tibble: 1,488,568 x 6
+   date       county    state    fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish Washing… 53061     1      0
+ 2 2020-01-22 Snohomish Washing… 53061     1      0
+ 3 2020-01-23 Snohomish Washing… 53061     1      0
+ 4 2020-01-24 Cook      Illinois 17031     1      0
+ 5 2020-01-24 Snohomish Washing… 53061     1      0
+ 6 2020-01-25 Orange    Califor… 06059     1      0
+ 7 2020-01-25 Cook      Illinois 17031     1      0
+ 8 2020-01-25 Snohomish Washing… 53061     1      0
+ 9 2020-01-26 Maricopa  Arizona  04013     1      0
+10 2020-01-26 Los Ange… Califor… 06037     1      0
+# … with 1,488,558 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.panel1-q13-auto[
+
+```r
+covid %&gt;%
+* right_join(region, by = "state")
+```
+]
+ 
+.panel2-q13-auto[
+
+```
+# A tibble: 1,451,491 x 7
+   date       county    state    fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish Washing… 53061     1      0
+ 2 2020-01-22 Snohomish Washing… 53061     1      0
+ 3 2020-01-23 Snohomish Washing… 53061     1      0
+ 4 2020-01-24 Cook      Illinois 17031     1      0
+ 5 2020-01-24 Snohomish Washing… 53061     1      0
+ 6 2020-01-25 Orange    Califor… 06059     1      0
+ 7 2020-01-25 Cook      Illinois 17031     1      0
+ 8 2020-01-25 Snohomish Washing… 53061     1      0
+ 9 2020-01-26 Maricopa  Arizona  04013     1      0
+10 2020-01-26 Los Ange… Califor… 06037     1      0
+# … with 1,451,481 more rows, and 1 more variable:
+#   region &lt;fct&gt;
+```
+]
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.panel1-q13-auto[
+
+```r
+covid %&gt;%
+  right_join(region, by = "state") %&gt;%
+* group_by(region, date)
+```
+]
+ 
+.panel2-q13-auto[
+
+```
+# A tibble: 1,451,491 x 7
+# Groups:   region, date [2,092]
+   date       county    state    fips  cases deaths
+   &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2020-01-21 Snohomish Washing… 53061     1      0
+ 2 2020-01-22 Snohomish Washing… 53061     1      0
+ 3 2020-01-23 Snohomish Washing… 53061     1      0
+ 4 2020-01-24 Cook      Illinois 17031     1      0
+ 5 2020-01-24 Snohomish Washing… 53061     1      0
+ 6 2020-01-25 Orange    Califor… 06059     1      0
+ 7 2020-01-25 Cook      Illinois 17031     1      0
+ 8 2020-01-25 Snohomish Washing… 53061     1      0
+ 9 2020-01-26 Maricopa  Arizona  04013     1      0
+10 2020-01-26 Los Ange… Califor… 06037     1      0
+# … with 1,451,481 more rows, and 1 more variable:
+#   region &lt;fct&gt;
+```
+]
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.panel1-q13-auto[
+
+```r
+covid %&gt;%
+  right_join(region, by = "state") %&gt;%
+  group_by(region, date) %&gt;%
+* summarize(cases  = sum(cases),
+*           deaths = sum(deaths))
+```
+]
+ 
+.panel2-q13-auto[
+
+```
+# A tibble: 2,092 x 4
+# Groups:   region [4]
+   region    date       cases deaths
+   &lt;fct&gt;     &lt;date&gt;     &lt;dbl&gt;  &lt;dbl&gt;
+ 1 Northeast 2020-02-01     1      0
+ 2 Northeast 2020-02-02     1      0
+ 3 Northeast 2020-02-03     1      0
+ 4 Northeast 2020-02-04     1      0
+ 5 Northeast 2020-02-05     1      0
+ 6 Northeast 2020-02-06     1      0
+ 7 Northeast 2020-02-07     1      0
+ 8 Northeast 2020-02-08     1      0
+ 9 Northeast 2020-02-09     1      0
+10 Northeast 2020-02-10     1      0
+# … with 2,082 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.panel1-q13-auto[
+
+```r
+covid %&gt;%
+  right_join(region, by = "state") %&gt;%
+  group_by(region, date) %&gt;%
+  summarize(cases  = sum(cases),
+            deaths = sum(deaths)) %&gt;%
+* pivot_longer(cols = c('cases', 'deaths'))
+```
+]
+ 
+.panel2-q13-auto[
+
+```
+# A tibble: 4,184 x 4
+# Groups:   region [4]
+   region    date       name   value
+   &lt;fct&gt;     &lt;date&gt;     &lt;chr&gt;  &lt;dbl&gt;
+ 1 Northeast 2020-02-01 cases      1
+ 2 Northeast 2020-02-01 deaths     0
+ 3 Northeast 2020-02-02 cases      1
+ 4 Northeast 2020-02-02 deaths     0
+ 5 Northeast 2020-02-03 cases      1
+ 6 Northeast 2020-02-03 deaths     0
+ 7 Northeast 2020-02-04 cases      1
+ 8 Northeast 2020-02-04 deaths     0
+ 9 Northeast 2020-02-05 cases      1
+10 Northeast 2020-02-05 deaths     0
+# … with 4,174 more rows
+```
+]
+
+---
+count: false
+ 
+##Question 1: Refine and Pivot (the right data for the task)
+.panel1-q13-auto[
+
+```r
+covid %&gt;%
+  right_join(region, by = "state") %&gt;%
+  group_by(region, date) %&gt;%
+  summarize(cases  = sum(cases),
+            deaths = sum(deaths)) %&gt;%
+  pivot_longer(cols = c('cases', 'deaths')) -&gt;
+* covid_region
+```
+]
+ 
+.panel2-q13-auto[
+
+]
+
+&lt;style&gt;
+.panel1-q13-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q13-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q13-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.panel1-q14-auto[
+
+```r
+*ggplot(covid_region, aes(x = date, y = value))
+```
+]
+ 
+.panel2-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_01_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.panel1-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +
+* geom_line(aes(col = region))
+```
+]
+ 
+.panel2-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_02_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.panel1-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +
+  geom_line(aes(col = region)) +
+* facet_grid(name~region, scale = "free_y")
+```
+]
+ 
+.panel2-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_03_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.panel1-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +
+  geom_line(aes(col = region)) +
+  facet_grid(name~region, scale = "free_y") +
+* theme_linedraw()
+```
+]
+ 
+.panel2-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_04_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.panel1-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +
+  geom_line(aes(col = region)) +
+  facet_grid(name~region, scale = "free_y") +
+  theme_linedraw() +
+* theme(legend.position = "bottom")
+```
+]
+ 
+.panel2-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_05_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.panel1-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +
+  geom_line(aes(col = region)) +
+  facet_grid(name~region, scale = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "bottom") +
+* theme(legend.position = "NA")
+```
+]
+ 
+.panel2-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_06_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Question 1: Plotting (table to visual!)
+.panel1-q14-auto[
+
+```r
+ggplot(covid_region, aes(x = date, y = value)) +
+  geom_line(aes(col = region)) +
+  facet_grid(name~region, scale = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "bottom") +
+  theme(legend.position = "NA") +
+* labs(title = "Cummulative Cases and Deaths: Region",
+*      y = "Daily Cumulative Count",
+*      x = "Date",
+*      caption = "Daily Exercise 07",
+*      subtitle = "COVID-19 Data: NY-Times" )
+```
+]
+ 
+.panel2-q14-auto[
+&lt;img src="lecture-08_files/figure-html/q14_auto_07_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-q14-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q14-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q14-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+class: center, middle, inverse
+# Today: 
+Wrapping up our "working with tables" unit
+---
+
+# Re-cap: Data Types
+
+- **Values** have a type 
+
+--
+
+- Values can be **assigned** to **names**
+
+--
+
+- Assignment creates a permanent **object** (within the working session)
+
+--
+
+- **Objects** can be seen in the Environment tab
+
+--
+
+- names can be referenced in scripts, Rmds, and code
+
+--
+
+- Objects have a **type** and a **class**
+
+--
+
+
+```r
+x = 10
+class(x)
+```
+
+```
+[1] "numeric"
+```
+
+```r
+typeof(x)
+```
+
+```
+[1] "double"
+```
+
+
+---
+
+# S3 Atomic Vectors
+
+- One of the most important vector attributes is `class`, which underlies the S3 object system. 
+
+--
+
+- A class attribute turns an object into an S3 object, which means it will behave differently from a regular vector when passed to a generic function. 
+
+--
+
+- Every S3 object is built on top of a base type, and can store additional information in other `attributes`. 
+
+---
+
+# S3: Use cases
+
+1. Categorical data, where values come from a fixed set of levels recorded in factor vectors.
+
+--
+
+2. Dates (daily resolution), which are recorded in Date vectors.
+
+--
+
+3. Date-times (with second or sub-second resolution), which are stored in POSIXct vectors.
+
+&lt;center&gt;
+&lt;img src="lec-img/04-vec-list-02.png" width = "25%"&gt; &lt;img src="lec-img/08-s3-vectors.png", width ="25%"&gt; 
+&lt;/center&gt;
+
+---
+
+# Categorical
+
+- Much like a categorical raster (think landcover), `factors` store categorical values
+
+--
+
+- A factor vector can only contain only predefined values. 
+
+--
+
+- Factors are built on the `integer` data type with two attributes: 
+
+--
+
+  -  a `class` (factor) which makes it behave differently from integer vectors, 
+
+--
+
+  -  a `levels`, which defines the allowed values.
+
+---
+count: false
+ 
+#Factors
+.panel1-fac-auto[
+
+```r
+*(x = factor(c("Jan", "Feb", "Mar", "Apr")))
+```
+]
+ 
+.panel2-fac-auto[
+
+```
+[1] Jan Feb Mar Apr
+Levels: Apr Feb Jan Mar
+```
+]
+
+---
+count: false
+ 
+#Factors
+.panel1-fac-auto[
+
+```r
+(x = factor(c("Jan", "Feb", "Mar", "Apr")))
+*class(x)
+```
+]
+ 
+.panel2-fac-auto[
+
+```
+[1] Jan Feb Mar Apr
+Levels: Apr Feb Jan Mar
+```
+
+```
+[1] "factor"
+```
+]
+
+---
+count: false
+ 
+#Factors
+.panel1-fac-auto[
+
+```r
+(x = factor(c("Jan", "Feb", "Mar", "Apr")))
+class(x)
+*typeof(x)
+```
+]
+ 
+.panel2-fac-auto[
+
+```
+[1] Jan Feb Mar Apr
+Levels: Apr Feb Jan Mar
+```
+
+```
+[1] "factor"
+```
+
+```
+[1] "integer"
+```
+]
+
+---
+count: false
+ 
+#Factors
+.panel1-fac-auto[
+
+```r
+(x = factor(c("Jan", "Feb", "Mar", "Apr")))
+class(x)
+typeof(x)
+*attributes(x)
+```
+]
+ 
+.panel2-fac-auto[
+
+```
+[1] Jan Feb Mar Apr
+Levels: Apr Feb Jan Mar
+```
+
+```
+[1] "factor"
+```
+
+```
+[1] "integer"
+```
+
+```
+$levels
+[1] "Apr" "Feb" "Jan" "Mar"
+
+$class
+[1] "factor"
+```
+]
+
+---
+count: false
+ 
+#Factors
+.panel1-fac-auto[
+
+```r
+(x = factor(c("Jan", "Feb", "Mar", "Apr")))
+class(x)
+typeof(x)
+attributes(x)
+*unclass(x)
+```
+]
+ 
+.panel2-fac-auto[
+
+```
+[1] Jan Feb Mar Apr
+Levels: Apr Feb Jan Mar
+```
+
+```
+[1] "factor"
+```
+
+```
+[1] "integer"
+```
+
+```
+$levels
+[1] "Apr" "Feb" "Jan" "Mar"
+
+$class
+[1] "factor"
+```
+
+```
+[1] 3 2 4 1
+attr(,"levels")
+[1] "Apr" "Feb" "Jan" "Mar"
+```
+]
+
+&lt;style&gt;
+.panel1-fac-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-fac-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-fac-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# Factors in the "wild"
+
+
+```r
+head(gapminder,1)
+```
+
+```
+# A tibble: 1 x 6
+  country     continent  year
+  &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;
+1 Afghanistan Asia       1952
+# … with 3 more variables:
+#   lifeExp &lt;dbl&gt;, pop &lt;int&gt;,
+#   gdpPercap &lt;dbl&gt;
+```
+
+```r
+head(covid_region,1)
+```
+
+```
+# A tibble: 1 x 4
+# Groups:   region [1]
+  region  date       name  value
+  &lt;fct&gt;   &lt;date&gt;     &lt;chr&gt; &lt;dbl&gt;
+1 Northe… 2020-02-01 cases     1
+```
+
+```r
+levels(covid_region$region)
+```
+
+```
+[1] "Northeast"    
+[2] "South"        
+[3] "North Central"
+[4] "West"         
+```
+
+```r
+nlevels(covid_region$region)
+```
+
+```
+[1] 4
+```
+---
+
+# So what?
+
+--
+
+- Factors are stored as an integer vector with a corresponding set of character values to use when the factor is displayed.
+
+--
+
+- The ordering of factor drives some of our graphics and other functions that rely on order 
+--
+
+
+```r
+levels(covid_region$region)
+```
+
+```
+[1] "Northeast"    
+[2] "South"        
+[3] "North Central"
+[4] "West"         
+```
+--
+
+&lt;img src="lecture-08_files/figure-html/unnamed-chunk-9-1.png" width="432" /&gt;
+---
+
+# Levels
+
+
+```r
+## default order is alphabetical
+covid_region$region %&gt;%
+  levels()
+```
+
+```
+[1] "Northeast"    
+[2] "South"        
+[3] "North Central"
+[4] "West"         
+```
+
+--
+
+
+```r
+## order by frequency
+covid_region$region %&gt;% 
+  fct_infreq() %&gt;%
+  levels()
+```
+
+```
+[1] "West"         
+[2] "North Central"
+[3] "Northeast"    
+[4] "South"        
+```
+
+---
+
+# Levels
+
+
+```r
+## backwards!
+covid_region$region %&gt;% 
+  fct_rev() %&gt;%
+  levels()
+```
+
+```
+[1] "West"         
+[2] "North Central"
+[3] "South"        
+[4] "Northeast"    
+```
+
+---
+
+# Some toy data
+
+- total cases for three states
+
+
+```r
+(today = covid %&gt;% 
+  filter(date == max(date), state %in% c("California", "Hawaii", "Nevada")) %&gt;% 
+  group_by(state) %&gt;% 
+  summarize(totCases = sum(cases)) %&gt;% 
+  mutate(state = as.factor(state)))
+```
+
+```
+# A tibble: 3 x 2
+  state      totCases
+  &lt;fct&gt;         &lt;dbl&gt;
+1 California  3822073
+2 Hawaii        36646
+3 Nevada       334763
+```
+
+---
+
+# Factor Manipulation
+
+
+```r
+# Reorder based on characteristic
+fct_reorder(today$state, today$totCases) %&gt;%  levels()
+```
+
+```
+[1] "Hawaii"     "Nevada"    
+[3] "California"
+```
+
+--
+
+```r
+fct_reorder(today$state, -today$totCases) %&gt;% levels()
+```
+
+```
+[1] "California" "Nevada"    
+[3] "Hawaii"    
+```
+
+--
+
+```r
+# Reorder based on preference
+fct_relevel(today$state,"Nevada") %&gt;% levels()
+```
+
+```
+[1] "Nevada"     "California"
+[3] "Hawaii"    
+```
+
+--
+
+```r
+fct_recode(today$state, "NV" = "Nevada", "CA" = "California") %&gt;% levels()
+```
+
+```
+[1] "CA"     "Hawaii" "NV"    
+```
+
+---
+# Recode
+
+```r
+covid_region %&gt;% 
+  mutate(region = fct_recode(region, "SOUTH" = "South")) %&gt;% 
+  ggplot(aes(x = date, y = value)) +
+  geom_line(aes(col = region)) +
+  facet_grid(name~region, scale = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "NA") 
+```
+
+&lt;img src="lecture-08_files/figure-html/unnamed-chunk-18-1.png" width="432" /&gt;
+
+---
+# Reoder By Choice
+
+```r
+covid_region %&gt;% 
+  mutate(region = fct_relevel(region, c("South"))) %&gt;% 
+  ggplot(aes(x = date, y = value)) +
+  geom_line(aes(col = region)) +
+  facet_grid(name~region, scale = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "NA") 
+```
+
+&lt;img src="lecture-08_files/figure-html/unnamed-chunk-19-1.png" width="432" /&gt;
+---
+# Reorder By Frequency of Occurance
+
+```r
+covid_region %&gt;% 
+  mutate(region = fct_infreq(region)) %&gt;% 
+  ggplot(aes(x = date, y = value)) +
+  geom_line(aes(col = region)) +
+  facet_grid(name~region, scale = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "NA")
+```
+
+&lt;img src="lecture-08_files/figure-html/unnamed-chunk-20-1.png" width="432" /&gt;
+
+---
+
+# Dates
+
+- Date vectors are built on double (numeric) vectors.
+
+--
+
+- They have class “Date” and no other attributes
+
+--
+
+- This is why operations like `min`, `max`, `&gt;`, `-` work
+
+--
+
+
+```r
+x = "2020-08-04"; y = as.Date(x)
+class(x)
+```
+
+```
+[1] "character"
+```
+
+```r
+y = as.Date(x)
+class(y)
+```
+
+```
+[1] "Date"
+```
+
+```r
+typeof(y)
+```
+
+```
+[1] "double"
+```
+
+```r
+attributes(y)
+```
+
+```
+$class
+[1] "Date"
+```
+
+```r
+unclass(y)
+```
+
+```
+[1] 18478
+```
+---
+
+# Dates
+
+The numeric value represents the `number of days` since 1970-01-01
+1970-01-01 is the Unix Epoch.
+
+
+```r
+x = as.Date("1970-01-02")
+unclass(x)
+```
+
+```
+[1] 1
+```
+
+```r
+x = as.Date("1969-12-31")
+unclass(x)
+```
+
+```
+[1] -1
+```
+
+---
+
+# Beyond Day-Dates
+
+- R provides two ways of storing date-time information, POSIXct, and POSIXlt. 
+  - “POSIX” = Portable Operating System Interface
+  - “ct”  = calendar time 
+  - “lt”  = local time. Here we’ll focus on 
+- `POSIXct` is most appropriate for use in data frames. 
+- `POSIXct` vectors are built on top of double/numeirc, 
+- The numeric value represents the number of _seconds_ since the Unix Epoch (1970-01-01).
+
+
+```r
+(x =  as.POSIXct("2020-08-02 22:00", tz = 'UTC'))
+```
+
+```
+[1] "2020-08-02 22:00:00 UTC"
+```
+
+```r
+unclass(x)
+```
+
+```
+[1] 1596405600
+attr(,"tzone")
+[1] "UTC"
+```
+
+
+```r
+structure(x, tzone = "America/Chicago")
+```
+
+```
+[1] "2020-08-02 17:00:00 CDT"
+```
+
+```r
+structure(x, tzone = "America/New_York")
+```
+
+```
+[1] "2020-08-02 18:00:00 EDT"
+```
+
+```r
+structure(x, tzone = "America/Los_Angeles")
+```
+
+```
+[1] "2020-08-02 15:00:00 PDT"
+```
+
+---
+
+# The basics and beyond &lt;svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M505.12019,19.09375c-1.18945-5.53125-6.65819-11-12.207-12.1875C460.716,0,435.507,0,410.40747,0,307.17523,0,245.26909,55.20312,199.05238,128H94.83772c-16.34763.01562-35.55658,11.875-42.88664,26.48438L2.51562,253.29688A28.4,28.4,0,0,0,0,264a24.00867,24.00867,0,0,0,24.00582,24H127.81618l-22.47457,22.46875c-11.36521,11.36133-12.99607,32.25781,0,45.25L156.24582,406.625c11.15623,11.1875,32.15619,13.15625,45.27726,0l22.47457-22.46875V488a24.00867,24.00867,0,0,0,24.00581,24,28.55934,28.55934,0,0,0,10.707-2.51562l98.72834-49.39063c14.62888-7.29687,26.50776-26.5,26.50776-42.85937V312.79688c72.59753-46.3125,128.03493-108.40626,128.03493-211.09376C512.07526,76.5,512.07526,51.29688,505.12019,19.09375ZM384.04033,168A40,40,0,1,1,424.05,128,40.02322,40.02322,0,0,1,384.04033,168Z"&gt;&lt;/path&gt;&lt;/svg&gt;
+
+- So far you have learned the basics of working with tables in R
+- But there are: 
+
+  - Multiple ways to do things
+  - Finding help
+  - Implementing existing solutions
+
+---
+
+# Multiple ways to solve a problem...
+
+**Question**: How many new cases each day has there been in Santa Barbara County?
+
+--
+
+**Task**: Separating cumulative values ... (today - yesterday...)
+
+--
+
+ - `?diff` (base R): Returns suitably lagged and iterated differences.
+
+--
+
+ - `?lag ` (dplyr): Find the "previous" (lag()) or "next" (lead()) values in a vector. 
+
+--
+
+
+```r
+(x = c(5, 15, 19,20,22))
+```
+
+```
+[1]  5 15 19 20 22
+```
+
+```r
+diff(x)
+```
+
+```
+[1] 10  4  1  2
+```
+
+```r
+lag(x)
+```
+
+```
+[1] NA  5 15 19 20
+```
+
+--
+
+- For `diff` the right answers but the wrong length
+- For `lag` the right lengths but the "wrong" answers
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+*covid
+```
+]
+ 
+.panel2-lag-auto[
+
+```
+# A tibble: 1,488,568 x 6
+   date       county state fips 
+   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
+ 1 2020-01-21 Snoho… Wash… 53061
+ 2 2020-01-22 Snoho… Wash… 53061
+ 3 2020-01-23 Snoho… Wash… 53061
+ 4 2020-01-24 Cook   Illi… 17031
+ 5 2020-01-24 Snoho… Wash… 53061
+ 6 2020-01-25 Orange Cali… 06059
+ 7 2020-01-25 Cook   Illi… 17031
+ 8 2020-01-25 Snoho… Wash… 53061
+ 9 2020-01-26 Maric… Ariz… 04013
+10 2020-01-26 Los A… Cali… 06037
+# … with 1,488,558 more rows,
+#   and 2 more variables:
+#   cases &lt;dbl&gt;, deaths &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+* filter(county == "Santa Barbara")
+```
+]
+ 
+.panel2-lag-auto[
+
+```
+# A tibble: 478 x 6
+   date       county state fips 
+   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
+ 1 2020-03-15 Santa… Cali… 06083
+ 2 2020-03-16 Santa… Cali… 06083
+ 3 2020-03-17 Santa… Cali… 06083
+ 4 2020-03-18 Santa… Cali… 06083
+ 5 2020-03-19 Santa… Cali… 06083
+ 6 2020-03-20 Santa… Cali… 06083
+ 7 2020-03-21 Santa… Cali… 06083
+ 8 2020-03-22 Santa… Cali… 06083
+ 9 2020-03-23 Santa… Cali… 06083
+10 2020-03-24 Santa… Cali… 06083
+# … with 468 more rows, and 2
+#   more variables:
+#   cases &lt;dbl&gt;, deaths &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+  filter(county == "Santa Barbara") %&gt;%
+* mutate(newCases = cases - lag(cases))
+```
+]
+ 
+.panel2-lag-auto[
+
+```
+# A tibble: 478 x 7
+   date       county state fips 
+   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
+ 1 2020-03-15 Santa… Cali… 06083
+ 2 2020-03-16 Santa… Cali… 06083
+ 3 2020-03-17 Santa… Cali… 06083
+ 4 2020-03-18 Santa… Cali… 06083
+ 5 2020-03-19 Santa… Cali… 06083
+ 6 2020-03-20 Santa… Cali… 06083
+ 7 2020-03-21 Santa… Cali… 06083
+ 8 2020-03-22 Santa… Cali… 06083
+ 9 2020-03-23 Santa… Cali… 06083
+10 2020-03-24 Santa… Cali… 06083
+# … with 468 more rows, and 3
+#   more variables:
+#   cases &lt;dbl&gt;, deaths &lt;dbl&gt;,
+#   newCases &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+  filter(county == "Santa Barbara") %&gt;%
+  mutate(newCases = cases - lag(cases)) %&gt;%
+* mutate(newCases2 = c(NA, diff(cases)))
+```
+]
+ 
+.panel2-lag-auto[
+
+```
+# A tibble: 478 x 8
+   date       county state fips 
+   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
+ 1 2020-03-15 Santa… Cali… 06083
+ 2 2020-03-16 Santa… Cali… 06083
+ 3 2020-03-17 Santa… Cali… 06083
+ 4 2020-03-18 Santa… Cali… 06083
+ 5 2020-03-19 Santa… Cali… 06083
+ 6 2020-03-20 Santa… Cali… 06083
+ 7 2020-03-21 Santa… Cali… 06083
+ 8 2020-03-22 Santa… Cali… 06083
+ 9 2020-03-23 Santa… Cali… 06083
+10 2020-03-24 Santa… Cali… 06083
+# … with 468 more rows, and 4
+#   more variables:
+#   cases &lt;dbl&gt;, deaths &lt;dbl&gt;,
+#   newCases &lt;dbl&gt;,
+#   newCases2 &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+  filter(county == "Santa Barbara") %&gt;%
+  mutate(newCases = cases - lag(cases)) %&gt;%
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%
+* pivot_longer(cols = c('cases', 'newCases'))
+```
+]
+ 
+.panel2-lag-auto[
+
+```
+# A tibble: 956 x 8
+   date       county state fips 
+   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
+ 1 2020-03-15 Santa… Cali… 06083
+ 2 2020-03-15 Santa… Cali… 06083
+ 3 2020-03-16 Santa… Cali… 06083
+ 4 2020-03-16 Santa… Cali… 06083
+ 5 2020-03-17 Santa… Cali… 06083
+ 6 2020-03-17 Santa… Cali… 06083
+ 7 2020-03-18 Santa… Cali… 06083
+ 8 2020-03-18 Santa… Cali… 06083
+ 9 2020-03-19 Santa… Cali… 06083
+10 2020-03-19 Santa… Cali… 06083
+# … with 946 more rows, and 4
+#   more variables:
+#   deaths &lt;dbl&gt;,
+#   newCases2 &lt;dbl&gt;,
+#   name &lt;chr&gt;, value &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+  filter(county == "Santa Barbara") %&gt;%
+  mutate(newCases = cases - lag(cases)) %&gt;%
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%
+* mutate(name = fct_recode(name,
+*                          "Cummulative Cases" = "cases",
+*                          "New Cases" = "newCases"))
+```
+]
+ 
+.panel2-lag-auto[
+
+```
+# A tibble: 956 x 8
+   date       county state fips 
+   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
+ 1 2020-03-15 Santa… Cali… 06083
+ 2 2020-03-15 Santa… Cali… 06083
+ 3 2020-03-16 Santa… Cali… 06083
+ 4 2020-03-16 Santa… Cali… 06083
+ 5 2020-03-17 Santa… Cali… 06083
+ 6 2020-03-17 Santa… Cali… 06083
+ 7 2020-03-18 Santa… Cali… 06083
+ 8 2020-03-18 Santa… Cali… 06083
+ 9 2020-03-19 Santa… Cali… 06083
+10 2020-03-19 Santa… Cali… 06083
+# … with 946 more rows, and 4
+#   more variables:
+#   deaths &lt;dbl&gt;,
+#   newCases2 &lt;dbl&gt;,
+#   name &lt;fct&gt;, value &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+  filter(county == "Santa Barbara") %&gt;%
+  mutate(newCases = cases - lag(cases)) %&gt;%
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%
+  mutate(name = fct_recode(name,
+                           "Cummulative Cases" = "cases",
+                           "New Cases" = "newCases")) %&gt;%
+* ggplot(aes(x = date, y = value))
+```
+]
+ 
+.panel2-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_07_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+  filter(county == "Santa Barbara") %&gt;%
+  mutate(newCases = cases - lag(cases)) %&gt;%
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%
+  mutate(name = fct_recode(name,
+                           "Cummulative Cases" = "cases",
+                           "New Cases" = "newCases")) %&gt;%
+  ggplot(aes(x = date, y = value)) +
+* geom_col(aes(color = name, fill = name))
+```
+]
+ 
+.panel2-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_08_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+  filter(county == "Santa Barbara") %&gt;%
+  mutate(newCases = cases - lag(cases)) %&gt;%
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%
+  mutate(name = fct_recode(name,
+                           "Cummulative Cases" = "cases",
+                           "New Cases" = "newCases")) %&gt;%
+  ggplot(aes(x = date, y = value)) +
+  geom_col(aes(color = name, fill = name)) +
+* facet_wrap(~name)
+```
+]
+ 
+.panel2-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_09_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+  filter(county == "Santa Barbara") %&gt;%
+  mutate(newCases = cases - lag(cases)) %&gt;%
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%
+  mutate(name = fct_recode(name,
+                           "Cummulative Cases" = "cases",
+                           "New Cases" = "newCases")) %&gt;%
+  ggplot(aes(x = date, y = value)) +
+  geom_col(aes(color = name, fill = name)) +
+  facet_wrap(~name) +
+* facet_wrap(~name, scales = "free_y")
+```
+]
+ 
+.panel2-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_10_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+  filter(county == "Santa Barbara") %&gt;%
+  mutate(newCases = cases - lag(cases)) %&gt;%
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%
+  mutate(name = fct_recode(name,
+                           "Cummulative Cases" = "cases",
+                           "New Cases" = "newCases")) %&gt;%
+  ggplot(aes(x = date, y = value)) +
+  geom_col(aes(color = name, fill = name)) +
+  facet_wrap(~name) +
+  facet_wrap(~name, scales = "free_y") +
+* theme_linedraw()
+```
+]
+ 
+.panel2-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_11_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+  filter(county == "Santa Barbara") %&gt;%
+  mutate(newCases = cases - lag(cases)) %&gt;%
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%
+  mutate(name = fct_recode(name,
+                           "Cummulative Cases" = "cases",
+                           "New Cases" = "newCases")) %&gt;%
+  ggplot(aes(x = date, y = value)) +
+  geom_col(aes(color = name, fill = name)) +
+  facet_wrap(~name) +
+  facet_wrap(~name, scales = "free_y") +
+  theme_linedraw() +
+* theme(legend.position = "none")
+```
+]
+ 
+.panel2-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_12_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Lagging Values: 2 ways
+.panel1-lag-auto[
+
+```r
+covid %&gt;%
+  filter(county == "Santa Barbara") %&gt;%
+  mutate(newCases = cases - lag(cases)) %&gt;%
+  mutate(newCases2 = c(NA, diff(cases))) %&gt;%
+  pivot_longer(cols = c('cases', 'newCases')) %&gt;%
+  mutate(name = fct_recode(name,
+                           "Cummulative Cases" = "cases",
+                           "New Cases" = "newCases")) %&gt;%
+  ggplot(aes(x = date, y = value)) +
+  geom_col(aes(color = name, fill = name)) +
+  facet_wrap(~name) +
+  facet_wrap(~name, scales = "free_y") +
+  theme_linedraw() +
+  theme(legend.position = "none") +
+* labs(title = "Santa Barbara Cases Cases")
+```
+]
+ 
+.panel2-lag-auto[
+&lt;img src="lecture-08_files/figure-html/lag_auto_13_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-lag-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-lag-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-lag-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+# Real World Application
+
+- From a New York Times Article
+
+&lt;img src="lec-img/08-alabama-covid.png" width = "50%"&gt;
+
+---
+# Getting Help
+
+&lt;img src="lec-img/08-rollmean-google.png"&gt;
+
+---
+# Reading the docs ...
+
+
+```r
+install.packages("zoo")
+library(zoo)
+?rollmean
+```
+
+&lt;img src="lec-img/08-rollmean-doc.png" width = "50%"&gt;
+
+---
+# Testing ...:
+
+
+```r
+(x = c(1:20))
+```
+
+```
+ [1]  1  2  3  4  5  6  7  8  9
+[10] 10 11 12 13 14 15 16 17 18
+[19] 19 20
+```
+
+```r
+#k	integer width of the rolling window. Must be odd for rollmedian.
+rollmean(x, k =5)
+```
+
+```
+ [1]  3  4  5  6  7  8  9 10 11
+[10] 12 13 14 15 16 17 18
+```
+
+```r
+#fill: a three-component vector or list (recycled otherwise) providing filling values 
+#      at the left/within/to the right of the data range. 
+rollmean(x, k= 5, fill = NA)
+```
+
+```
+ [1] NA NA  3  4  5  6  7  8  9
+[10] 10 11 12 13 14 15 16 17 18
+[19] NA NA
+```
+
+```r
+#align: character specifying whether the index of the result should be 
+#       left- or right-aligned or centered (default) compared to the rolling 
+#       window of observations.
+rollmean(x, k= 5, fill = NA, align = "right")
+```
+
+```
+ [1] NA NA NA NA  3  4  5  6  7
+[10]  8  9 10 11 12 13 14 15 16
+[19] 17 18
+```
+
+
+---
+
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+*state.of.interest = "Alabama"
+```
+]
+ 
+.panel2-al-auto[
+
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+*covid
+```
+]
+ 
+.panel2-al-auto[
+
+```
+# A tibble: 1,488,568 x 6
+   date       county state fips 
+   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
+ 1 2020-01-21 Snoho… Wash… 53061
+ 2 2020-01-22 Snoho… Wash… 53061
+ 3 2020-01-23 Snoho… Wash… 53061
+ 4 2020-01-24 Cook   Illi… 17031
+ 5 2020-01-24 Snoho… Wash… 53061
+ 6 2020-01-25 Orange Cali… 06059
+ 7 2020-01-25 Cook   Illi… 17031
+ 8 2020-01-25 Snoho… Wash… 53061
+ 9 2020-01-26 Maric… Ariz… 04013
+10 2020-01-26 Los A… Cali… 06037
+# … with 1,488,558 more rows,
+#   and 2 more variables:
+#   cases &lt;dbl&gt;, deaths &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+* filter(state == state.of.interest)
+```
+]
+ 
+.panel2-al-auto[
+
+```
+# A tibble: 31,408 x 6
+   date       county state fips 
+   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
+ 1 2020-03-13 Elmore Alab… 01051
+ 2 2020-03-13 Jeffe… Alab… 01073
+ 3 2020-03-13 Limes… Alab… 01083
+ 4 2020-03-13 Montg… Alab… 01101
+ 5 2020-03-13 Tusca… Alab… 01125
+ 6 2020-03-14 Baldw… Alab… 01003
+ 7 2020-03-14 Elmore Alab… 01051
+ 8 2020-03-14 Jeffe… Alab… 01073
+ 9 2020-03-14 Limes… Alab… 01083
+10 2020-03-14 Montg… Alab… 01101
+# … with 31,398 more rows, and
+#   2 more variables:
+#   cases &lt;dbl&gt;, deaths &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+  filter(state == state.of.interest) %&gt;%
+* group_by(date)
+```
+]
+ 
+.panel2-al-auto[
+
+```
+# A tibble: 31,408 x 6
+# Groups:   date [480]
+   date       county state fips 
+   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
+ 1 2020-03-13 Elmore Alab… 01051
+ 2 2020-03-13 Jeffe… Alab… 01073
+ 3 2020-03-13 Limes… Alab… 01083
+ 4 2020-03-13 Montg… Alab… 01101
+ 5 2020-03-13 Tusca… Alab… 01125
+ 6 2020-03-14 Baldw… Alab… 01003
+ 7 2020-03-14 Elmore Alab… 01051
+ 8 2020-03-14 Jeffe… Alab… 01073
+ 9 2020-03-14 Limes… Alab… 01083
+10 2020-03-14 Montg… Alab… 01101
+# … with 31,398 more rows, and
+#   2 more variables:
+#   cases &lt;dbl&gt;, deaths &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+  filter(state == state.of.interest) %&gt;%
+  group_by(date) %&gt;%
+* summarise(cases = sum(cases))
+```
+]
+ 
+.panel2-al-auto[
+
+```
+# A tibble: 480 x 2
+   date       cases
+   &lt;date&gt;     &lt;dbl&gt;
+ 1 2020-03-13     6
+ 2 2020-03-14    12
+ 3 2020-03-15    23
+ 4 2020-03-16    29
+ 5 2020-03-17    39
+ 6 2020-03-18    51
+ 7 2020-03-19    78
+ 8 2020-03-20   106
+ 9 2020-03-21   131
+10 2020-03-22   157
+# … with 470 more rows
+```
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+  filter(state == state.of.interest) %&gt;%
+  group_by(date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+* mutate(newCases = cases - lag(cases),
+*        roll7 = rollmean(newCases, 7, fill = NA, align="right"))
+```
+]
+ 
+.panel2-al-auto[
+
+```
+# A tibble: 480 x 4
+   date       cases newCases
+   &lt;date&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+ 1 2020-03-13     6       NA
+ 2 2020-03-14    12        6
+ 3 2020-03-15    23       11
+ 4 2020-03-16    29        6
+ 5 2020-03-17    39       10
+ 6 2020-03-18    51       12
+ 7 2020-03-19    78       27
+ 8 2020-03-20   106       28
+ 9 2020-03-21   131       25
+10 2020-03-22   157       26
+# … with 470 more rows, and 1
+#   more variable: roll7 &lt;dbl&gt;
+```
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+  filter(state == state.of.interest) %&gt;%
+  group_by(date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  mutate(newCases = cases - lag(cases),
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%
+* ggplot(aes(x = date))
+```
+]
+ 
+.panel2-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_07_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+  filter(state == state.of.interest) %&gt;%
+  group_by(date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  mutate(newCases = cases - lag(cases),
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%
+  ggplot(aes(x = date)) +
+* geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5")
+```
+]
+ 
+.panel2-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_08_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+  filter(state == state.of.interest) %&gt;%
+  group_by(date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  mutate(newCases = cases - lag(cases),
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%
+  ggplot(aes(x = date)) +
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +
+* geom_line(aes(y = roll7), col = "darkred", size = 1)
+```
+]
+ 
+.panel2-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_09_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+  filter(state == state.of.interest) %&gt;%
+  group_by(date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  mutate(newCases = cases - lag(cases),
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%
+  ggplot(aes(x = date)) +
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +
+  geom_line(aes(y = roll7), col = "darkred", size = 1) +
+* ggthemes::theme_wsj()
+```
+]
+ 
+.panel2-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_10_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+  filter(state == state.of.interest) %&gt;%
+  group_by(date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  mutate(newCases = cases - lag(cases),
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%
+  ggplot(aes(x = date)) +
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +
+  geom_line(aes(y = roll7), col = "darkred", size = 1) +
+  ggthemes::theme_wsj() +
+* labs(title = paste("New Reported cases by day in", state.of.interest))
+```
+]
+ 
+.panel2-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_11_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+  filter(state == state.of.interest) %&gt;%
+  group_by(date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  mutate(newCases = cases - lag(cases),
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%
+  ggplot(aes(x = date)) +
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +
+  geom_line(aes(y = roll7), col = "darkred", size = 1) +
+  ggthemes::theme_wsj() +
+  labs(title = paste("New Reported cases by day in", state.of.interest)) +
+* theme(plot.background = element_rect(fill = "white"),
+*       panel.background = element_rect(fill = "white"),
+*       plot.title = element_text(size = 14, face = 'bold'))
+```
+]
+ 
+.panel2-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_12_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+  filter(state == state.of.interest) %&gt;%
+  group_by(date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  mutate(newCases = cases - lag(cases),
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%
+  ggplot(aes(x = date)) +
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +
+  geom_line(aes(y = roll7), col = "darkred", size = 1) +
+  ggthemes::theme_wsj() +
+  labs(title = paste("New Reported cases by day in", state.of.interest)) +
+  theme(plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"),
+        plot.title = element_text(size = 14, face = 'bold')) +
+* theme(aspect.ratio = .5)
+```
+]
+ 
+.panel2-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_13_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+#Replicate the NY-Times Image
+.panel1-al-auto[
+
+```r
+state.of.interest = "Alabama"
+
+covid %&gt;%
+  filter(state == state.of.interest) %&gt;%
+  group_by(date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  mutate(newCases = cases - lag(cases),
+         roll7 = rollmean(newCases, 7, fill = NA, align="right")) %&gt;%
+  ggplot(aes(x = date)) +
+  geom_col(aes(y = newCases), col = NA, fill = "#F5B8B5") +
+  geom_line(aes(y = roll7), col = "darkred", size = 1) +
+  ggthemes::theme_wsj() +
+  labs(title = paste("New Reported cases by day in", state.of.interest)) +
+  theme(plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"),
+        plot.title = element_text(size = 14, face = 'bold')) +
+  theme(aspect.ratio = .5)
+```
+]
+ 
+.panel2-al-auto[
+&lt;img src="lecture-08_files/figure-html/al_auto_14_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-al-auto {
+  color: black;
+  width: 48.5%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-al-auto {
+  color: black;
+  width: 48.5%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-al-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+---
+
+class: middle, center, inverse
+# Nicely Rendering Tables in Reports:
+---
+
+# Some toy data (hint, hint)
+
+
+```r
+dat = covid %&gt;% 
+  filter(state == "California") %&gt;% 
+  group_by(county) %&gt;% 
+  mutate(newCases = cases - lag(cases)) %&gt;% 
+  ungroup() %&gt;% 
+  filter(date == max(date)) 
+
+(most_new_cases = dat %&gt;% 
+  slice_max(newCases, n = 5) %&gt;% 
+  select(county, newCases))
+```
+
+```
+# A tibble: 58 x 2
+   county       newCases
+   &lt;chr&gt;           &lt;dbl&gt;
+ 1 Los Angeles       436
+ 2 Santa Clara       114
+ 3 Contra Costa       68
+ 4 Kings               2
+ 5 Alameda             0
+ 6 Alpine              0
+ 7 Amador              0
+ 8 Butte               0
+ 9 Calaveras           0
+10 Colusa              0
+# … with 48 more rows
+```
+
+---
+
+# knitr::kable
+
+- base table
+
+
+```r
+knitr::kable(most_new_cases)
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; county &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; newCases &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Los Angeles &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 436 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Clara &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 114 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Contra Costa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Kings &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alameda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alpine &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Amador &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Butte &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Calaveras &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colusa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Del Norte &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; El Dorado &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Fresno &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Glenn &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Humboldt &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Imperial &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Inyo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Kern &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lake &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lassen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Madera &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Marin &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mariposa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mendocino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Merced &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Modoc &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mono &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Monterey &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Napa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Nevada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Orange &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Placer &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Plumas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Riverside &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sacramento &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Benito &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Bernardino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Diego &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Francisco &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Joaquin &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Luis Obispo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Mateo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Barbara &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Cruz &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Shasta &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sierra &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Siskiyou &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Solano &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sonoma &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Stanislaus &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sutter &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tehama &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Trinity &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tulare &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tuolumne &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Ventura &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Yolo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Yuba &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# knitr::kable
+
+- add a caption
+
+
+```r
+knitr::kable(most_new_cases, caption = "Most New Cases California Counties")
+```
+
+&lt;table&gt;
+&lt;caption&gt;Most New Cases California Counties&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; county &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; newCases &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Los Angeles &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 436 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Clara &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 114 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Contra Costa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Kings &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alameda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alpine &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Amador &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Butte &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Calaveras &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colusa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Del Norte &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; El Dorado &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Fresno &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Glenn &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Humboldt &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Imperial &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Inyo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Kern &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lake &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lassen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Madera &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Marin &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mariposa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mendocino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Merced &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Modoc &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mono &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Monterey &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Napa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Nevada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Orange &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Placer &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Plumas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Riverside &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sacramento &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Benito &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Bernardino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Diego &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Francisco &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Joaquin &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Luis Obispo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Mateo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Barbara &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Cruz &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Shasta &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sierra &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Siskiyou &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Solano &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sonoma &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Stanislaus &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sutter &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tehama &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Trinity &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tulare &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tuolumne &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Ventura &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Yolo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Yuba &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# knitr::kable
+
+- Refine col.names
+
+
+```r
+knitr::kable(most_new_cases, 
+             caption = "Most New Cases California Counties",
+             col.names = c("County", "New Cases"))
+```
+
+&lt;table&gt;
+&lt;caption&gt;Most New Cases California Counties&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; County &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; New Cases &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Los Angeles &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 436 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Clara &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 114 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Contra Costa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Kings &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alameda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alpine &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Amador &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Butte &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Calaveras &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colusa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Del Norte &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; El Dorado &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Fresno &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Glenn &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Humboldt &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Imperial &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Inyo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Kern &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lake &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lassen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Madera &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Marin &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mariposa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mendocino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Merced &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Modoc &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mono &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Monterey &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Napa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Nevada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Orange &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Placer &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Plumas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Riverside &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sacramento &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Benito &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Bernardino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Diego &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Francisco &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Joaquin &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Luis Obispo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Mateo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Barbara &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Cruz &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Shasta &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sierra &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Siskiyou &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Solano &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sonoma &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Stanislaus &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sutter &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tehama &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Trinity &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tulare &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tuolumne &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Ventura &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Yolo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Yuba &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# knitr::kable
+
+- Refine number formatting
+
+
+```r
+knitr::kable(most_new_cases, 
+             caption = "Most New Cases California Counties",
+             col.names = c("County", "New Cases"),
+             format.args = list(big.mark = ","))
+```
+
+&lt;table&gt;
+&lt;caption&gt;Most New Cases California Counties&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; County &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; New Cases &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Los Angeles &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 436 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Clara &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 114 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Contra Costa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Kings &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alameda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alpine &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Amador &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Butte &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Calaveras &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colusa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Del Norte &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; El Dorado &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Fresno &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Glenn &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Humboldt &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Imperial &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Inyo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Kern &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lake &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lassen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Madera &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Marin &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mariposa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mendocino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Merced &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Modoc &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mono &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Monterey &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Napa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Nevada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Orange &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Placer &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Plumas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Riverside &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sacramento &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Benito &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Bernardino &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Diego &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Francisco &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Joaquin &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Luis Obispo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; San Mateo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Barbara &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Santa Cruz &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Shasta &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sierra &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Siskiyou &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Solano &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sonoma &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Stanislaus &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sutter &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tehama &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Trinity &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tulare &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tuolumne &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Ventura &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Yolo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Yuba &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# kableExtra::kable (optional!)
+
+- Adding style with kableExtra
+
+
+```r
+#install.package("kableExtra")
+knitr::kable(most_new_cases, 
+             caption = "Most New Cases California Counties",
+             col.names = c("County", "New Cases"),
+             format.args = list(big.mark = ",")) %&gt;% 
+  kableExtra::kable_styling("striped", full_width = TRUE, font_size = 14)
+```
+
+&lt;img src="lec-img/08-kableExtra.png"&gt;
+
+---
+
+## Assignment
+
+In your `geog13-daily-exercises/R` directory
+
+1. Create a new file called `day-08.R`
+2. Open that file and add your name, date, and the purpose of the script as comments (preceded by #)
+
+***
+
+**Question 1**: Plot the daily _new_ cases overlaid with a _7-day rolling mean_ for a **state** of your choice (cannot be Alabama)
+
+---
+
+class: middle, center
+# Submission:
+
+Push your work to Github
+
+Turn in your Rscript, image and image to the Gauchospace dropbox
+
+---
+class: middle, center, inverse
+# END
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
