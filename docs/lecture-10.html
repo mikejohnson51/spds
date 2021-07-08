@@ -1,0 +1,2405 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 10: Features
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+
+---
+
+# Simple Features
+
+&lt;img src="lec-img/09-sf-model.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+# Todays Data:
+
+
+```
+Simple feature collection with 58 features and 4 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+Geodetic CRS:  NAD83
+# A tibble: 58 x 5
+   geoid name         aland stat_nm                             geometry
+   &lt;chr&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;                     &lt;MULTIPOLYGON [°]&gt;
+ 1 06075 San Fra…   1.21e 8 Califo… (((-122.512 37.77113, -122.4654 37.…
+ 2 06057 Nevada     2.48e 9 Califo… (((-121.2661 39.27272, -121.1275 39…
+ 3 06047 Merced     5.01e 9 Califo… (((-121.2268 37.13477, -120.9638 37…
+ 4 06003 Alpine     1.91e 9 Califo… (((-120.0725 38.50987, -120.0724 38…
+ 5 06013 Contra …   1.87e 9 Califo… (((-122.4253 37.95567, -122.3676 37…
+ 6 06107 Tulare     1.25e10 Califo… (((-119.5461 36.50896, -119.4663 36…
+ 7 06033 Lake       3.25e 9 Califo… (((-123.0778 39.17379, -122.9948 39…
+ 8 06051 Mono       7.90e 9 Califo… (((-119.6392 38.32688, -119.5424 38…
+ 9 06025 Imperial   1.08e10 Califo… (((-116.1056 32.72157, -116.0811 33…
+10 06001 Alameda    1.91e 9 Califo… (((-122.3337 37.8098, -122.3039 37.…
+# … with 48 more rows
+```
+
+---
+
+# Simple Features 
+
+- Simple feature geometries describe the geometries of `features.` 
+ 
+--
+
+- The main application of simple feature geometries is to describe 2D geometries as `points`, `lines`, or `polygons`.
+
+--
+
+- “simple” refers to the fact that line or polygon geometries are represented by set of points connected with straight lines.
+
+--
+
+- Simple features access is a standard (Herring 2011, Herring (2010), ISO (2004)) for describing simple feature geometries via:
+
+--
+
+  1. a class hierarchy
+  
+--
+  
+  2. a set of operations
+
+--
+
+  3. binary and text encodings
+
+---
+
+# Simple Features Access
+
+- [Simple features](https://en.wikipedia.org/wiki/Simple_Features) or [_simple feature access_](http://www.opengeospatial.org/standards/sfa) refers to the formal standard (ISO 19125-1:2004) describing how objects in the real world can be represented in computers, with emphasis on the _spatial_ geometry of these objects. 
+
+--
+
+- It also describes how objects can be stored in and retrieved from databases, and which geometrical operations should/can be defined for them.
+
+--
+
+- The standard is widely implemented in spatial databases (such as PostGIS), commercial GIS (e.g., [ESRI ArcGIS](http://www.esri.com/)) and forms the vector data basis for libraries such as [GDAL](http://www.gdal.org/). 
+
+--
+
+- A subset of simple features (e.g. the **big 7**) forms the [GeoJSON](http://geojson.org/) specification.
+
+--
+
+-  R has well-supported classes for storing spatial data ([sp](https://CRAN.R-project.org/package=sp)) and interfacing to the above mentioned environments ([rgdal](https://CRAN.R-project.org/package=rgdal), [rgeos](https://CRAN.R-project.org/package=rgeos)), but has so far lacked a complete implementation of simple features, making conversions at times convoluted, inefficient or incomplete. 
+
+--
+
+- [sf](http://github.com/r-spatial/sf) is seeking to fill this gap and has/will succeed [sp](https://CRAN.R-project.org/package=sp)
+
+---
+
+# So what is a feature?
+
+- A feature is a thing (object) in the real world, such as a building or a river 
+
+--
+
+- They often consist of other objects. 
+
+--
+
+  - A river system can be a feature, a river can be a feature, a river outlet can be a feature.
+
+--
+
+  - A image pixel can be a feature, and the image can be a feature...
+
+---
+
+# Spatial Features
+
+- The standard says: "_A simple feature is defined by the OpenGIS Abstract specification to have both **spatial** and **non-spatial** attributes. Spatial attributes are geometry valued, and simple features are based on 2D geometry with linear interpolation between vertices._"  - [standard](http://www.opengeospatial.org/standards/sfa).
+
+--
+
+- Spatial Features have a _geometry_ describing _where_  the feature is located and _how_ it is represented.
+
+
+```r
+str(ca$geometry)
+```
+
+```
+sfc_MULTIPOLYGON of length 58; first list element: List of 1
+ $ :List of 1
+  ..$ : num [1:11, 1:2] -123 -122 -122 -122 -122 ...
+ - attr(*, "class")= chr [1:3] "XY" "MULTIPOLYGON" "sfg"
+```
+
+
+--
+
+- The geometry of a river can be its watershed, of its mainstem, or the point it drains to (see the OGC [HY_Feature](https://docs.opengeospatial.org/is/14-111r6/14-111r6.html) standard) 
+
+--
+
+
+- Features can have attributes describing other properties of the feature 
+
+- Other properties may include its length, slope, stream order or average flowrate
+
+---
+
+
+## Geometry types
+
+The following 7 simple feature types are the most common, and are the only ones used for [GeoJSON](https://tools.ietf.org/html/rfc7946):
+
+*****
+
+| SINGLE | Description                                        |
+| ---- | -------------------------------------------------- |
+| `POINT` | zero-dimensional geometry containing a single point |
+| `LINESTRING` | sequence of points connected by straight, non-self intersecting line pieces; one-dimensional geometry |
+| `POLYGON` | geometry with a positive area (two-dimensional); sequence of points form a closed, non-self intersecting ring; the first ring denotes the exterior ring, zero or more subsequent rings denote holes in this exterior ring |
+
+****
+
+| MULTI (same typed) | Description                                        |
+| ---- | -------------------------------------------------- |
+| `MULTIPOINT` | set of points; a MULTIPOINT is simple if no two Points in the MULTIPOINT are equal |
+| `MULTILINESTRING` | set of linestrings |
+| `MULTIPOLYGON` | set of polygons |
+
+
+*****
+
+| Multi-Typed | Description                                        |
+| ---- | -------------------------------------------------- |
+| `GEOMETRYCOLLECTION` | set of geometries of any type except GEOMETRYCOLLECTION |
+
+****
+
+- The descriptions above were copied from the [PostGIS manual](http://postgis.net/docs/using_postgis_dbmanagement.html).
+
+---
+
+The remaining geometries 10 are rarer, but increasingly find implementations:
+
+***
+
+| type | description                                        |
+| ---- | -------------------------------------------------- |
+| `CIRCULARSTRING` | The CIRCULARSTRING is the basic curve type, similar to a LINESTRING in the linear world. A single segment requires three points, the start and end points (first and third) and any other point on the arc. The exception to this is for a closed circle, where the start and end points are the same. In this case the second point MUST be the center of the arc, i.e., the opposite side of the circle. To chain arcs together, the last point of the previous arc becomes the first point of the next arc, just like in LINESTRING. This means that a valid circular string must have an odd number of points greater than 1. |
+| `COMPOUNDCURVE` | A compound curve is a single, continuous curve that has both curved (circular) segments and linear segments. That means that in addition to having well-formed components, the end point of every component (except the last) must be coincident with the start point of the following component. |
+| `CURVEPOLYGON` | Example compound curve in a curve polygon: CURVEPOLYGON(COMPOUNDCURVE(CIRCULARSTRING(0 0,2 0, 2 1, 2 3, 4 3),(4 3, 4 5, 1 4, 0 0)), CIRCULARSTRING(1.7 1, 1.4 0.4, 1.6 0.4, 1.6 0.5, 1.7 1) ) |
+| `MULTICURVE` |  A MultiCurve is a 1-dimensional GeometryCollection whose elements are Curves, it can include linear strings, circular strings or compound strings.  |
+| `MULTISURFACE` | A MultiSurface is a 2-dimensional GeometryCollection whose elements are Surfaces, all using coordinates from the same coordinate reference system. |
+| `CURVE` | A Curve is a 1-dimensional geometric object usually stored as a sequence of Points, with the subtype of Curve specifying the form of the interpolation between Points |
+| `SURFACE` | A Surface is a 2-dimensional geometric object |
+| `POLYHEDRALSURFACE` | A PolyhedralSurface is a contiguous collection of polygons, which share common boundary segments  |
+| `TIN` | A TIN (triangulated irregular network) is a PolyhedralSurface consisting only of Triangle patches.|
+| `TRIANGLE` | A Triangle is a polygon with 3 distinct, non-collinear vertices and no interior boundary |
+
+*****
+
+---
+
+
+## Dimensions
+
+**All** geometries are composed of `points` 
+
+--
+
+- Points are defined by coordinates in a 2-, 3- or 4-D space.  
+
+--
+
+- In addition to XY coordinates, there are two optional dimensions:
+
+  * a Z coordinate, denoting altitude
+  * an M coordinate (rarely used), denoting some _measure_ 
+
+--
+
+- The `M` describes  a property of the vertex that is *independent* of the feature. 
+
+  - It sounds attractive to encode a time as M, however these quickly become invalid once the path self-intersects.
+
+--
+
+Both Z and M are found relatively **rarely**, and software support to do something useful with them is rarer still.
+
+
+---
+
+## Valid geometries
+
+Valid geometries obey the following properties:
+
+--
+
+  - `LINESTRINGS` shall not self-intersect
+  
+--
+
+  - `POLYGON` rings shall be closed (last point = first point)
+
+--
+
+  - `POLYGON` holes (inner rings) shall be inside their exterior ring
+  
+--
+
+  - `POLYGON` inner rings shall maximally touch the exterior ring in single points, not over a line
+  
+--
+  
+  - `POLYGON` rings shall not repeat their own path
+
+--
+  
+If any of the above is **not** the case, the geometry is not valid.
+
+---
+
+## Non-simple and non-valid geometries
+
+`st_is_simple` and `st_is_valid` provide methods to help detect non-simple and non-valid geometries:
+
+--
+
+- An example of a non-simple geometries is a self-intersecting lines;
+
+
+```r
+(x1 &lt;- st_linestring(cbind(c(0,1,0,1),c(0,1,1,0))))
+```
+
+```
+LINESTRING (0 0, 1 1, 0 1, 1 0)
+```
+
+```r
+st_is_simple(x1)
+```
+
+```
+[1] FALSE
+```
+
+&lt;img src="lecture-10_files/figure-html/unnamed-chunk-7-1.png" width="20%" style="display: block; margin: auto;" /&gt;
+---
+
+- An example of a non-valid geometry are would be a polygon with slivers or self-intersections.
+
+
+```r
+(x2 &lt;- st_polygon(list(cbind(c(0,1,1,1,0,0),c(0,0,1,0.6,1,0)))))
+```
+
+```
+POLYGON ((0 0, 1 0, 1 1, 1 0.6, 0 1, 0 0))
+```
+
+```r
+(x3 &lt;- st_polygon(list(cbind(c(0,1,0,1,0),c(0,1,1,0,0)))))
+```
+
+```
+POLYGON ((0 0, 1 1, 0 1, 1 0, 0 0))
+```
+
+```r
+st_is_valid(c(x2,x3))
+```
+
+```
+[1] FALSE
+```
+
+&lt;img src="lecture-10_files/figure-html/unnamed-chunk-9-1.png" width="20%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Empty Geometries
+
+- An important concept in the feature geometry framework is the `empty` geometry. 
+
+--
+
+- `empty` geometries serve similar purposes as NA values in vectors (placeholder)
+
+--
+
+- Empty geometries arise naturally from geometrical operations, for instance:
+
+
+```r
+(e = st_intersection(st_point(c(0,0)), st_point(c(1,1))))
+```
+
+```
+GEOMETRYCOLLECTION EMPTY
+```
+
+--
+
+- It is not entirely clear what the benefit is of having `typed` empty geometries, but according to the simple feature standard they are type so the `sf` package abides by that.
+
+--
+
+- Empty geometries can be detected by:
+
+
+```r
+st_is_empty(e)
+```
+
+```
+[1] TRUE
+```
+
+---
+
+# So:
+
+  - There are 17 typed geometries supported by the simple feature standard
+  - All geometries are made up of points
+  - points can exist in 2,3,4 Dinimsonal space
+  - `LINESTRING` and `POLYGON` geometries have rules that define validity
+  - Geometries can be empty (but are still typed)
+
+---
+class: inverse, middle, center
+## Well-known Text, Well-known Binary
+---
+
+### WKT and WKB
+
+The simple feature standard includes two encodings: 
+
+--
+
+Well-known text (WKT) &amp; well-known binary (WKB) 
+
+--
+
+`Well Known Text` is human-readable:
+
+
+```r
+x &lt;- st_linestring(matrix(10:1,5))
+st_as_text(x)
+```
+
+```
+[1] "LINESTRING (10 5, 9 4, 8 3, 7 2, 6 1)"
+```
+
+In this example, 
+
+The word `LINESTRING` provides the geometry *type* which is followed by a parentheses, inside the parentheses are the `points` that make up the geometry.
+
+--
+
+Separate points are separated by a "comma", while the point coordinates are separated by a "space."
+
+---
+
+Coordinates are usually floating point numbers, and moving large amounts of information as text is slow and imprecise. 
+
+--
+
+For that reason, we use well-known binary (WKB) encoding
+
+
+```r
+x
+```
+
+```
+LINESTRING (10 5, 9 4, 8 3, 7 2, 6 1)
+```
+
+```r
+st_as_binary(x)
+```
+
+```
+ [1] 01 02 00 00 00 05 00 00 00 00 00 00 00 00 00 24 40 00 00 00 00 00
+[23] 00 14 40 00 00 00 00 00 00 22 40 00 00 00 00 00 00 10 40 00 00 00
+[45] 00 00 00 20 40 00 00 00 00 00 00 08 40 00 00 00 00 00 00 1c 40 00
+[67] 00 00 00 00 00 00 40 00 00 00 00 00 00 18 40 00 00 00 00 00 00 f0
+[89] 3f
+```
+
+--
+
+- Binary conversion is used to communicate geometries to external libraries (GDAL, GEOS, liblwgeom) and spatial databases because it is fast and lossless. 
+
+--
+
+- WKT and WKB can both be transformed back into R native objects by
+
+--
+
+
+```r
+st_as_sfc("LINESTRING(10 5, 9 4, 8 3, 7 2, 6 1)")[[1]]
+```
+
+```
+LINESTRING (10 5, 9 4, 8 3, 7 2, 6 1)
+```
+
+```r
+st_as_sfc(structure(list(st_as_binary(x)), class = "WKB"))[[1]]
+```
+
+```
+LINESTRING (10 5, 9 4, 8 3, 7 2, 6 1)
+```
+
+--
+
+Conversion between R native objects and WKB is done by package `sf` in compiled (C++/Rcpp) code, making this a reusable and fast route for I/O of simple feature geometries in R.
+
+---
+
+# How simple features are organized in R?
+
+- Simple Features is a standard that is implemented in R (not limited to R)
+
+--
+
+- So far we have discusses simple features the _standard_, rather then simple features the _implementation_
+
+--
+
+- In R, simple features are implemented using standard data *structures* (S3 classes, lists, matrix, vector).  
+
+--
+
+- Attributes are  stored in `data.frames` (or `tbl_df`)
+
+--
+
+- Feature geometries are stored in a `data.frame` column. 
+
+--
+
+- Since geometries are not single-valued, they are put in a `list-column`
+- This means each observation (element) is a list itself!
+
+--
+Remember our nested lists?
+
+
+```r
+list(list(c(1:5)))
+```
+
+```
+[[1]]
+[[1]][[1]]
+[1] 1 2 3 4 5
+```
+  
+---
+class: middle, center, inverse
+
+# sfg --&gt; sfc --&gt; sf
+
+---
+
+# sf, sfc, sfg
+
+The three classes are used to represent simple feature obejcts are:
+
+--
+
+
+* `sf`: `data.frame` with feature attributes and geometries
+
+--
+
+which is composed of
+
+* `sfc`: the `list-column` with the geometries for each feature
+
+--
+
+which is composed of
+
+* `sfg`, individual simple feature geometries
+
+---
+
+# sf, sfc, sfg
+
+&lt;img src="lec-img/10-sf-diagram.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+In the output we see:
+
+* in green a simple feature: a single **record** (row, consisting of attributes and geometry
+* in blue a single simple feature **geometry** (an object of class `sfg`)
+* in red a simple feature list-column (an object of class `sfc`, which is a column in the `data.frame`)
+
+Even though geometries are native R objects, they are printed as **well-known text**
+
+---
+
+## `sfg`: simple feature geometry (blue)
+
+&lt;img src="lec-img/10-sf-diagram.png" width="35%" style="display: block; margin: auto;" /&gt;
+
+- Simple feature geometry (`sfg`) objects carry the geometry for a single feature
+
+--
+
+- Simple feature geometries are implemented as R native data, using the following rules
+
+  1. a single POINT is a numeric vector
+  
+--
+
+  2. a set of points (e.g. in a LINESTRING or ring of a POLYGON) is a `matrix`, each row containing a point
+
+--
+
+  3. any other set is a `list`
+
+--
+
+    - list of numeric matrices for `MULTILINESTRING` and `POLYGON`
+    - list of lists of numeric matrices for `MULTIPOLYGON`
+    - list of (typed) geometries for `GEOMETRYCOLLECTION`
+
+---
+
+## `sfg`: simple feature geometry
+
+Creator functions are **rarely** used in practice, since we typically read existing spatial data. But, they are useful for illustration:
+
+
+```r
+(x &lt;- st_point(c(1,2)))
+```
+
+```
+POINT (1 2)
+```
+
+```r
+str(x)
+```
+
+```
+ 'XY' num [1:2] 1 2
+```
+
+```r
+(x &lt;- st_linestring(matrix(c(1,2,3,4), ncol=2)))
+```
+
+```
+LINESTRING (1 3, 2 4)
+```
+
+```r
+str(x)
+```
+
+```
+ 'XY' num [1:2, 1:2] 1 2 3 4
+```
+
+---
+
+## `sfg`: simple feature geometry
+
+All geometry objects have a S3 class indicating their (1) dimension, (2) type, and (3) superclass
+
+
+```r
+(pt = st_point(c(0,1)))
+```
+
+```
+POINT (0 1)
+```
+
+```r
+attributes(pt)
+```
+
+```
+$class
+[1] "XY"    "POINT" "sfg"  
+```
+
+```r
+(pt2 = st_point(c(0,1,4)))
+```
+
+```
+POINT Z (0 1 4)
+```
+
+```r
+attributes(pt2)
+```
+
+```
+$class
+[1] "XYZ"   "POINT" "sfg"  
+```
+
+---
+
+## `sfg`: simple feature geometry
+
+.pull-left[
+
+```r
+(m1 = rbind(c(8, 1), c(2, 5), c(3, 2)))
+```
+
+```
+     [,1] [,2]
+[1,]    8    1
+[2,]    2    5
+[3,]    3    2
+```
+
+```r
+(mp = st_multipoint(m1))
+```
+
+```
+MULTIPOINT ((8 1), (2 5), (3 2))
+```
+
+```r
+attributes(mp)
+```
+
+```
+$dim
+[1] 3 2
+
+$class
+[1] "XY"         "MULTIPOINT" "sfg"       
+```
+]
+
+.pull-right[
+
+```r
+(ls = st_linestring(m1))
+```
+
+```
+LINESTRING (8 1, 2 5, 3 2)
+```
+
+```r
+attributes(ls)
+```
+
+```
+$dim
+[1] 3 2
+
+$class
+[1] "XY"         "LINESTRING" "sfg"       
+```
+]
+
+---
+
+## `sfg`: simple feature geometry
+
+Although these geometries contain the same `points` (m1), they have entirely different meaning: the point set is a zero-dimensional, the line a one-dimensional geometry:
+
+Here, dimensions is no the XY vs XYZ, but rather whether the geometry has length (1D) or area (2D) or greater...
+
+
+```r
+st_dimension(mp)
+```
+
+```
+[1] 0
+```
+
+```r
+st_length(mp)
+```
+
+```
+[1] 0
+```
+
+```r
+st_dimension(ls)
+```
+
+```
+[1] 1
+```
+
+```r
+st_length(ls)
+```
+
+```
+[1] 10.37338
+```
+
+---
+
+## GEOMETRYCOLLECTION 
+
+- Single features can have a geometry that consists of several geometries of different types.
+
+--
+
+- Such cases arise rather naturally when looking for intersections. For instance, the intersection of two LINESTRING geometries may be the combination of a `LINESTRING` and a `POINT.` 
+
+--
+
+- Putting this intersection into a single feature geometry needs a `GEOMETRYCOLLECTION`
+
+--
+
+
+```r
+pt &lt;- st_point(c(1, 0))
+ls &lt;- st_linestring(matrix(c(4, 3, 0, 0), ncol = 2))
+poly1 &lt;- st_polygon(list(matrix(c(5.5, 7, 7, 6, 5.5, 0, 0, -0.5, -0.5, 0), ncol = 2)))
+poly2 &lt;- st_polygon(list(matrix(c(6.6, 8, 8, 7, 6.6, 1, 1, 1.5, 1.5, 1), ncol = 2)))
+multipoly &lt;- st_multipolygon(list(poly1, poly2))
+
+(j &lt;- st_geometrycollection(list(pt, ls, poly1, poly2, multipoly)))
+```
+
+```
+GEOMETRYCOLLECTION (POINT (1 0), LINESTRING (4 0, 3 0), POLYGON ((5.5 0, 7 0, 7 -0.5, 6 -0.5, 5.5 0)), POLYGON ((6.6 1, 8 1, 8 1.5, 7 1.5, 6.6 1)), MULTIPOLYGON (((5.5 0, 7 0, 7 -0.5, 6 -0.5, 5.5 0)), ((6.6 1, 8 1, 8 1.5, 7 1.5, 6.6 1))))
+```
+
+---
+
+- In case we end up with `GEOMETRYCOLLECTION` objects, the next question is often what to do with them. One thing we can do is extract elements from them:
+
+--
+
+```r
+st_collection_extract(j, "POLYGON")
+```
+
+```
+Geometry set for 3 features 
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 5.5 ymin: -0.5 xmax: 8 ymax: 1.5
+CRS:           NA
+```
+
+```
+MULTIPOLYGON (((5.5 0, 7 0, 7 -0.5, 6 -0.5, 5.5...
+```
+
+```
+MULTIPOLYGON (((6.6 1, 8 1, 8 1.5, 7 1.5, 6.6 1)))
+```
+
+```
+MULTIPOLYGON (((5.5 0, 7 0, 7 -0.5, 6 -0.5, 5.5...
+```
+
+```r
+st_collection_extract(j, "POINT")
+```
+
+```
+POINT (1 0)
+```
+
+```r
+st_collection_extract(j, "LINESTRING")
+```
+
+```
+LINESTRING (4 0, 3 0)
+```
+
+---
+
+# Conversion between geometry types
+
+We can convert simple feature geometries using the `st_cast` generic (up to the extent that a conversion is feasible):
+
+--
+
+
+```r
+methods(st_cast)
+```
+
+```
+ [1] st_cast.CIRCULARSTRING*     st_cast.COMPOUNDCURVE*     
+ [3] st_cast.CURVE*              st_cast.GEOMETRYCOLLECTION*
+ [5] st_cast.LINESTRING*         st_cast.MULTICURVE*        
+ [7] st_cast.MULTILINESTRING*    st_cast.MULTIPOINT*        
+ [9] st_cast.MULTIPOLYGON*       st_cast.MULTISURFACE*      
+[11] st_cast.POINT*              st_cast.POLYGON*           
+[13] st_cast.sf*                 st_cast.sfc*               
+[15] st_cast.sfc_CIRCULARSTRING*
+see '?methods' for accessing help and source code
+```
+
+---
+
+Lets take the Santa Barbara County in our California sf object:
+
+
+```r
+(ca1 = ca$geometry[[35]])
+```
+
+```
+MULTIPOLYGON (((-119.9162 34.05835, -119.8573 34.0713, -119.7395 34.0493, -119.5667 34.05345, -119.4707 34.054, -119.4877 33.99652, -119.5545 33.99782, -119.6628 33.98589, -119.7212 33.95958, -119.7959 33.96293, -119.8734 33.98038, -119.8769 34.02353, -119.9162 34.05835)), ((-120.3683 34.07647, -120.2425 34.05717, -120.1359 34.02609, -120.0551 34.03773, -119.9843 33.98395, -119.9737 33.94248, -120.0497 33.91456, -120.1218 33.89571, -120.179 33.92799, -120.2001 33.9569, -120.3648 33.99178, -120.4541 34.02808, -120.3683 34.07647)), ((-120.6503 34.97517, -120.4962 34.99316, -120.4355 34.98676, -120.3018 34.90557, -120.3345 35.00632, -120.1884 35.03038, -120.1676 35.0753, -120.0821 35.11468, -119.9801 35.05757, -119.9284 35.05979, -119.7456 34.97368, -119.673 34.97338, -119.5358 34.89758, -119.4728 34.90117, -119.4424 34.90127, -119.4424 34.5611, -119.4423 34.46395, -119.446 34.40407, -119.4779 34.37884, -119.537 34.3955, -119.6169 34.421, -119.6847 34.4083, -119.7091 34.3954, -119.7859 34.416, -119.8358 34.4158, -119.874 34.4088, -119.972 34.44464, -120.0507 34.46165, -120.1412 34.47341, -120.2951 34.47062, -120.4514 34.44709, -120.5114 34.52295, -120.5501 34.54279, -120.5813 34.55696, -120.6226 34.55402, -120.6457 34.58104, -120.602 34.6921, -120.6149 34.73071, -120.6263 34.73807, -120.6103 34.85818, -120.6708 34.90412, -120.6503 34.97517)))
+```
+
+```r
+(ca_ls = st_cast(ca1, "MULTILINESTRING"))
+```
+
+```
+MULTILINESTRING ((-119.9162 34.05835, -119.8573 34.0713, -119.7395 34.0493, -119.5667 34.05345, -119.4707 34.054, -119.4877 33.99652, -119.5545 33.99782, -119.6628 33.98589, -119.7212 33.95958, -119.7959 33.96293, -119.8734 33.98038, -119.8769 34.02353, -119.9162 34.05835), (-120.3683 34.07647, -120.2425 34.05717, -120.1359 34.02609, -120.0551 34.03773, -119.9843 33.98395, -119.9737 33.94248, -120.0497 33.91456, -120.1218 33.89571, -120.179 33.92799, -120.2001 33.9569, -120.3648 33.99178, -120.4541 34.02808, -120.3683 34.07647), (-120.6503 34.97517, -120.4962 34.99316, -120.4355 34.98676, -120.3018 34.90557, -120.3345 35.00632, -120.1884 35.03038, -120.1676 35.0753, -120.0821 35.11468, -119.9801 35.05757, -119.9284 35.05979, -119.7456 34.97368, -119.673 34.97338, -119.5358 34.89758, -119.4728 34.90117, -119.4424 34.90127, -119.4424 34.5611, -119.4423 34.46395, -119.446 34.40407, -119.4779 34.37884, -119.537 34.3955, -119.6169 34.421, -119.6847 34.4083, -119.7091 34.3954, -119.7859 34.416, -119.8358 34.4158, -119.874 34.4088, -119.972 34.44464, -120.0507 34.46165, -120.1412 34.47341, -120.2951 34.47062, -120.4514 34.44709, -120.5114 34.52295, -120.5501 34.54279, -120.5813 34.55696, -120.6226 34.55402, -120.6457 34.58104, -120.602 34.6921, -120.6149 34.73071, -120.6263 34.73807, -120.6103 34.85818, -120.6708 34.90412, -120.6503 34.97517))
+```
+
+&lt;img src="lecture-10_files/figure-html/unnamed-chunk-27-1.png" width="432" /&gt;
+
+---
+
+It is often convenient to analyze the the points that make up a `LINESTRING` However,
+
+
+```r
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;% 
+  st_linestring() %&gt;% 
+  st_cast("POINT")
+```
+
+```
+Warning in st_cast.LINESTRING(., "POINT"): point from first coordinate
+only
+```
+
+```
+POINT (0 0)
+```
+
+does not what we expect, because it will convert a **single** geometry into a new **single** geometry (one line to one point)
+
+---
+
+Instead, we must recognize that a collection of points is what defines a `LINSETRING` and a collection of of `POINT`, operating as a single unit, is a `MULTIPOINT`
+
+
+```r
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;% 
+  st_linestring() %&gt;% 
+  st_cast("MULTIPOINT")
+```
+
+```
+MULTIPOINT ((0 0), (1 1), (1 0), (0 1))
+```
+
+---
+
+If we really wanted the individual `POINT` geometries, we need to work with sets:
+
+
+```r
+(p &lt;- rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;% 
+   st_linestring() %&gt;% 
+*  st_sfc() %&gt;%
+   st_cast("POINT"))
+```
+
+```
+Geometry set for 4 features 
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:           NA
+```
+
+```
+POINT (0 0)
+```
+
+```
+POINT (1 1)
+```
+
+```
+POINT (1 0)
+```
+
+```
+POINT (0 1)
+```
+
+---
+
+#  `sfc`: sets of geometries
+
+- `sf` provides a dedicated class for handeling geometry sets, called `sfc` (simple feature geometry list column). 
+
+--
+
+- We can create such a list column with constructor function `st_sfc`:
+
+
+```r
+(sfc = st_sfc(st_point(c(0,1)), st_point(c(-3,2))))
+```
+
+```
+Geometry set for 2 features 
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -3 ymin: 1 xmax: 0 ymax: 2
+CRS:           NA
+```
+
+```
+POINT (0 1)
+```
+
+```
+POINT (-3 2)
+```
+
+--
+
+The default report from the print method for sfc gives
+
+- the number of features geometries
+- the feature geometry type (here: POINT)
+- the feature geometry dimension (here: XY)
+- the bounding box for the set
+- the coordinate reference system for the set (epsg and proj4string)
+- the first few geometries, as (abbreviated) WKT
+
+---
+
+The class of the geometry `list-column` is a combination of a specific class, and a superclass. 
+
+
+```r
+class(sfc)
+```
+
+```
+[1] "sfc_POINT" "sfc"      
+```
+
+--
+
+In addition to a class, the `sfc` object has further attributes (remember S3 class!)
+
+
+```r
+attributes(sfc) %&gt;% names()
+```
+
+```
+[1] "class"     "precision" "bbox"      "crs"       "n_empty"  
+```
+
+which are used to record for the whole set:
+
+- a precision value
+- the bounding box enclosing all geometries (for x and y)
+- a coordinate reference system
+- the number of empty geometries contained in the set
+
+--
+
+This means that all these properties are defined for the set (sfc), and not for geometries (sfg) individually.
+
+---
+
+`sfc` objects are lists with each entry being an sfg object:
+
+
+```r
+p[[2]]
+```
+
+```
+POINT (1 1)
+```
+
+and we will use these lists as _list columns_ in `data.frame` or `tibble` objects to represent simple features with geometries in a list column.
+
+---
+
+
+count: false
+ 
+Sets of geometries arise when we separate compound geometries: 
+.panel1-set-auto[
+
+```r
+*rbind(c(0,0), c(1,1), c(1,0), c(0,1))
+```
+]
+ 
+.panel2-set-auto[
+
+```
+     [,1] [,2]
+[1,]    0    0
+[2,]    1    1
+[3,]    1    0
+[4,]    0    1
+```
+]
+
+---
+count: false
+ 
+Sets of geometries arise when we separate compound geometries: 
+.panel1-set-auto[
+
+```r
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;%
+*  st_linestring()
+```
+]
+ 
+.panel2-set-auto[
+
+```
+LINESTRING (0 0, 1 1, 1 0, 0 1)
+```
+]
+
+---
+count: false
+ 
+Sets of geometries arise when we separate compound geometries: 
+.panel1-set-auto[
+
+```r
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;%
+   st_linestring() %&gt;%
+*  st_sfc()
+```
+]
+ 
+.panel2-set-auto[
+
+```
+Geometry set for 1 feature 
+Geometry type: LINESTRING
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:           NA
+```
+
+```
+LINESTRING (0 0, 1 1, 1 0, 0 1)
+```
+]
+
+---
+count: false
+ 
+Sets of geometries arise when we separate compound geometries: 
+.panel1-set-auto[
+
+```r
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;%
+   st_linestring() %&gt;%
+   st_sfc() %&gt;%
+*  st_cast("POINT")
+```
+]
+ 
+.panel2-set-auto[
+
+```
+Geometry set for 4 features 
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:           NA
+```
+
+```
+POINT (0 0)
+```
+
+```
+POINT (1 1)
+```
+
+```
+POINT (1 0)
+```
+
+```
+POINT (0 1)
+```
+]
+
+---
+count: false
+ 
+Sets of geometries arise when we separate compound geometries: 
+.panel1-set-auto[
+
+```r
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;%
+   st_linestring() %&gt;%
+   st_sfc() %&gt;%
+   st_cast("POINT") -&gt;
+* p
+```
+]
+ 
+.panel2-set-auto[
+
+]
+
+---
+count: false
+ 
+Sets of geometries arise when we separate compound geometries: 
+.panel1-set-auto[
+
+```r
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;%
+   st_linestring() %&gt;%
+   st_sfc() %&gt;%
+   st_cast("POINT") -&gt;
+  p
+
+
+*rbind(c(0,0), c(1,1), c(1,0), c(0,1))
+```
+]
+ 
+.panel2-set-auto[
+
+```
+     [,1] [,2]
+[1,]    0    0
+[2,]    1    1
+[3,]    1    0
+[4,]    0    1
+```
+]
+
+---
+count: false
+ 
+Sets of geometries arise when we separate compound geometries: 
+.panel1-set-auto[
+
+```r
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;%
+   st_linestring() %&gt;%
+   st_sfc() %&gt;%
+   st_cast("POINT") -&gt;
+  p
+
+
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;%
+*  st_linestring()
+```
+]
+ 
+.panel2-set-auto[
+
+```
+LINESTRING (0 0, 1 1, 1 0, 0 1)
+```
+]
+
+---
+count: false
+ 
+Sets of geometries arise when we separate compound geometries: 
+.panel1-set-auto[
+
+```r
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;%
+   st_linestring() %&gt;%
+   st_sfc() %&gt;%
+   st_cast("POINT") -&gt;
+  p
+
+
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) %&gt;%
+   st_linestring() %&gt;%
+*  st_cast("POINT")
+```
+]
+ 
+.panel2-set-auto[
+
+```
+POINT (0 0)
+```
+]
+
+&lt;style&gt;
+.panel1-set-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-set-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-set-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+- On the last slide, `st_sfc` creates a set of _one_ `LINESTRING` (p), with a size of 4.
+
+--
+
+- Going the other way around (from set to feature), we need to _combine_ geometries:
+
+--
+
+.pull-left[
+
+```r
+p
+```
+
+```
+Geometry set for 4 features 
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:           NA
+```
+
+```
+POINT (0 0)
+```
+
+```
+POINT (1 1)
+```
+
+```
+POINT (1 0)
+```
+
+```
+POINT (0 1)
+```
+]
+
+.pull-right[
+
+```r
+st_combine(p)
+```
+
+```
+Geometry set for 1 feature 
+Geometry type: MULTIPOINT
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:           NA
+```
+
+```
+MULTIPOINT ((0 0), (1 1), (1 0), (0 1))
+```
+]
+---
+
+# Casting must be done the level of the feature
+
+If we want to go from the 4 feature (p) object to a 1 feature LINESTRING, we must combine before casting ...
+
+
+```r
+st_combine(p) %&gt;% 
+  st_cast("LINESTRING")
+```
+
+```
+Geometry set for 1 feature 
+Geometry type: LINESTRING
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:           NA
+```
+
+```
+LINESTRING (0 0, 1 1, 1 0, 0 1)
+```
+
+---
+
+# Disolving Geometries 
+
+Combining geometries **preserves** their interior boundaries, unioning **resolves/dissolves** the internal boundaries:
+
+.pull-left[
+
+```r
+(ca_geom = ca$geometry)
+```
+
+```
+Geometry set for 58 features 
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+Geodetic CRS:  NAD83
+First 5 geometries:
+```
+
+```
+MULTIPOLYGON (((-122.512 37.77113, -122.4654 37...
+```
+
+```
+MULTIPOLYGON (((-121.2661 39.27272, -121.1275 3...
+```
+
+```
+MULTIPOLYGON (((-121.2268 37.13477, -120.9638 3...
+```
+
+```
+MULTIPOLYGON (((-120.0725 38.50987, -120.0724 3...
+```
+
+```
+MULTIPOLYGON (((-122.4253 37.95567, -122.3676 3...
+```
+]
+
+.pull-right[
+
+```r
+plot(ca_geom)
+```
+
+&lt;img src="lecture-10_files/figure-html/unnamed-chunk-39-1.png" width="432" /&gt;
+]
+
+]
+
+---
+
+.pull-left[
+
+```r
+(ca_c = st_combine(ca_geom) )
+```
+
+```
+Geometry set for 1 feature 
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+Geodetic CRS:  NAD83
+```
+
+```
+MULTIPOLYGON (((-122.512 37.77113, -122.4654 37...
+```
+
+```r
+(ca_u = st_union(ca_geom) )
+```
+
+```
+Geometry set for 1 feature 
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+Geodetic CRS:  NAD83
+```
+
+```
+MULTIPOLYGON (((-118.5634 33.43438, -118.4826 3...
+```
+]
+
+.pull-right[
+
+```r
+(ca_c_ml = st_combine(ca_geom) %&gt;% 
+   st_cast("MULTILINESTRING"))
+```
+
+```
+Geometry set for 1 feature 
+Geometry type: MULTILINESTRING
+Dimension:     XY
+Bounding box:  xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+Geodetic CRS:  NAD83
+```
+
+```
+MULTILINESTRING ((-122.512 37.77113, -122.4654 ...
+```
+
+```r
+(ca_u_ml = st_union(ca_geom)  %&gt;% 
+    st_cast("MULTILINESTRING"))
+```
+
+```
+Geometry set for 1 feature 
+Geometry type: MULTILINESTRING
+Dimension:     XY
+Bounding box:  xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+Geodetic CRS:  NAD83
+```
+
+```
+MULTILINESTRING ((-118.5634 33.43438, -118.4826...
+```
+]
+
+---
+
+&lt;img src="lecture-10_files/figure-html/unnamed-chunk-42-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Mixed geometries
+
+Sets of simple features also consist of features with heterogeneous geometries. In this case, the geometry type of the set is `GEOMETRY`:
+
+.pull-left[
+
+```r
+(g = st_sfc(st_point(c(0,0)), 
+            st_linestring(rbind(c(0,0), c(1,1)))))
+```
+
+```
+Geometry set for 2 features 
+Geometry type: GEOMETRY
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:           NA
+```
+
+```
+POINT (0 0)
+```
+
+```
+LINESTRING (0 0, 1 1)
+```
+]
+
+.pull-right[
+These set can be filtered by using `st_is`
+
+
+```r
+g %&gt;% st_is("LINESTRING")
+```
+
+```
+[1] FALSE  TRUE
+```
+
+or, when working with sf objects,
+
+
+```r
+st_sf(g) %&gt;% 
+  filter(st_is(., "LINESTRING"))
+```
+
+```
+Simple feature collection with 1 feature and 0 fields
+Geometry type: LINESTRING
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:           NA
+                      g
+1 LINESTRING (0 0, 1 1)
+```
+
+]
+
+---
+class: middle, center
+## `sf`: objects with simple features
+---
+
+Simple features `geometries` and feature `attributes` are put together in `sf` (simple feature) objects.  
+
+
+```r
+ca &lt;- st_read("data/ca.shp")
+```
+
+```
+Reading layer `ca' from data source 
+  `/Users/mikejohnson/github/spds/lectures/data/ca.shp' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 58 features and 12 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+Geodetic CRS:  NAD83
+```
+
+This `sf` object is of class
+
+
+```r
+class(ca)
+```
+
+```
+[1] "sf"         "data.frame"
+```
+
+meaning it extends `data.frame`, but with a single list-column with geometries, which is held in the column named:
+
+
+```r
+attr(ca, "sf_column")
+```
+
+```
+[1] "geometry"
+```
+
+---
+
+## sfc: simple feature geometry list-column
+
+The column in the `sf` `data.frame` that contains the geometries is a list, of class `sfc`.
+
+We can retrieve the geometry list-column as we would any data.frame column (e.g. `ca$geometry`), or more generally with `st_geometry`:
+
+
+```r
+(ca_geom &lt;- st_geometry(ca))
+```
+
+```
+Geometry set for 58 features 
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+Geodetic CRS:  NAD83
+First 5 geometries:
+```
+
+```
+MULTIPOLYGON (((-122.512 37.77113, -122.4654 37...
+```
+
+```
+MULTIPOLYGON (((-121.2661 39.27272, -121.1275 3...
+```
+
+```
+MULTIPOLYGON (((-121.2268 37.13477, -120.9638 3...
+```
+
+```
+MULTIPOLYGON (((-120.0725 38.50987, -120.0724 3...
+```
+
+```
+MULTIPOLYGON (((-122.4253 37.95567, -122.3676 3...
+```
+
+Geometries are printed in abbreviated form, but we can view a complete geometry by selecting it:
+
+
+```r
+ca_geom[[1]]
+```
+
+```
+MULTIPOLYGON (((-122.512 37.77113, -122.4654 37.80088, -122.3981 37.80563, -122.3853 37.79072, -122.3765 37.73856, -122.3568 37.72951, -122.3617 37.71501, -122.3898 37.70833, -122.5007 37.70813, -122.5056 37.73557, -122.512 37.77113)))
+```
+
+---
+
+## Reading and writing
+
+As we've seen above, reading spatial data from an external file can be done via `sf`
+  - reading data requires the "parser function" and the file path
+
+
+```r
+ca &lt;- st_read("data/ca.shp")
+```
+
+```
+Reading layer `ca' from data source 
+  `/Users/mikejohnson/github/spds/lectures/data/ca.shp' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 58 features and 12 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+Geodetic CRS:  NAD83
+```
+
+we can suppress the output by adding argument `quiet=TRUE` or by using the otherwise nearly identical but more quiet
+
+
+```r
+ca &lt;- read_sf("data/ca.shp")
+```
+
+Writing takes place in the same fashion, using `st_write`:
+
+
+```r
+st_write(ca, "data/ca.shp")
+```
+
+or its quiet alternative that silently overwrites existing files by default,
+
+
+```r
+write_sf(ca, "ca.shp") # silently overwrites
+```
+
+---
+
+# From CSV
+
+Spatial data can also be created from CSV and other flat files once it is in R:
+
+
+```r
+(cities = readr::read_csv("data/uscities.csv") %&gt;% 
+  select(city, state_name, county_name, population, lat, lng) )
+```
+
+```
+# A tibble: 28,889 x 6
+   city         state_name county_name population   lat   lng
+   &lt;chr&gt;        &lt;chr&gt;      &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 South Creek  Washington Pierce            2500  47.0 -122.
+ 2 Roslyn       Washington Kittitas           947  47.3 -121.
+ 3 Sprague      Washington Lincoln            441  47.3 -118.
+ 4 Gig Harbor   Washington Pierce            9507  47.3 -123.
+ 5 Lake Cassidy Washington Snohomish         3591  48.1 -122.
+ 6 Tenino       Washington Thurston          1830  46.9 -123.
+ 7 Jamestown    Washington Clallam            289  48.1 -123.
+ 8 Three Lakes  Washington Snohomish         3390  47.9 -122.
+ 9 Curlew Lake  Washington Ferry              573  48.7 -119.
+10 Chain Lake   Washington Snohomish         4280  47.9 -122.
+# … with 28,879 more rows
+```
+
+---
+
+To do this, you must specify the `X` and the `Y` coordinate columns as well as a CRS:
+
+- A typical lat/long CRS is EPSG:4326
+
+
+```r
+(cities_sf = st_as_sf(cities, coords = c("lng", "lat"), crs = 4326))
+```
+
+```
+Simple feature collection with 28889 features and 4 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -176.6295 ymin: 17.9559 xmax: 173.123 ymax: 70.638
+Geodetic CRS:  WGS 84
+# A tibble: 28,889 x 5
+   city         state_name county_name population            geometry
+ * &lt;chr&gt;        &lt;chr&gt;      &lt;chr&gt;            &lt;dbl&gt;         &lt;POINT [°]&gt;
+ 1 South Creek  Washington Pierce            2500 (-122.3921 46.9994)
+ 2 Roslyn       Washington Kittitas           947 (-121.0989 47.2507)
+ 3 Sprague      Washington Lincoln            441 (-117.9713 47.3048)
+ 4 Gig Harbor   Washington Pierce            9507 (-122.5968 47.3352)
+ 5 Lake Cassidy Washington Snohomish         3591  (-122.092 48.0639)
+ 6 Tenino       Washington Thurston          1830 (-122.8607 46.8537)
+ 7 Jamestown    Washington Clallam            289 (-123.0911 48.1229)
+ 8 Three Lakes  Washington Snohomish         3390  (-121.9924 47.942)
+ 9 Curlew Lake  Washington Ferry              573 (-118.6663 48.7311)
+10 Chain Lake   Washington Snohomish         4280 (-121.9861 47.9038)
+# … with 28,879 more rows
+```
+
+---
+
+# Data Manipulation
+
+Since `sf` objects are `data.frames`, our `dplyr` verbs work!
+
+Lets find the most populous city in each California county...
+
+---
+
+count: false
+ 
+##sf and dplyr
+.panel1-dplyr-auto[
+
+```r
+*cities_sf
+```
+]
+ 
+.panel2-dplyr-auto[
+
+```
+Simple feature collection with 28889 features and 4 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -176.6295 ymin: 17.9559 xmax: 173.123 ymax: 70.638
+Geodetic CRS:  WGS 84
+# A tibble: 28,889 x 5
+   city         state_name county_name population            geometry
+ * &lt;chr&gt;        &lt;chr&gt;      &lt;chr&gt;            &lt;dbl&gt;         &lt;POINT [°]&gt;
+ 1 South Creek  Washington Pierce            2500 (-122.3921 46.9994)
+ 2 Roslyn       Washington Kittitas           947 (-121.0989 47.2507)
+ 3 Sprague      Washington Lincoln            441 (-117.9713 47.3048)
+ 4 Gig Harbor   Washington Pierce            9507 (-122.5968 47.3352)
+ 5 Lake Cassidy Washington Snohomish         3591  (-122.092 48.0639)
+ 6 Tenino       Washington Thurston          1830 (-122.8607 46.8537)
+ 7 Jamestown    Washington Clallam            289 (-123.0911 48.1229)
+ 8 Three Lakes  Washington Snohomish         3390  (-121.9924 47.942)
+ 9 Curlew Lake  Washington Ferry              573 (-118.6663 48.7311)
+10 Chain Lake   Washington Snohomish         4280 (-121.9861 47.9038)
+# … with 28,879 more rows
+```
+]
+
+---
+count: false
+ 
+##sf and dplyr
+.panel1-dplyr-auto[
+
+```r
+cities_sf %&gt;%
+* filter(state_name == "California")
+```
+]
+ 
+.panel2-dplyr-auto[
+
+```
+Simple feature collection with 1505 features and 4 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -124.2619 ymin: 32.5689 xmax: -114.264 ymax: 41.9872
+Geodetic CRS:  WGS 84
+# A tibble: 1,505 x 5
+   city            state_name county_name population            geometry
+ * &lt;chr&gt;           &lt;chr&gt;      &lt;chr&gt;            &lt;dbl&gt;         &lt;POINT [°]&gt;
+ 1 El Dorado Hills California El Dorado        45104   (-121.049 38.675)
+ 2 Lemon Cove      California Tulare             232  (-119.0312 36.379)
+ 3 Dillon Beach    California Marin              156  (-122.956 38.2436)
+ 4 Patterson Tract California Tulare            2320 (-119.2956 36.3795)
+ 5 Redcrest        California Humboldt            36 (-123.9474 40.3987)
+ 6 Madera          California Madera           83636  (-120.0803 36.964)
+ 7 Brooktrails     California Mendocino         3705 (-123.3963 39.4429)
+ 8 Geyserville     California Sonoma             929 (-122.9034 38.7173)
+ 9 Delhi           California Merced           11622 (-120.7759 37.4306)
+10 Stanton         California Orange           38528 (-117.9935 33.8002)
+# … with 1,495 more rows
+```
+]
+
+---
+count: false
+ 
+##sf and dplyr
+.panel1-dplyr-auto[
+
+```r
+cities_sf %&gt;%
+  filter(state_name == "California") %&gt;%
+* group_by(county_name)
+```
+]
+ 
+.panel2-dplyr-auto[
+
+```
+Simple feature collection with 1505 features and 4 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -124.2619 ymin: 32.5689 xmax: -114.264 ymax: 41.9872
+Geodetic CRS:  WGS 84
+# A tibble: 1,505 x 5
+# Groups:   county_name [58]
+   city            state_name county_name population            geometry
+   &lt;chr&gt;           &lt;chr&gt;      &lt;chr&gt;            &lt;dbl&gt;         &lt;POINT [°]&gt;
+ 1 El Dorado Hills California El Dorado        45104   (-121.049 38.675)
+ 2 Lemon Cove      California Tulare             232  (-119.0312 36.379)
+ 3 Dillon Beach    California Marin              156  (-122.956 38.2436)
+ 4 Patterson Tract California Tulare            2320 (-119.2956 36.3795)
+ 5 Redcrest        California Humboldt            36 (-123.9474 40.3987)
+ 6 Madera          California Madera           83636  (-120.0803 36.964)
+ 7 Brooktrails     California Mendocino         3705 (-123.3963 39.4429)
+ 8 Geyserville     California Sonoma             929 (-122.9034 38.7173)
+ 9 Delhi           California Merced           11622 (-120.7759 37.4306)
+10 Stanton         California Orange           38528 (-117.9935 33.8002)
+# … with 1,495 more rows
+```
+]
+
+---
+count: false
+ 
+##sf and dplyr
+.panel1-dplyr-auto[
+
+```r
+cities_sf %&gt;%
+  filter(state_name == "California") %&gt;%
+  group_by(county_name) %&gt;%
+* slice_max(population, n = 1)
+```
+]
+ 
+.panel2-dplyr-auto[
+
+```
+Simple feature collection with 58 features and 4 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -124.1902 ymin: 32.7867 xmax: -115.5586 ymax: 41.7727
+Geodetic CRS:  WGS 84
+# A tibble: 58 x 5
+# Groups:   county_name [58]
+   city          state_name county_name population              geometry
+   &lt;chr&gt;         &lt;chr&gt;      &lt;chr&gt;            &lt;dbl&gt;           &lt;POINT [°]&gt;
+ 1 Oakland       California Alameda         425195   (-122.2165 37.7903)
+ 2 Mesa Vista    California Alpine             291   (-119.8033 38.8103)
+ 3 Ione          California Amador            7730   (-120.9422 38.3613)
+ 4 Chico         California Butte           106268   (-121.8152 39.7575)
+ 5 Rancho Calav… California Calaveras         6437    (-120.857 38.1248)
+ 6 Colusa        California Colusa            6781   (-122.0096 39.2049)
+ 7 Concord       California Contra Cos…     654770   (-122.0016 37.9722)
+ 8 Crescent City California Del Norte        15886   (-124.1902 41.7727)
+ 9 El Dorado Hi… California El Dorado        45104     (-121.049 38.675)
+10 Fresno        California Fresno          698021   (-119.7941 36.7831)
+# … with 48 more rows
+```
+]
+
+---
+count: false
+ 
+##sf and dplyr
+.panel1-dplyr-auto[
+
+```r
+cities_sf %&gt;%
+  filter(state_name == "California") %&gt;%
+  group_by(county_name) %&gt;%
+  slice_max(population, n = 1) -&gt;
+* ca_cities
+```
+]
+ 
+.panel2-dplyr-auto[
+
+]
+
+&lt;style&gt;
+.panel1-dplyr-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-dplyr-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-dplyr-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+## Plotting
+
+We've already seen that ggplot is a powerful visualization tool:
+
+--
+
+The 5 steps we described for building a ggplot are:
+  1. canvas
+  2. layers (geoms)
+  3. labels
+  4. facets
+  5. themes
+
+--
+  
+spatial work in R is becoming so common that ggplot comes with a sf geom (geom_sf)
+
+---
+count: false
+ 
+##sf an ggplot
+.panel1-ggplot-auto[
+
+```r
+*ggplot()
+```
+]
+ 
+.panel2-ggplot-auto[
+&lt;img src="lecture-10_files/figure-html/ggplot_auto_01_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##sf an ggplot
+.panel1-ggplot-auto[
+
+```r
+ggplot() +
+* geom_sf(data = ca, aes(fill = aland/1e10))
+```
+]
+ 
+.panel2-ggplot-auto[
+&lt;img src="lecture-10_files/figure-html/ggplot_auto_02_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##sf an ggplot
+.panel1-ggplot-auto[
+
+```r
+ggplot() +
+  geom_sf(data = ca, aes(fill = aland/1e10)) +
+* geom_sf(data = ca_cities, aes(size = population/1e5), col = "red")
+```
+]
+ 
+.panel2-ggplot-auto[
+&lt;img src="lecture-10_files/figure-html/ggplot_auto_03_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##sf an ggplot
+.panel1-ggplot-auto[
+
+```r
+ggplot() +
+  geom_sf(data = ca, aes(fill = aland/1e10)) +
+  geom_sf(data = ca_cities, aes(size = population/1e5), col = "red") +
+* theme_linedraw()
+```
+]
+ 
+.panel2-ggplot-auto[
+&lt;img src="lecture-10_files/figure-html/ggplot_auto_04_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##sf an ggplot
+.panel1-ggplot-auto[
+
+```r
+ggplot() +
+  geom_sf(data = ca, aes(fill = aland/1e10)) +
+  geom_sf(data = ca_cities, aes(size = population/1e5), col = "red") +
+  theme_linedraw() +
+* labs(title = "California Counties: Land Area",
+*      size = "Population \n(100,000)",
+*      fill = "Acres \n(billions)")
+```
+]
+ 
+.panel2-ggplot-auto[
+&lt;img src="lecture-10_files/figure-html/ggplot_auto_05_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-ggplot-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-ggplot-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-ggplot-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# Assignment
+
+- Today assignment will answer part of your questions in lab 03.
+
+- Create a new file called day-8.R in your R diretory of your daily exercise project
+
+- Yesterday, you downloaded the `USABoundaries` package. From this we can access geometries for all USA states.
+
+******
+
+1. Filer `USABoundaries:us_states` to CONUS by removing Puerto Rico, Alaska, and Hawaii
+
+
+
+
+```r
+USAboundaries::us_states()
+```
+
+```
+Simple feature collection with 52 features and 12 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -179.1743 ymin: 17.91377 xmax: 179.7739 ymax: 71.35256
+Geodetic CRS:  WGS 84
+First 10 features:
+   statefp  statens    affgeoid geoid stusps                 name lsad
+1       23 01779787 0400000US23    23     ME                Maine   00
+2       15 01779782 0400000US15    15     HI               Hawaii   00
+3       04 01779777 0400000US04    04     AZ              Arizona   00
+4       05 00068085 0400000US05    05     AR             Arkansas   00
+5       10 01779781 0400000US10    10     DE             Delaware   00
+6       13 01705317 0400000US13    13     GA              Georgia   00
+7       27 00662849 0400000US27    27     MN            Minnesota   00
+8       02 01785533 0400000US02    02     AK               Alaska   00
+9       06 01779778 0400000US06    06     CA           California   00
+10      11 01702382 0400000US11    11     DC District of Columbia   00
+          aland       awater           state_name state_abbr
+1  7.988522e+10  11748755195                Maine         ME
+2  1.663410e+10  11777698394               Hawaii         HI
+3  2.941986e+11   1027346486              Arizona         AZ
+4  1.347715e+11   2960191698             Arkansas         AR
+5  5.047195e+09   1398720828             Delaware         DE
+6  1.491698e+11   4741100880              Georgia         GA
+7  2.062323e+11  18929176411            Minnesota         MN
+8  1.477946e+12 245390495931               Alaska         AK
+9  4.035011e+11  20466718403           California         CA
+10 1.583650e+08     18633403 District of Columbia         DC
+   jurisdiction_type                       geometry
+1              state MULTIPOLYGON (((-68.92401 4...
+2              state MULTIPOLYGON (((-156.0497 1...
+3              state MULTIPOLYGON (((-114.7997 3...
+4              state MULTIPOLYGON (((-94.61792 3...
+5              state MULTIPOLYGON (((-75.77379 3...
+6              state MULTIPOLYGON (((-85.60516 3...
+7              state MULTIPOLYGON (((-97.22904 4...
+8              state MULTIPOLYGON (((179.4813 51...
+9              state MULTIPOLYGON (((-118.594 33...
+10          district MULTIPOLYGON (((-77.11976 3...
+```
+
+---
+## Assignment
+
+2. Cast CONUS into a `MULTILINESTRING` Geometry set of 1 feature:
+
+ - You should **preserve** the internal state boundaries
+ - Your result should only have 1 feature
+ - The geometry type should be `MULTILINESTRING`
+
+******
+
+Your results should look like this:
+
+.pull-left[
+
+```
+Geometry set for 1 feature 
+Geometry type: MULTILINESTRING
+Dimension:     XY
+Bounding box:  xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+Geodetic CRS:  WGS 84
+```
+
+```
+MULTILINESTRING ((-68.92401 43.88541, -68.87478...
+```
+]
+
+.pull-right[]
+&lt;img src="lecture-10_files/figure-html/unnamed-chunk-60-1.png" width="432" /&gt;
+]
+
+---
+# Assignment
+
+3. Cast CONUS into a `MULTILINESTRING` Geometry set of 1 feature:
+  - You should **dissolve** the internal boundaries
+  - Your result should only have 1 feature
+  - The geometry type should be `MULTILINESTRING`
+
+****
+
+Your results should look like this:
+.pull-left[
+
+```
+Geometry set for 1 feature 
+Geometry type: MULTILINESTRING
+Dimension:     XY
+Bounding box:  xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+Geodetic CRS:  WGS 84
+```
+
+```
+MULTILINESTRING ((-68.94443 43.83533, -68.88848...
+```
+]
+
+.pull-right[]
+&lt;img src="lecture-10_files/figure-html/unnamed-chunk-62-1.png" width="432" /&gt;
+]
+
+---
+
+
+class: middle, center
+# Submission:
+
+Push your work to Github
+
+Turn in your Rscript to the Gauchospace dropbox
+
+---
+class: middle, center, inverse
+# END
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
