@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 12: Spatial Predicates
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+# Picking back up!
+
+---
+
+# Yesterday
+
+We learned about the SRS (Spatial Reference Systems)
+
+--
+
+- They can be **geographic** (3D, angular units)
+
+--
+
+  - Ellipsoid (squished sphere model)
+
+--
+
+  - geoid (mathamatical model of gravitatial feild)
+  
+--
+  
+  - datum the relationship between the ellipsoid and geoid
+
+--
+    - can be local (NAD27)
+    
+--
+
+    - can be global (WGS84, NAD83)
+    
+---
+  
+- SRS can be projected (x-y axis, measurement units (m), false origin)
+
+--
+
+  - All PCS are based on GCS
+      
+--
+  
+  - Projections seek to place the 3D earth on 2D
+      
+--
+  
+  - Do this by defining a plane that can be conic, cylindrical or planar
+      
+--
+  
+  - "unfolding to this plane" creates distortion of **shape**, **area**, **distance**, or **direction**
+      
+--
+  
+  - The distortion is greater from point/lines of tangency or secanacy 
+
+---
+
+# Measure (GEOS Measures)
+
+- Measures are the questions we ask about the dimension of a geometry
+    
+--
+  
+  - How long is a line or polygon perimeter (unit)
+      
+--
+  
+  - What is the area of a polygon (unit^2^)
+      
+--
+  
+  - How far are two object from one another (unit)
+      
+--
+  
+  
+- Measures come from the GEOS library
+    
+--
+  
+- Measures are in the **units** of the base projection
+    
+--
+  
+- Measures can be Euclidean (PCS) or geodesic (GSC)
+
+--
+
+  - geodesic (Great Circle) distances can be more accurate by eliminating distortion
+  
+--
+
+  - but are much slower to calculate
+
+---
+
+# For example ...
+
+```r
+usa = st_cast(st_union(us_states()), "MULTILINESTRING")
+
+nrow(cities)
+```
+
+```
+[1] 28889
+```
+
+
+```r
+# Great Circle Distance in GCS
+system.time({x = st_distance(usa, cities)})
+# user      system elapsed 
+# 103.560   1.390  117.128 
+
+# Euclidian Distance on PCS
+system.time({x = st_distance(usa, cities, which = "Euclidean")})
+# user    system  elapsed 
+# 2.422   0.019   2.494 
+```
+
+
+---
+
+# Units
+
+When possible measure operations report results with a units appropriate for the CRS:
+
+
+```r
+ca = st_read("data/ca.shp")
+```
+
+```
+Reading layer `ca' from data source 
+  `/Users/mikejohnson/github/spds/lectures/data/ca.shp' using driver `ESRI Shapefile'
+Simple feature collection with 58 features and 12 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.4096 ymin: 32.53416 xmax: -114.1391 ymax: 42.00925
+Geodetic CRS:  NAD83
+```
+
+```r
+a &lt;- st_area(ca[1,])
+attributes(a) %&gt;% unlist()
+```
+
+```
+units.numerator1 units.numerator2            class 
+             "m"              "m"          "units" 
+```
+---
+
+The **units** package can be used to convert between units:
+
+
+```r
+units::set_units(a, km^2) # result in square kilometers
+```
+
+```
+113.9796 [km^2]
+```
+
+```r
+units::set_units(a, ha) # result in hectares
+```
+
+```
+11397.96 [ha]
+```
+--
+
+and the results can be stripped of their attributes for cases where numeric values are needed (e.g. math operators and ggplot):
+
+
+```r
+as.numeric(a)
+```
+
+```
+[1] 113979625
+```
+
+---
+# Daily Exersise 11
+ 
+Tasks: Read in `uscities.csv`, make an `sf` object, isolate your home town and Santa Barbara
+
+
+```r
+homes = readr::read_csv("/Users/mikejohnson/github/spds/lectures/data/uscities.csv") %&gt;%
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) %&gt;% 
+  filter(city %in% c("Santa Barbara", "Colorado Springs"))
+```
+
+---
+
+From there we needed to calculate the distance of these 2 points in a WGS84, Equal Area, and Equidistant Projection:
+
+
+```r
+st_distance(homes)
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 1423393
+[2,] 1423393       0
+```
+
+```r
+st_distance(st_transform(homes, 5070))
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 1413414
+[2,] 1413414       0
+```
+
+```r
+st_distance(st_transform(homes, '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'))
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 1352729
+[2,] 1352729       0
+```
+---
+
+Last, we needed to select 1 of  the outputs and modify/drop the units
+
+
+```r
+library(units)
+
+st_distance(homes)
+```
+
+```
+Units: [m]
+        [,1]    [,2]
+[1,]       0 1423393
+[2,] 1423393       0
+```
+
+```r
+(st_distance(homes) %&gt;% 
+  set_units("km") %&gt;% 
+  drop_units())
+```
+
+```
+         [,1]     [,2]
+[1,]    0.000 1423.393
+[2,] 1423.393    0.000
+```
+
+---
+
+# Topologic Diminsion
+
+A **POINT** is shape with a dimension of 0 that occupies a single location in coordinate space.
+
+
+```r
+# POINT defined as numeric vector
+(st_dimension(st_point(c(0,1))))
+```
+
+```
+[1] 0
+```
+--
+
+A **LINESTRING** is shape that has a dimension of 1 (length)
+
+
+```r
+# LINESTRING defined by matrix
+(st_dimension(st_linestring(matrix(1:4, nrow = 2))))
+```
+
+```
+[1] 1
+```
+
+--
+
+A **POLYGON** is surface stored as a list of its exterior and interior rings. It has a dimension of 2. (area)
+
+
+```r
+# POLYGON defined by LIST (interior and exterior rings)
+(st_dimension(st_polygon(list(matrix(c(1:4, 1,2), nrow = 3, byrow = TRUE)))))
+```
+
+```
+[1] 2
+```
+
+---
+
+## Geometric Interiors, Boundaries and Exteriors
+
+All geometries have interior, boundary and exterior regions.
+
+The terms `interior` and `boundary` are used in the context of algebraic topology and manifold theory and **not** general topology
+
+--
+
+The OGC has define these states for the common geometry types in the simple features standard:
+
+****
+|             Subtypes          | Dim 	|                        Interior (I)                        	|  boundary (B)    |   
+|:----------------------------	|:----	|:----------------------------------------------------------	|:-----------------|
+| Point, MultiPoint             | 0   	| Point, Points                                              	| Empty            |  
+| LineString, Line              | 1   	| Points that are left when the boundary points are removed. 	| Two end points.  |   	
+| Polygon                       | 2   	| Points within the rings.                                   	| Set of rings.    |   	
+  
+****
+
+---
+
+## Interior, Boundary and Exterior: POINTS
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-14-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Interior, Boundary and Exterior: LINESTRING
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-15-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Interior, Boundary and Exterior: POLYGON
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-16-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Summary
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-17-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+```
+TableGrob (3 x 4) "arrange": 12 grobs
+    z     cells    name           grob
+1   1 (1-1,1-1) arrange gtable[layout]
+2   2 (1-1,2-2) arrange gtable[layout]
+3   3 (1-1,3-3) arrange gtable[layout]
+4   4 (1-1,4-4) arrange gtable[layout]
+5   5 (2-2,1-1) arrange gtable[layout]
+6   6 (2-2,2-2) arrange gtable[layout]
+7   7 (2-2,3-3) arrange gtable[layout]
+8   8 (2-2,4-4) arrange gtable[layout]
+9   9 (3-3,1-1) arrange gtable[layout]
+10 10 (3-3,2-2) arrange gtable[layout]
+11 11 (3-3,3-3) arrange gtable[layout]
+12 12 (3-3,4-4) arrange gtable[layout]
+```
+
+---
+
+class: middle, center
+
+In the following, we are interested in the resulting geometry that occurs when 2 geometries are overlaid...
+
+---
+
+
+# Overlap is a POINT: 0D
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-18-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+--
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-19-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+--
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-20-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Overlap is a LINESTRING: 1D
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-21-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+--
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-22-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+--
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-23-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Overlap is a POLYGON: 2D
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-24-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+--
+
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-25-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+--
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-26-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+# No Overlap = FALSE
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-27-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+## DE-9IM
+
+- Dimensionally Extended 9-Intersection Model (DE-9IM)
+
+- The DE-9IM is a **topological** model and (standard) used to describe the spatial relations of two geometries 
+
+--
+
+- Used in geometry, point-set topology, geospatial topology
+
+--
+
+- The **DE-9IM** _matrix_ provides a way to classify geometry relations using the set **{0,1,2,F}** or **{T,F}**
+
+---
+
+- With a **{T,F}** matrix domain, there are 512 possible relations that can be grouped into binary classification schemes. 
+
+--
+
+- About 10 of these, have been given a common name such as _intersects_, _touches_, and _within_. 
+
+--
+
+- When testing two geometries against a scheme, the result is a spatial _predicate_ named by the scheme.
+
+--
+
+- The model was developed by Clementini and others based on the seminal works of Egenhofer 
+
+--
+
+- Provides the primary basis for queries and assertions in GIS and spatial databases (PostGIS).
+
+---
+
+# The Matrix Model
+
+The **DE-9IM** matrix is based on a 3x3 intersection matrix:
+
+
+&lt;img src="lec-img/12-de-9Im-matrix.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+--
+
+Where: 
+
+  - **dim** is the dimension of the intersection and
+  
+--
+
+  - I is the interior
+  - B is the boundary
+  - E is the exterior 
+
+Of respective geometries `a` and `b`
+
+--
+
+- Empty sets are denoted as **F** 
+- non-empty sets are denoted with the maximum dimension of the intersection *{0,1,2}*
+
+---
+
+A simplier (binary) version of this matrix can be created by mapping all non-empty intersections {0,1,2} to TRUE.
+
+
+
+![](lec-img/12-de-9Im-matrix-simple.svg)
+
+--
+
+Where `II` would state: "Does the Interior of a overlap with the Interior of b in a way that produces a point (0), line (1), or polygon (2)"
+
+--
+
+Where `IB` would state: "Does the Interior of "a" overlap with the Boundary of "b" in a way that produces a point (0), line (1), or polygon (2)"
+
+---
+
+Both matrix forms:
+  - dimensional {0,1,2,F}
+  - boolean {T,F}
+  
+Can be serialize as a "DE-9IM string code" representing the matrix in a single string element
+
+- The Open Geospatial Consortium (OGC) has standardized the typical spatial predicates (Contains, Crosses, Intersects, Touches, etc.) as *boolean* functions, and the DE-9IM model as a function that returns the DE-9IM code, with domain of {0,1,2,F}
+
+- This DE-9IM string code is a standardized format for data interchange.
+
+---
+
+# Illustration
+
+
+&lt;img src="lec-img/12-de-91m-figure.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+Reading from left-to-right and top-to-bottom, the DE-9IM(a,b) string code is '212101212'
+
+---
+
+# Spatial Predicates
+
+
+- Spatial predicates are topologically-invariant binary relations based on the DE-9IM. 
+
+--
+
+- "named spatial predicates" have been defined for some common relations.
+
+--
+
+- A few spatial predicate functions that can be derived (expressed by masks) from DE-9IM include (* = wildcard):
+
+--
+
+**Equals**:   `T*F**FFF*`  
+"Two geometries are topologically equal if their interiors intersect and no part of the interior or boundary of one geometry intersects the exterior of the other"
+
+--
+
+**Disjoint**: `FF*FF*****`  
+"a and b are disjoint: they have no point in common. They form a set of disconnected geometries."
+
+--
+
+**Touches**:  `FT*******` |	`F**T*****`  |	`F***T****`  
+"a touches b: they have at least one point in common, but their interiors do not intersect."
+
+--
+
+**Contains**: `T*****FF**`
+"a contains b: geometry b lies in a, and the interiors intersect" 
+
+--
+
+**Covers**:   `T*****FF*`	| `*T****FF*` |	`***T**FF*` |	`****T*FF*`  
+"a covers b: geometry b lies in a."
+
+---
+
+# Example Dataset
+
+- Geometry X is a 3 feature polygon colored in red
+- Cemetery Y is a 4 feature polygon colored in blue
+
+&lt;img src="lecture-12_files/figure-html/unnamed-chunk-30-1.png" width="432" /&gt;
+
+---
+
+# Spatial Predicates in R
+
+
+```r
+st_relate(x,y)
+```
+
+```
+     [,1]        [,2]        [,3]        [,4]       
+[1,] "212FF1FF2" "FF2FF1212" "212101212" "FF2FF1212"
+[2,] "FF2FF1212" "212101212" "212101212" "FF2FF1212"
+[3,] "FF2FF1212" "FF2FF1212" "212101212" "FF2FF1212"
+```
+
+```r
+st_relate(x,x)
+```
+
+```
+     [,1]        [,2]        [,3]       
+[1,] "2FFF1FFF2" "FF2F01212" "FF2F11212"
+[2,] "FF2F01212" "2FFF1FFF2" "FF2FF1212"
+[3,] "FF2F11212" "FF2FF1212" "2FFF1FFF2"
+```
+
+```r
+st_relate(y,y)
+```
+
+```
+     [,1]        [,2]        [,3]        [,4]       
+[1,] "2FFF1FFF2" "FF2FF1212" "212101212" "FF2FF1212"
+[2,] "FF2FF1212" "2FFF1FFF2" "212101212" "FF2FF1212"
+[3,] "212101212" "212101212" "2FFF1FFF2" "FF2FF1212"
+[4,] "FF2FF1212" "FF2FF1212" "FF2FF1212" "2FFF1FFF2"
+```
+
+---
+
+## Binary logical operations 
+
+Returns either a *sparse* matrix
+
+
+```r
+st_intersects(x,y)
+```
+
+```
+Sparse geometry binary predicate list of length 3, where the
+predicate was `intersects'
+ 1: 1, 3
+ 2: 2, 3
+ 3: 3
+```
+
+or a *dense* matrix
+
+
+```r
+st_intersects(x, y, sparse = FALSE)
+```
+
+```
+      [,1]  [,2] [,3]  [,4]
+[1,]  TRUE FALSE TRUE FALSE
+[2,] FALSE  TRUE TRUE FALSE
+[3,] FALSE FALSE TRUE FALSE
+```
+
+---
+
+
+```r
+st_disjoint(x, y, sparse = FALSE)
+```
+
+```
+      [,1]  [,2]  [,3] [,4]
+[1,] FALSE  TRUE FALSE TRUE
+[2,]  TRUE FALSE FALSE TRUE
+[3,]  TRUE  TRUE FALSE TRUE
+```
+
+
+```r
+st_touches(x, y, sparse = FALSE)
+```
+
+```
+      [,1]  [,2]  [,3]  [,4]
+[1,] FALSE FALSE FALSE FALSE
+[2,] FALSE FALSE FALSE FALSE
+[3,] FALSE FALSE FALSE FALSE
+```
+
+
+```r
+st_within(x, y, sparse = FALSE)
+```
+
+```
+      [,1]  [,2]  [,3]  [,4]
+[1,] FALSE FALSE FALSE FALSE
+[2,] FALSE FALSE FALSE FALSE
+[3,] FALSE FALSE FALSE FALSE
+```
+
+---
+
+
+```r
+st_contains(x, y, sparse = FALSE)
+```
+
+```
+      [,1]  [,2]  [,3]  [,4]
+[1,]  TRUE FALSE FALSE FALSE
+[2,] FALSE FALSE FALSE FALSE
+[3,] FALSE FALSE FALSE FALSE
+```
+
+```r
+st_overlaps(x, y, sparse = FALSE)
+```
+
+```
+      [,1]  [,2] [,3]  [,4]
+[1,] FALSE FALSE TRUE FALSE
+[2,] FALSE  TRUE TRUE FALSE
+[3,] FALSE FALSE TRUE FALSE
+```
+
+```r
+st_equals(x, y, sparse = FALSE)
+```
+
+```
+      [,1]  [,2]  [,3]  [,4]
+[1,] FALSE FALSE FALSE FALSE
+[2,] FALSE FALSE FALSE FALSE
+[3,] FALSE FALSE FALSE FALSE
+```
+
+---
+
+
+```r
+st_covers(x, y, sparse = FALSE)
+```
+
+```
+      [,1]  [,2]  [,3]  [,4]
+[1,]  TRUE FALSE FALSE FALSE
+[2,] FALSE FALSE FALSE FALSE
+[3,] FALSE FALSE FALSE FALSE
+```
+
+```r
+st_covered_by(x, y, sparse = FALSE)
+```
+
+```
+      [,1]  [,2]  [,3]  [,4]
+[1,] FALSE FALSE FALSE FALSE
+[2,] FALSE FALSE FALSE FALSE
+[3,] FALSE FALSE FALSE FALSE
+```
+
+```r
+st_equals_exact(x, y,0.001, sparse = FALSE)
+```
+
+```
+      [,1]  [,2]  [,3]  [,4]
+[1,] FALSE FALSE FALSE FALSE
+[2,] FALSE FALSE FALSE FALSE
+[3,] FALSE FALSE FALSE FALSE
+```
+---
+
+# Example 
+
+- You have been tasked by the USACE of identify the population living along the Mississippi River systems
+
+- You are interested in the county level since most flood control measures and flood response efforts are enforced by county EMAs 
+
+- Federal funding however is administered at the state level so you need population counts aggregated to state...
+
+--
+
+
+```r
+# Global River Shapefile filtered to the Mississippi System
+miss = read_sf('/Users/mikejohnson/github/spds/lectures/data/majorrivers_0_0/MajorRivers.shp') %&gt;% 
+  filter(SYSTEM == "Mississippi") 
+
+
+# Which counties intersect this system
+misscount = st_filter(us_counties(), miss,  .predicate = st_intersects) 
+
+# Find all counties in the intersecting states
+counties =  filter(us_counties(), state_name %in% c(misscount$state_name) )
+
+# Find all impacted states
+states   =  filter(us_states(), state_name %in% c(misscount$state_name) ) 
+```
+
+---
+
+count: false
+ 
+##Intersecting Counties
+.panel1-q11-auto[
+
+```r
+*ggplot()
+```
+]
+ 
+.panel2-q11-auto[
+&lt;img src="lecture-12_files/figure-html/q11_auto_01_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Intersecting Counties
+.panel1-q11-auto[
+
+```r
+ggplot() +
+* geom_sf(data = counties, lty = 3)
+```
+]
+ 
+.panel2-q11-auto[
+&lt;img src="lecture-12_files/figure-html/q11_auto_02_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Intersecting Counties
+.panel1-q11-auto[
+
+```r
+ggplot() +
+  geom_sf(data = counties, lty = 3) +
+* geom_sf(data = states, fill = NA, size = 1)
+```
+]
+ 
+.panel2-q11-auto[
+&lt;img src="lecture-12_files/figure-html/q11_auto_03_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Intersecting Counties
+.panel1-q11-auto[
+
+```r
+ggplot() +
+  geom_sf(data = counties, lty = 3) +
+  geom_sf(data = states, fill = NA, size = 1) +
+* geom_sf(data = misscount, fill = 'red', alpha = .5)
+```
+]
+ 
+.panel2-q11-auto[
+&lt;img src="lecture-12_files/figure-html/q11_auto_04_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Intersecting Counties
+.panel1-q11-auto[
+
+```r
+ggplot() +
+  geom_sf(data = counties, lty = 3) +
+  geom_sf(data = states, fill = NA, size = 1) +
+  geom_sf(data = misscount, fill = 'red', alpha = .5) +
+* geom_sf(data = miss, col = "blue")
+```
+]
+ 
+.panel2-q11-auto[
+&lt;img src="lecture-12_files/figure-html/q11_auto_05_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Intersecting Counties
+.panel1-q11-auto[
+
+```r
+ggplot() +
+  geom_sf(data = counties, lty = 3) +
+  geom_sf(data = states, fill = NA, size = 1) +
+  geom_sf(data = misscount, fill = 'red', alpha = .5) +
+  geom_sf(data = miss, col = "blue") +
+* theme_linedraw()
+```
+]
+ 
+.panel2-q11-auto[
+&lt;img src="lecture-12_files/figure-html/q11_auto_06_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-q11-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q11-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q11-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+##Intersecting Populations
+.panel1-q12-auto[
+
+```r
+*st_filter(cities, misscount, .predicate = st_within)
+```
+]
+ 
+.panel2-q12-auto[
+
+```
+Simple feature collection with 3262 features and 3 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -112.6693 ymin: 29.2134 xmax: -77.6454 ymax: 48.8571
+Geodetic CRS:  WGS 84
+# A tibble: 3,262 x 4
+   city         state_name population           geometry
+ * &lt;chr&gt;        &lt;chr&gt;           &lt;dbl&gt;        &lt;POINT [°]&gt;
+ 1 Nelson       Wisconsin         351 (-92.0044 44.4214)
+ 2 Fennimore    Wisconsin        2482 (-90.6491 42.9793)
+ 3 Whitehall    Wisconsin        1583 (-91.3476 44.3705)
+ 4 River Falls  Wisconsin       15873 (-92.6244 44.8608)
+ 5 Livingston   Wisconsin         643 (-90.4337 42.9001)
+ 6 Hillsboro    Wisconsin        1402 (-90.3365 43.6559)
+ 7 Ferryville   Wisconsin         175 (-91.0935 43.3516)
+ 8 Eleva        Wisconsin         665 (-91.4705 44.5763)
+ 9 Independence Wisconsin        1308 (-91.4172 44.3328)
+10 Patch Grove  Wisconsin         197 (-90.9725 42.9406)
+# … with 3,252 more rows
+```
+]
+
+---
+count: false
+ 
+##Intersecting Populations
+.panel1-q12-auto[
+
+```r
+st_filter(cities, misscount, .predicate = st_within) %&gt;%
+* group_by(state_name)
+```
+]
+ 
+.panel2-q12-auto[
+
+```
+Simple feature collection with 3262 features and 3 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -112.6693 ymin: 29.2134 xmax: -77.6454 ymax: 48.8571
+Geodetic CRS:  WGS 84
+# A tibble: 3,262 x 4
+# Groups:   state_name [23]
+   city         state_name population           geometry
+   &lt;chr&gt;        &lt;chr&gt;           &lt;dbl&gt;        &lt;POINT [°]&gt;
+ 1 Nelson       Wisconsin         351 (-92.0044 44.4214)
+ 2 Fennimore    Wisconsin        2482 (-90.6491 42.9793)
+ 3 Whitehall    Wisconsin        1583 (-91.3476 44.3705)
+ 4 River Falls  Wisconsin       15873 (-92.6244 44.8608)
+ 5 Livingston   Wisconsin         643 (-90.4337 42.9001)
+ 6 Hillsboro    Wisconsin        1402 (-90.3365 43.6559)
+ 7 Ferryville   Wisconsin         175 (-91.0935 43.3516)
+ 8 Eleva        Wisconsin         665 (-91.4705 44.5763)
+ 9 Independence Wisconsin        1308 (-91.4172 44.3328)
+10 Patch Grove  Wisconsin         197 (-90.9725 42.9406)
+# … with 3,252 more rows
+```
+]
+
+---
+count: false
+ 
+##Intersecting Populations
+.panel1-q12-auto[
+
+```r
+st_filter(cities, misscount, .predicate = st_within) %&gt;%
+  group_by(state_name) %&gt;%
+* summarize(tot = sum(population)/1e6)
+```
+]
+ 
+.panel2-q12-auto[
+
+```
+Simple feature collection with 23 features and 2 fields
+Geometry type: MULTIPOINT
+Dimension:     XY
+Bounding box:  xmin: -112.6693 ymin: 29.2134 xmax: -77.6454 ymax: 48.8571
+Geodetic CRS:  WGS 84
+# A tibble: 23 x 3
+   state_name    tot                                                  geometry
+   &lt;chr&gt;       &lt;dbl&gt;                                          &lt;MULTIPOINT [°]&gt;
+ 1 Arkansas    1.15  ((-94.4168 35.2335), (-94.4107 35.1877), (-94.3799 35.02…
+ 2 Colorado    0.324 ((-107.092 39.4051), (-107.054 39.6463), (-107.0413 39.3…
+ 3 Illinois    0.588 ((-91.4277 40.3509), (-91.3829 40.5457), (-91.3798 39.93…
+ 4 Indiana     0.453 ((-87.9308 38.1291), (-87.9151 38.2042), (-87.8955 37.93…
+ 5 Iowa        0.829 ((-96.3901 42.4959), (-96.3516 42.3975), (-96.3035 42.31…
+ 6 Kansas      1.06  ((-102.0078 38.0415), (-101.7784 37.9618), (-101.2587 37…
+ 7 Kentucky    1.78  ((-89.1836 36.565), (-89.102 36.7596), (-89.0822 36.9658…
+ 8 Louisiana   2.51  ((-91.7191 31.4436), (-91.6179 30.594), (-91.592 30.7383…
+ 9 Minnesota   5.87  ((-95.1303 47.5211), (-95.1162 45.5003), (-95.106 47.866…
+10 Mississippi 0.296 ((-91.4152 31.496), (-91.3867 31.5437), (-91.3521 31.575…
+# … with 13 more rows
+```
+]
+
+---
+count: false
+ 
+##Intersecting Populations
+.panel1-q12-auto[
+
+```r
+st_filter(cities, misscount, .predicate = st_within) %&gt;%
+  group_by(state_name) %&gt;%
+  summarize(tot = sum(population)/1e6) %&gt;%
+* st_drop_geometry()
+```
+]
+ 
+.panel2-q12-auto[
+
+```
+# A tibble: 23 x 2
+   state_name    tot
+ * &lt;chr&gt;       &lt;dbl&gt;
+ 1 Arkansas    1.15 
+ 2 Colorado    0.324
+ 3 Illinois    0.588
+ 4 Indiana     0.453
+ 5 Iowa        0.829
+ 6 Kansas      1.06 
+ 7 Kentucky    1.78 
+ 8 Louisiana   2.51 
+ 9 Minnesota   5.87 
+10 Mississippi 0.296
+# … with 13 more rows
+```
+]
+
+---
+count: false
+ 
+##Intersecting Populations
+.panel1-q12-auto[
+
+```r
+st_filter(cities, misscount, .predicate = st_within) %&gt;%
+  group_by(state_name) %&gt;%
+  summarize(tot = sum(population)/1e6) %&gt;%
+  st_drop_geometry() %&gt;%
+* ggplot()
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-12_files/figure-html/q12_auto_05_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Intersecting Populations
+.panel1-q12-auto[
+
+```r
+st_filter(cities, misscount, .predicate = st_within) %&gt;%
+  group_by(state_name) %&gt;%
+  summarize(tot = sum(population)/1e6) %&gt;%
+  st_drop_geometry() %&gt;%
+  ggplot() +
+* geom_col(aes(x = reorder(state_name, -tot), y = tot))
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-12_files/figure-html/q12_auto_06_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Intersecting Populations
+.panel1-q12-auto[
+
+```r
+st_filter(cities, misscount, .predicate = st_within) %&gt;%
+  group_by(state_name) %&gt;%
+  summarize(tot = sum(population)/1e6) %&gt;%
+  st_drop_geometry() %&gt;%
+  ggplot() +
+  geom_col(aes(x = reorder(state_name, -tot), y = tot)) +
+* theme_linedraw()
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-12_files/figure-html/q12_auto_07_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Intersecting Populations
+.panel1-q12-auto[
+
+```r
+st_filter(cities, misscount, .predicate = st_within) %&gt;%
+  group_by(state_name) %&gt;%
+  summarize(tot = sum(population)/1e6) %&gt;%
+  st_drop_geometry() %&gt;%
+  ggplot() +
+  geom_col(aes(x = reorder(state_name, -tot), y = tot)) +
+  theme_linedraw() +
+* theme(axis.text.x = element_text(angle = 90) )
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-12_files/figure-html/q12_auto_08_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Intersecting Populations
+.panel1-q12-auto[
+
+```r
+st_filter(cities, misscount, .predicate = st_within) %&gt;%
+  group_by(state_name) %&gt;%
+  summarize(tot = sum(population)/1e6) %&gt;%
+  st_drop_geometry() %&gt;%
+  ggplot() +
+  geom_col(aes(x = reorder(state_name, -tot), y = tot)) +
+  theme_linedraw() +
+  theme(axis.text.x = element_text(angle = 90) ) +
+* labs(title = "Population living along Mississippi River System",
+*      x = "",
+*      y = "Population (millions)")
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-12_files/figure-html/q12_auto_09_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+##Intersecting Populations
+.panel1-q12-auto[
+
+```r
+st_filter(cities, misscount, .predicate = st_within) %&gt;%
+  group_by(state_name) %&gt;%
+  summarize(tot = sum(population)/1e6) %&gt;%
+  st_drop_geometry() %&gt;%
+  ggplot() +
+  geom_col(aes(x = reorder(state_name, -tot), y = tot)) +
+  theme_linedraw() +
+  theme(axis.text.x = element_text(angle = 90) ) +
+  labs(title = "Population living along Mississippi River System",
+       x = "",
+       y = "Population (millions)")
+
+*ggsave(filename = "lec-img/lecture-12-pop-count.png", height = 4)
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-12_files/figure-html/q12_auto_10_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-q12-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q12-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q12-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+
+## Assignment
+
+Identify all the states that touch a state of your choice:
+
+1. Filter `us_states()` to a state of your choice
+
+2. Use a spatial `filter` and the correct `predicate` to identify the states that **touch** Colorado
+
+3. Make a map that includes:
+   1. all states
+   2. those states that touch Colorado in red with a **alpha** level of .5
+   3. make your map using `ggplot` and include themes and labels
+   
+4. Save your image with `ggsave`
+
+---
+
+class: middle, center
+
+# Submission:
+
+Submit your R script and image to Gauchospace.
+
+---
+
+class: middle, center, inverse
+# END
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
