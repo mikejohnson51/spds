@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 13: Unary, Binary, Simplification
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+# Picking up again ...
+
+- Topological relations describe the spatial relationships between objects. 
+
+--
+
+- These relationships are based on the DE-9IM matrix model
+
+--
+
+- This matrix quantifies the relationship between an object by the intersection of the interior, exterior and boundary of the object
+
+--
+
+- The intersection is defined by the possible set options _{0,1,2,F}_
+
+--
+
+- This set can be reduced to _{T,F}_ where any 0D,1D, or 2D relation is defined as TRUE
+
+---
+
+# Interior, Boundary, Exterior
+
+The Interior, Boundary, Exterior conditions are defined for each geometric type
+
+&lt;img src="lec-img/12-int-ext-bound.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Remember...
+
+- A **POINT**: is a single XY location
+
+--
+
+- **POLYLINE**: is an ordered set of POINTS
+
+--
+
+- **POLYGON**: is a ordered set of rings, where rings are closed lines
+
+--
+
+The more points that make up a line or polygon, the more computations needed to evaluate geometric relationships
+
+---
+
+# DE-9IM
+
+- Dimensional Extended 9 intersections matrix
+
+&lt;img src="lec-img/12-de-91m-figure.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Daily Assignment 12: `st_touches`
+
+&lt;img src="lec-img/13-postgis-touches.png" width="90%" style="display: block; margin: auto;" /&gt;
+---
+
+# st_touches
+
+
+.pull-left[
+&lt;img src="lec-img/12-de-91m-figure.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+A touching relation is defined by three _{T,F}_ DE-9IM "masks" 
+
+- `FT*******`: Interiors do **not** intersect, Interior~a~ intersects Boundary~b~
+
+- `F**T*****` : Interiors do **not** intersect, Interior~b~ intersects Boundary~a~
+
+- `F***T****`: Interiors do **not** intersect, Boundary~b~ intersects Boundary~a~
+]
+
+---
+
+# st_realtes vs. predicate calls...
+
+`FT*******`; `F**T*****`; `F***T****`
+
+
+```r
+states = filter(us_states(), stusps %in% c("WA", "OR", "MT", "ID")) %&gt;%
+  select(name)
+
+wa = filter(states, name == "Washington")
+```
+
+--
+
+
+```r
+(mutate(states, 
+        deim9 = st_relate(states, wa),
+        touch = st_touches(states, wa, sparse = F)))
+```
+
+```
+Simple feature collection with 4 features and 3 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.7258 ymin: 41.98858 xmax: -104.0391 ymax: 49.00249
+Geodetic CRS:  WGS 84
+        name                       geometry     deim9 touch
+1      Idaho MULTIPOLYGON (((-117.243 44... FF2F11212  TRUE
+2    Montana MULTIPOLYGON (((-116.0492 4... FF2FF1212 FALSE
+3     Oregon MULTIPOLYGON (((-124.5524 4... FF2F11212  TRUE
+4 Washington MULTIPOLYGON (((-123.2371 4... 2FFF1FFF2 FALSE
+```
+
+---
+# Binary Predicates
+
+- Collectively, predicates define the type of relationship each 2D object has with another.
+
+--
+
+- Of the ~ 512 unique relationships offered by the DE-9IM models a selection of ~ 10 have been named.
+
+--
+
+- These are include in PostGIS/GEOS and are made accessible via R sf
+
+&lt;img src="lec-img/13-sf-binary.png" width="669" style="display: block; margin: auto;" /&gt;
+
+---
+
+# So... 
+
+- binary predicates return conditional _{T,F}_ relations based on predefined masks of the DE-9IM strings
+
+--
+
+- Up to this point in class we have been using boolean _{T,F}_ masks to filter data.frames by columns:
+
+--
+
+
+```r
+fruits = c("apple", "orange", "lemon", "watermelon")
+```
+
+--
+
+
+```r
+fruits == "apple"
+```
+
+```
+[1]  TRUE FALSE FALSE FALSE
+```
+
+--
+
+
+```r
+fruits %in% c("apple", "lemon")
+```
+
+```
+[1]  TRUE FALSE  TRUE FALSE
+```
+
+---
+
+# Filtering on data.frames
+
+- We have used `dplyr::filter` to  subset a data frame, retaining all rows that satisfy a `boolean` condition. 
+
+.pull-left[
+
+```r
+mutate(states, equalsWA = (name == "Washington")) %&gt;% 
+  st_drop_geometry()
+```
+
+```
+        name equalsWA
+1      Idaho    FALSE
+2    Montana    FALSE
+3     Oregon    FALSE
+4 Washington     TRUE
+```
+]
+
+.pull-right[
+
+```r
+filter(states, name == "Washington") %&gt;% 
+  st_drop_geometry()
+```
+
+```
+        name
+1 Washington
+```
+]
+
+---
+
+# Spatial Filtering
+ 
+- We can filter spatially, using `st_filter` as the function call
+
+--
+
+- Here the `boolean` condition is not passed (e.g. stusps == WA)
+
+--
+
+- But instead,  is defined by a spatial predicate
+
+--
+
+- The default predicate is `st_intersects` but can be changed with the `.predicate` argument:
+
+.pull-left[
+
+```r
+mutate(states, 
+       touch = st_touches(states, wa, sparse = FALSE)) 
+```
+
+```
+although coordinates are longitude/latitude, st_touches assumes that they are planar
+```
+
+```
+Simple feature collection with 4 features and 2 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.7258 ymin: 41.98858 xmax: -104.0391 ymax: 49.00249
+Geodetic CRS:  WGS 84
+        name                       geometry touch
+1      Idaho MULTIPOLYGON (((-117.243 44...  TRUE
+2    Montana MULTIPOLYGON (((-116.0492 4... FALSE
+3     Oregon MULTIPOLYGON (((-124.5524 4...  TRUE
+4 Washington MULTIPOLYGON (((-123.2371 4... FALSE
+```
+]
+
+
+.pull-right[
+
+```r
+st_filter(states, wa, .predicate = st_touches) 
+```
+
+```
+although coordinates are longitude/latitude, st_touches assumes that they are planar
+```
+
+```
+Simple feature collection with 2 features and 1 field
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.5524 ymin: 41.98858 xmax: -111.0436 ymax: 49.00091
+Geodetic CRS:  WGS 84
+    name                       geometry
+1  Idaho MULTIPOLYGON (((-117.243 44...
+2 Oregon MULTIPOLYGON (((-124.5524 4...
+```
+]
+
+---
+
+# Result 
+
+
+```r
+ggplot(states) + 
+  geom_sf() + 
+  geom_sf(data = wa, fill = "blue", alpha = .3) +
+  geom_sf(data = st_filter(states, wa, .predicate = st_touches), fill = "red", alpha = .5) + 
+  theme_void()
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-17-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Distance Example (additional parameter)
+
+
+```r
+cities = read_csv("data/uscities.csv") %&gt;% 
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) %&gt;% 
+  select(city, population, state_name) %&gt;% 
+  st_transform(5070)
+```
+
+--
+
+
+```r
+sb = filter(cities, city == "Santa Barbara")
+```
+
+--
+
+
+```r
+st_filter(cities, sb, .predicate = st_is_within_distance, 10000) 
+```
+
+```
+Simple feature collection with 3 features and 3 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -2140651 ymin: 1530417 xmax: -2132289 ymax: 1533950
+Projected CRS: NAD83 / Conus Albers
+# A tibble: 3 x 4
+  city           population state_name           geometry
+* &lt;chr&gt;               &lt;dbl&gt; &lt;chr&gt;             &lt;POINT [m]&gt;
+1 Montecito            8984 California (-2132289 1530417)
+2 Mission Canyon       2651 California (-2139283 1533950)
+3 Santa Barbara      204034 California (-2140651 1531425)
+```
+
+---
+
+# Think back to week 2: Data Science
+
+- Filtering is a nice way to reduce the dimensions of a **single** dataset
+
+--
+
+- Often "*... one table is not enough... *"
+
+--
+
+- In these cases we want to combine - or **join** -  data 
+ 
+---
+
+# Spatial Joining
+
+- Joining two non-spatial datasets relies on a shared _key_  that uniquely identifies each record in a table
+
+&lt;img src="lec-img/07-joins.png" width="198" style="display: block; margin: auto;" /&gt;
+
+--
+
+- Spatially joining data relies on shared _geographic relations_ rather then a shared _key_
+
+--
+
+- Like filter, these relations can be defined by a **predicate**
+
+--
+
+****
+
+- As with tabular data, mutating joins *add* data to the target object (x) from a source object (y).
+
+---
+
+# st_join
+
+- In `sf` `st_join` provides this joining capacity
+
+--
+
+- By default, `st_join` performs a _left_ join (Returns all records from x, and the matched records from y)
+
+&lt;img src="lec-img/13-left-join.png" width="106" style="display: block; margin: auto;" /&gt;
+--
+
+- It can also do inner joins by setting `left = FALSE`. 
+
+&lt;img src="lec-img/13-inner-join.png" width="108" style="display: block; margin: auto;" /&gt;
+
+--
+
+- The default topological predicate `st_join` (and `st_filter`) is `st_intersects`
+
+--
+
+- This can be changed with the join argument (see `?st_join` for details).
+
+---
+
+# Every Starbucks in the World
+
+What county has the most Starbucks in each state?
+
+
+```r
+starbucks = readr::read_csv('data/directory.csv') %&gt;% 
+  filter(!is.na(Latitude), Country == "US") %&gt;% 
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %&gt;% 
+  st_transform(5070)
+```
+
+--
+
+
+```r
+nrow(starbucks)
+```
+
+```
+[1] 13608
+```
+
+```r
+names(starbucks)
+```
+
+```
+ [1] "Brand"          "Store Number"   "Store Name"    
+ [4] "Ownership Type" "Street Address" "City"          
+ [7] "State/Province" "Country"        "Postcode"      
+[10] "Phone Number"   "Timezone"       "geometry"      
+```
+
+--
+
+
+```r
+counties = USAboundaries::us_counties() %&gt;% 
+  filter(!state_abbr %in% c("AK", "HI", "PR")) %&gt;% 
+  st_transform(5070) %&gt;% 
+  select(name, state_name)
+```
+
+---
+
+
+```r
+topSB = st_join(counties, starbucks) %&gt;% 
+  group_by(name, state_name) %&gt;% 
+  summarise(n = n()) %&gt;% 
+  group_by(state_name) %&gt;% 
+  slice_max(n, n = 1) %&gt;% 
+  ungroup()
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-28-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+- Neither _joining_ nor _filtering_ spatially alter the underlying geometry of the features
+- In cases where we seek to alter a geometry bases on another, we need clipping methods
+
+---
+
+# Clipping 
+
+- Clipping is a form of subsetting that involves changing the geometry of at least some features.
+
+- Clipping can only apply to features more complex than points: (lines, polygons and their ‘multi’ equivalents). 
+
+
+&lt;img src="lec-img/13-clipping.png" width="597" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Spatial Subsetting
+
+- By default the data.frame subsetting methods we've seen (e.g `[,]`) implements `st_intersection`
+
+
+```r
+wa = st_transform(wa, 5070)
+*wa_starbucks = starbucks[wa,]
+
+ggplot() + geom_sf(data = wa) + geom_sf(data = wa_starbucks) + theme_void()
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-30-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Computational Complexity
+
+- In all the cases we have looked at, the number of `POINT` (e.g geometries, nodes, or vertices) define the complexity of the predicate or the clip
+
+--
+
+- Computational needs increase with the number of POINTS / NODES / VERTICES
+
+--
+
+- **Simplification** is a process for generalization  vector objects (lines and polygons) 
+
+--
+
+- Another reason for simplifying objects is to reduce the amount of memory, disk space and network bandwidth they consume
+
+--
+
+- Other times the level of detail captured in a geometry is either not needed, or, even counter productive the the scale/purpose of an analysis
+
+--
+
+- If you are cropping features to a national border, how much detail do you need? The more points in your border, the long the clip operation will take.
+
+--
+
+- In cases where we want to reduce th complexity in a geometry we can use simplicfication algorithms
+
+---
+
+# Ramer–Douglas–Peucker
+
+- Mark the `first` and `last` points as kept
+
+- Find the point, `p` that is the farthest from the first-last line segment. If there are no points between first and last we are done (the base case)
+
+- If `p` is closer than `tolerance` units to the line segment then everything between first and last can be discarded
+
+- Otherwise, mark p as kept and repeat steps 1-4 using the points between first and p and between p and last (the call to recursion)
+
+&lt;img src="lec-img/13-douglas-peucker-animated.gif" width="100%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# st_simplify
+
+&lt;img src="lec-img/13-postgis-st-simplify.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# st_simplify
+
+-  `sf` provides `st_simplify`, which uses the GEOS implementation of the Douglas-Peucker algorithm to reduce the vertex count. 
+
+- `st_simplify` uses the `dTolerance` to control the level of generalization in map units (see Douglas and Peucker 1973 for details). 
+
+&lt;img src="lec-img/13-r-st-simplify.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+usa = us_states() %&gt;% 
+  filter(!stusps %in% c("AK", "HI", "PR")) %&gt;% 
+  st_union() %&gt;% 
+  st_transform(5070)
+```
+
+```
+although coordinates are longitude/latitude, st_union assumes that they are planar
+```
+
+```r
+usa1000   = st_simplify(usa, dTolerance = 10000)
+usa10000  = st_simplify(usa, dTolerance = 100000)
+usa100000 = st_simplify(usa, dTolerance = 1000000)
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-35-1.png" width="864" style="display: block; margin: auto;" /&gt;
+
+---
+
+- A limitation with Douglas-Peucker (therfore st_simplify) is that it simplifies objects on a per-geometry basis. 
+
+- This means the ‘topology’ is lost, resulting in overlapping and disconected geometries. 
+
+
+
+```r
+states = st_transform(states, 5070)
+simp_states   = st_simplify(states, dTolerance = 20000)
+plot(simp_states$geometry)
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-36-1.png" width="504" /&gt;
+
+---
+
+# Visvalingam
+
+- The Visvalingam algorithm overcomes some limitations of the Douglas-Peucker algorithm (Visvalingam and Whyatt 1993).
+- it progressively removes points with the least-perceptible change. 
+- Simplification often allows the elimination of 95% or more points while retaining sufficient detail for visualization and often anaylsis
+
+---
+
+&lt;img src="lec-img/13-ms-simplify.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+
+```r
+library(rmapshaper)
+
+usa10 = ms_simplify(usa, keep = .1)
+usa5  = ms_simplify(usa, keep = .05)
+usa1  = ms_simplify(usa, keep = .01)
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-39-1.png" width="864" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+states = st_transform(states, 5070)
+simp_states   = ms_simplify(states, keep = .05)
+plot(simp_states$geometry)
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-40-1.png" width="504" /&gt;
+
+---
+
+In all cases, the number of points in a geometry can be cacluated with `mapview::npts()`
+
+
+```r
+states = st_transform(states, 5070)
+simp_states_st   = st_simplify(states, dTolerance = 20000)
+simp_states_ms   = ms_simplify(states, keep = .05)
+
+mapview::npts(states)
+```
+
+```
+[1] 1003
+```
+
+```r
+mapview::npts(simp_states_st)
+```
+
+```
+[1] 55
+```
+
+```r
+mapview::npts(simp_states_ms)
+```
+
+```
+[1] 64
+```
+
+
+---
+
+# Centroids and Buffers
+
+Geometries can also be modified by reducing or extending them ...
+
+---
+
+# Centroids
+
+- Centroid operations identify the center of geographic objects as a single point representation.
+
+--
+
+- Like statistical measures of central tendency (GEOG5), there are many ways to define the "center" of an object. 
+
+--
+
+- The most common is the geographic centroid which represnets the center of mass in a spatial object (think of balancing a plate on your finger). 
+
+--
+
+- Centroids can be used to create a simple point representation of complex geometries, or to estimate distances between polygons. 
+
+---
+
+- In R, the geographic centroid can be found with `st_centroid`
+
+
+```r
+states = st_transform(states, 5070)
+centroid = st_centroid(states)
+
+ggplot() + 
+  geom_sf(data = states) +
+  geom_sf(data = centroid) + 
+  theme_void()
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-42-1.png" width="504" /&gt;
+
+---
+# Buffers
+
+Buffers are polygons representing the area within a given distance of a geometric feature:
+
+
+```r
+buffer = st_buffer(centroid, 100000)
+
+ggplot() + 
+  geom_sf(data = states) +
+  geom_sf(data = centroid) + 
+  geom_sf(data = buffer, fill = NA)
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-43-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Combining centroids, with buffers, with clips
+
+
+```r
+states = st_transform(states, 5070)
+centroid = st_centroid(states)
+buffer = st_buffer(centroid, 100000)
+
+ggplot() + 
+  geom_sf(data = states) +
+  geom_sf(data = centroid) + 
+  geom_sf(data = buffer, fill = NA) + 
+  geom_sf(data = st_intersection(cities, buffer), col = "darkred", size = .5) + 
+  theme_void()
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-44-1.png" width="504" /&gt;
+
+---
+
+
+```r
+plot(st_buffer(states$geometry, 100000), border = 'red', col = NA, lwd = 3)
+plot(states$geometry, add = TRUE)
+plot(st_buffer(states$geometry, -50000), add = TRUE, border = 'blue', lwd = 2)
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-45-1.png" width="504" /&gt;
+
+---
+#How many people live within 50 km of the Mississippi System?
+--
+
+
+```r
+# Global River Shapefile filtered to the Mississippi System
+miss = read_sf('data/majorrivers_0_0/MajorRivers.shp') %&gt;% 
+  filter(SYSTEM == "Mississippi") %&gt;% 
+  st_transform(5070)
+```
+
+
+```r
+miss_buff = st_buffer(miss, 50000)
+```
+---
+
+
+```r
+ggplot() + 
+  geom_sf(data = usa, lty = 3) + 
+  geom_sf(data = miss_buff, fill = NA, size = 1) + 
+  geom_sf(data = miss, col = 'blue', alpha = .5) +
+  geom_sf(data = miss, col = "blue") + 
+  theme_linedraw()
+```
+
+&lt;img src="lecture-13_files/figure-html/unnamed-chunk-48-1.png" width="504" /&gt;
+
+---
+
+
+```r
+union_buff = st_union(miss_buff)
+```
+
+
+```r
+impacted_cities = cities[union_buff,]
+```
+
+---
+  
+count: false
+ 
+#Mapping Cities along Mississippi
+.panel1-q12-auto[
+
+```r
+*ggplot()
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-13_files/figure-html/q12_auto_01_output-1.png" width="504" /&gt;
+]
+
+---
+count: false
+ 
+#Mapping Cities along Mississippi
+.panel1-q12-auto[
+
+```r
+ggplot() +
+* geom_sf(data = union_buff, fill = NA, size = 1)
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-13_files/figure-html/q12_auto_02_output-1.png" width="504" /&gt;
+]
+
+---
+count: false
+ 
+#Mapping Cities along Mississippi
+.panel1-q12-auto[
+
+```r
+ggplot() +
+  geom_sf(data = union_buff, fill = NA, size = 1) +
+* geom_sf(data = impacted_cities, aes(col = population), size = .01)
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-13_files/figure-html/q12_auto_03_output-1.png" width="504" /&gt;
+]
+
+---
+count: false
+ 
+#Mapping Cities along Mississippi
+.panel1-q12-auto[
+
+```r
+ggplot() +
+  geom_sf(data = union_buff, fill = NA, size = 1) +
+  geom_sf(data = impacted_cities, aes(col = population), size = .01) +
+* scale_color_viridis_c()
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-13_files/figure-html/q12_auto_04_output-1.png" width="504" /&gt;
+]
+
+---
+count: false
+ 
+#Mapping Cities along Mississippi
+.panel1-q12-auto[
+
+```r
+ggplot() +
+  geom_sf(data = union_buff, fill = NA, size = 1) +
+  geom_sf(data = impacted_cities, aes(col = population), size = .01) +
+  scale_color_viridis_c() +
+* geom_sf(data = miss, col = 'blue', alpha = .5)
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-13_files/figure-html/q12_auto_05_output-1.png" width="504" /&gt;
+]
+
+---
+count: false
+ 
+#Mapping Cities along Mississippi
+.panel1-q12-auto[
+
+```r
+ggplot() +
+  geom_sf(data = union_buff, fill = NA, size = 1) +
+  geom_sf(data = impacted_cities, aes(col = population), size = .01) +
+  scale_color_viridis_c() +
+  geom_sf(data = miss, col = 'blue', alpha = .5) +
+* theme_linedraw()
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-13_files/figure-html/q12_auto_06_output-1.png" width="504" /&gt;
+]
+
+---
+count: false
+ 
+#Mapping Cities along Mississippi
+.panel1-q12-auto[
+
+```r
+ggplot() +
+  geom_sf(data = union_buff, fill = NA, size = 1) +
+  geom_sf(data = impacted_cities, aes(col = population), size = .01) +
+  scale_color_viridis_c() +
+  geom_sf(data = miss, col = 'blue', alpha = .5) +
+  theme_linedraw() +
+* ggrepel::geom_label_repel(
+*   data = slice_max(impacted_cities, population, n = 10),
+*   aes(label= city, geometry = geometry),
+*   stat = "sf_coordinates"
+* )
+```
+]
+ 
+.panel2-q12-auto[
+&lt;img src="lecture-13_files/figure-html/q12_auto_07_output-1.png" width="504" /&gt;
+]
+
+&lt;style&gt;
+.panel1-q12-auto {
+  color: black;
+  width: 38.8%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-q12-auto {
+  color: black;
+  width: 58.2%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-q12-auto {
+  color: black;
+  width: 0%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+# Compare to Intersect Estimate ...
+
+
+.pull-left[
+&lt;img src="lec-img/lecture-12-pop-count.png" width="50%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+&lt;img src="lec-img/lecture-13-pop-count.png" width="50%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Assignment
+
+- In your `docs` folder create an Rmd
+
+- install `rmapshaper`
+
+- Get the CONUS state borders from `USABoudaries::us_states` 
+
+- Play with both `st_simplify` and `ms_simplify`
+
+- Find the `dTolorance` and the `keep` parameters you feel maintain a desired shape and topology
+
+- Find the number of points in the raw data and in your simplifications using `mapview::npts`
+
+- In your Rmd, create a map for the raw, and each simplified geometry and report the number of points in each
+
+
+---
+
+class: center, middle
+# Submission
+
+Knit your Rmd file
+
+Submit the resulting html document to Gauchospace
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
