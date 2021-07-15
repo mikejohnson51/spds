@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 14: Writing functions
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+
+# Over the last few days:
+
+We have learned a lot! 
+
+--
+
+### tools for reading and writing data:
+  - read_sf / write_sf
+  - read_csv / write_csv
+  - read_excel
+
+--
+
+### tools for data maniputation
+ - filter
+ - select
+ - mutate
+ - group_by
+ - summarize
+ - rollmean, lag
+ 
+---
+
+### tools to manage/manipulate data type/structure
+  - as.numeric
+  - as.factor
+  - st_as_sf
+  - data.frame
+
+--
+  
+### tools for merging and shaping data
+  - inner_join
+  - left_join
+  - right_join
+  - full_join
+  - pivot_longer
+  - pivot_wider
+  
+--
+
+### tools for measuring geometries:
+  - st_distance
+  - st_area
+  - st_length
+  - set_units / drop_units
+
+---
+
+### tools to manage the level and type of geometry
+  - st_combine
+  - st_cast
+
+--
+
+### tools to define topological realtions: 
+  - st_intersects
+  - st_touches
+  - st_covers
+  - ...
+ 
+--
+
+### tools to modify geometeries
+  - st_buffer
+  - st_centroid
+  - st_coordinates
+  - st_bbox
+
+--
+
+### tools to modify geometries based on others
+  - st_intersection
+  - st_difference
+  - st_union
+  - ...
+  
+---
+
+### tools to join and filter data spatially
+  - st_filter
+  - st_join
+  
+---
+
+### tools to simplify complex geometries
+  - st_simplify (feature-based)
+  - ms_simplify (topology-preserving)
+  - mapview::npts
+
+--
+
+### tools to ask about, set, and change CRS
+  - st_crs
+  - st_set_crs
+  - st_transform
+
+---
+
+### tools to visualize data
+  - ggplot
+  - geom_*
+  - labs
+  - ggrepel
+  - gghighlight
+  - scale_*
+
+---
+
+# These tools are all functions
+
+- R is a statistical computing language that provides _features_ as _functions_ 
+
+--
+
+- Even with just its base installation, R provides hundreds of functions:
+
+
+```r
+length(lsf.str("package:base")) + length(lsf.str("package:stats")) + length(lsf.str("package:utils"))
+```
+
+```
+[1] 1893
+```
+
+--
+
+- sf provides over 100 more
+
+
+```r
+length(lsf.str("package:sf")) 
+```
+
+```
+[1] 136
+```
+
+--
+
+- and the core tidyverse packages (that we use) an additional ~750
+
+
+```r
+length(lsf.str("package:dplyr")) +
+length(lsf.str("package:ggplot2")) +
+length(lsf.str("package:tidyr")) +
+length(lsf.str("package:forcats"))
+```
+
+```
+[1] 793
+```
+
+---
+
+# To date,
+
+- We have been using functions written for us - mostly by `sf` and the `tidyverse`
+
+--
+
+- This how any commercial GIS suite operates as well
+ - Analysis and workflows are limited to the tools kits and options exposed to the user
+ - In R, a lot more is actually exposed!
+
+--
+
+- Everytime we install a new package, we download code that provides new specific features (as functions)
+
+--
+
+- Everytime we *attach* a package to a working session (`library()`) we are making those functions available/visible
+
+---
+
+## Functions are objects
+
+- Just like `x = 10` binds the value of 10 to the name x creating an object visible in the environment,
+
+--
+
+- functions are objects that can be called by name to execute a set of directions over defined arguments.
+
+--
+
+
+```r
+class(sf::st_intersects)
+```
+
+```
+[1] "function"
+```
+
+```r
+class(sf::st_as_sf)
+```
+
+```
+[1] "function"
+```
+
+---
+
+# Our own functions are visable as objects in the environemnt
+
+
+```r
+x = 10
+y = data.frame(x = 1:10, y = 10:1)
+f = function(x,y){ x  + y }
+```
+
+&lt;img src="lec-img/14-function-objects.png" width="348" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Advancing your programming skills
+
+- One of the best ways to improve your skills as a data scientist is to write functions.
+
+--
+
+- Functions allow you to automate common tasks in a more general way than copy-and-pasting. 
+
+--
+
+- The more times you apply a function, the more incentive you have to optimize it for speed/accuracy
+
+--
+
+- The more creative/unique your analyses and questions can be
+
+---
+
+# So why write functions opposed to scripts?
+
+
+ - The process can be named
+ 
+--
+
+ - As requirements change, you only need to update code in one place
+ 
+--
+
+ - You eliminate the chance of making incidental mistakes when you copy and paste (forgetting to change `dist_to_state` to `dist_to_border`).
+ 
+--
+
+ - functions can be 'sourced' into Rmd files and R Scripts
+
+--
+ - You save youself time
+
+---
+# Rule of thumb &lt;svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M466.27 286.69C475.04 271.84 480 256 480 236.85c0-44.015-37.218-85.58-85.82-85.58H357.7c4.92-12.81 8.85-28.13 8.85-46.54C366.55 31.936 328.86 0 271.28 0c-61.607 0-58.093 94.933-71.76 108.6-22.747 22.747-49.615 66.447-68.76 83.4H32c-17.673 0-32 14.327-32 32v240c0 17.673 14.327 32 32 32h64c14.893 0 27.408-10.174 30.978-23.95 44.509 1.001 75.06 39.94 177.802 39.94 7.22 0 15.22.01 22.22.01 77.117 0 111.986-39.423 112.94-95.33 13.319-18.425 20.299-43.122 17.34-66.99 9.854-18.452 13.664-40.343 8.99-62.99zm-61.75 53.83c12.56 21.13 1.26 49.41-13.94 57.57 7.7 48.78-17.608 65.9-53.12 65.9h-37.82c-71.639 0-118.029-37.82-171.64-37.82V240h10.92c28.36 0 67.98-70.89 94.54-97.46 28.36-28.36 18.91-75.63 37.82-94.54 47.27 0 47.27 32.98 47.27 56.73 0 39.17-28.36 56.72-28.36 94.54h103.99c21.11 0 37.73 18.91 37.82 37.82.09 18.9-12.82 37.81-22.27 37.81 13.489 14.555 16.371 45.236-5.21 65.62zM88 432c0 13.255-10.745 24-24 24s-24-10.745-24-24 10.745-24 24-24 24 10.745 24 24z"&gt;&lt;/path&gt;&lt;/svg&gt;
+
+- Data is the first argument (better for pipes!)
+
+--
+
+- Whenever you have copy-and pasted code more than twice you should write a function
+
+--
+
+For example how many times have we coded:
+
+
+```r
+states = USAboundaries::us_states() %&gt;% 
+  filter(!name %in% c("Hawaii", "Puerto Rico", "Alaska"))
+```
+
+--
+
+- Or made the same table with `knitr`/`kableExtra` only changing the `col.names` and `data.frame`
+
+--
+
+- Or calculated a distance, changed the units, and dropped them?
+
+--
+
+- All of these task are repetitive and prone to making errors that could impact our analysis but not break our code...
+
+---
+
+# The form of a function:
+
+Creating a function follows the form:
+
+
+```r
+name = function(arg1, arg2, *){
+  code
+  ..
+  return(...)
+}
+```
+
+
+Where:
+
+--
+
+ - `name` is the function name (e.g. `st_as_sf`)
+ 
+    - This is the name on which R is able to call the object
+
+--
+
+ - `arg1` is the first input
+ 
+--
+
+ - `arg2` is the second input
+ 
+--
+
+ - `*` is any other argument you want to define
+
+--
+
+ - `code ...` defines the instructions to carry out on `arg1` and `arg2`
+
+--
+ - `return(...)` is what the function returns
+ 
+---
+
+# Defining a function
+
+ - To define a function we need to identify the code we have, and what can/should generalized for future uses?
+ 
+--
+
+
+```r
+states = USAboundaries::us_states() %&gt;% 
+  filter(!name %in% c("Hawaii", "Puerto Rico", "Alaska"))
+```
+
+--
+
+ 
+- Here the input data (us_states) could change
+
+--
+
+- So could the variable name we filter by (name)
+
+---
+
+# Function Signiture
+
+So, lets start with a function that takes general input data and a variable name
+
+--
+
+
+```r
+get_conus = function(data, var){
+
+}
+```
+
+---
+
+# Function arguments
+
+Function arguments typically include two two broad sets: 
+  -  the data to compute on, 
+  -  arguments that control the details of the calculation
+  
+--
+
+- In `st_transform` `x` is the data, `crs` is the proj4string/EPSG code 
+
+--
+
+- In `ms_simplify` `input` is the data, `keep` defines the directions
+
+--
+
+- In `get_conus`: `data` provides the data, `var` defines the column to filter
+
+--
+
+- Generally, data arguments should come first. 
+- Detail arguments should go on the end
+- It can be useful - and good practice - to define default values. 
+  - should almost always be the most common value. 
+  - The exceptions to this rule are to do with safety of the process.
+    - e.g. `na.rm = FALSE`
+---
+
+# Code body
+
+We then have to carry these generalizations into the function directions using the arguments as our operators:
+ 
+
+```r
+get_conus = function(data, var){
+  conus = filter(data, !!var %in% c("Hawaii", "Puerto Rico", "Alaska"))
+  return(conus)
+}
+```
+
+--
+
+ - here, we replace `us_states()` with `data`
+ 
+--
+
+ - we use `get()` to return the *value* of a *named* object
+
+--
+
+ - We assign our filtered object to the name `conus`
+ 
+--
+
+ - And explicitly return the `conus` object from the function
+
+--
+
+***
+
+- The value returned by the function is *usually* the last evaluated statement, if we don't specify return we can take advantage of this default:
+
+
+```r
+get_conus = function(data, var){
+  filter(data, !get(var) %in% c("Hawaii", "Puerto Rico", "Alaska"))
+}
+```
+
+---
+
+# Using our function:
+
+- Like any object, we have to run the lines of code to save it as an object before we can use it directly in our code:
+
+- But then ...
+
+--
+
+.pull-left[
+### States
+
+```r
+x = get_conus(data = us_states(), var = "name")
+plot(x$geometry)
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-15-1.png" width="432" /&gt;
+]
+
+.pull-right[
+### Counties
+
+```r
+x2 = get_conus(us_counties(), "state_name")
+plot(x2$geometry)
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-16-1.png" width="432" /&gt;
+]
+---
+
+## Cities
+
+
+```r
+cities = read_csv("data/uscities.csv") %&gt;%
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) %&gt;% 
+  get_conus("state_name")
+
+plot(cities$geometry, pch = 16, cex = .1)
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-17-1.png" width="576" /&gt;
+
+---
+# It's ok to be more detailed
+
+- Another advantage of functions is that if our requirements change, we only need to make the change our code in one place. 
+
+--
+
+- This also means we can spend more time fine-tuning our code since we know it will be recycled.
+
+--
+
+- Here we can be more focused and make sure to remove other potential "non-conus" states from any input object:
+
+
+```r
+get_conus = function(data, var){
+  filter(data, !get(var) %in% 
+           c("Hawaii", "Puerto Rico", "Alaska",
+             "Guam", "District of Columbia"))
+}
+```
+
+--
+
+
+```r
+conus = get_conus(us_states(), "name")
+nrow(conus)
+```
+
+```
+[1] 48
+```
+
+---
+
+
+# Point-in-Polygon Case Study
+
+- The power of GIS lies in analyzing multiple data sources together. 
+
+- Often the answer you want lies in many different layers and you need to do some analysis to extract and compile information. 
+
+- One common analysis is Points-in-Polygon (PIP). 
+
+-  PIP is useful when you want to know how many - or what kind of -  points fall within the bounds of each polygon
+
+--
+
+&lt;img src="lec-img/14-pip.jpg" width="406" style="display: block; margin: auto;" /&gt;
+--
+
+
+- In 176A/176B you will learn about other useful ways of analysis point/polygon relationships such as point pattern analysis, interpolation, and others
+
+---
+
+# Data
+
+### CONUS counties
+
+```r
+counties = st_transform(us_counties(), 5070) %&gt;% 
+  select(name, geoid, state_name) %&gt;% 
+  get_conus("state_name")
+```
+
+--
+
+### CONUS Starbucks
+
+```r
+starbucks = read_csv('data/directory.csv') %&gt;% 
+  filter(!is.na(Latitude), Country == "US") %&gt;% 
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %&gt;% 
+  st_transform(5070) %&gt;% 
+  st_filter(counties) %&gt;% 
+  select(store_name = `Store Name`)
+```
+
+--
+
+### California Counties 
+
+```r
+ca = filter(counties, state_name == "California")
+```
+
+---
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-24-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Step 1: Spatial Join
+
+To count the Starbucks locations in CA counties, we start by joining the CA counties to the locations:
+
+--
+
+ - Here we uses the `counties` as the x table and the locations as the y table
+ 
+ - This is because we want to **add** the starbucks information to the `county` sf object.
+
+--
+
+ - Remember the default of `st_join` is a `left_join` on the `st_intersects` predicate
+
+--
+
+
+```r
+(starbucks1 = st_join(ca, starbucks))
+```
+
+```
+Simple feature collection with 2816 features and 4 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -2356114 ymin: 1243190 xmax: -1646840 ymax: 2452711
+Projected CRS: NAD83 / Conus Albers
+First 10 features:
+             name geoid state_name
+1   San Francisco 06075 California
+1.1 San Francisco 06075 California
+1.2 San Francisco 06075 California
+1.3 San Francisco 06075 California
+1.4 San Francisco 06075 California
+1.5 San Francisco 06075 California
+1.6 San Francisco 06075 California
+1.7 San Francisco 06075 California
+1.8 San Francisco 06075 California
+1.9 San Francisco 06075 California
+                        store_name
+1   Teavana - San Francisco Centre
+1.1         Church &amp; Market - S.F.
+1.2                 120 4th Street
+1.3   Safeway - San Francisco #995
+1.4  Teavana - Stonestown Galleria
+1.5         Safeway - Noriega #985
+1.6   Safeway - San Francisco #667
+1.7         5455 Geary Blvd. - WFB
+1.8    Safeway-San Francisco #2606
+1.9           California &amp; Battery
+                          geometry
+1   MULTIPOLYGON (((-2283315 19...
+1.1 MULTIPOLYGON (((-2283315 19...
+1.2 MULTIPOLYGON (((-2283315 19...
+1.3 MULTIPOLYGON (((-2283315 19...
+1.4 MULTIPOLYGON (((-2283315 19...
+1.5 MULTIPOLYGON (((-2283315 19...
+1.6 MULTIPOLYGON (((-2283315 19...
+1.7 MULTIPOLYGON (((-2283315 19...
+1.8 MULTIPOLYGON (((-2283315 19...
+1.9 MULTIPOLYGON (((-2283315 19...
+```
+---
+
+# Step 2: Point counts by Polygon
+
+`count()` is a dplyr function that "*lets you quickly count the unique values of one or more variables: df %&gt;% count(a, b) is roughly equivalent to df %&gt;% group_by(a, b) %&gt;% summarise(n = n())*"
+
+--
+
+
+```r
+(count(starbucks1, geoid))
+```
+
+```
+Simple feature collection with 58 features and 2 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -2356114 ymin: 1243190 xmax: -1646840 ymax: 2452711
+Projected CRS: NAD83 / Conus Albers
+First 10 features:
+   geoid   n                       geometry
+1  06001 116 MULTIPOLYGON (((-2267172 19...
+2  06003   1 MULTIPOLYGON (((-2057214 19...
+3  06005   2 MULTIPOLYGON (((-2137018 20...
+4  06007  10 MULTIPOLYGON (((-2180023 21...
+5  06009   2 MULTIPOLYGON (((-2142592 19...
+6  06011   1 MULTIPOLYGON (((-2255965 21...
+7  06013  97 MULTIPOLYGON (((-2270362 19...
+8  06015   1 MULTIPOLYGON (((-2292580 24...
+9  06017  14 MULTIPOLYGON (((-2140513 20...
+10 06019  53 MULTIPOLYGON (((-2150735 18...
+```
+
+---
+
+# Step 3: Combine the processes ...
+
+
+```r
+starbucks1 = st_join(ca, starbucks) %&gt;% 
+   count(geoid)
+
+plot(starbucks1['n'])
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-27-1.png" width="432" /&gt;
+
+---
+
+# Now for Colorado?
+
+We can anticipate that PIP is a useful process we want to implement over variable points and polygons pairs
+
+--
+
+So, lets make a function named `point_in_polygon`, that takes a `point` dataset and a `polygon` dataset
+
+--
+
+
+```r
+point_in_polygon = function(points, polygon){
+ st_join(polygon, points) %&gt;% 
+   count(geoid)
+}
+```
+
+---
+
+# Test
+
+.pull-left[
+
+```r
+ca_sb = point_in_polygon(starbucks, ca)
+plot(ca_sb['n'])
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-29-1.png" width="432" /&gt;
+]
+
+.pull-right[
+
+```r
+co_sb = point_in_polygon(starbucks, 
+                         filter(counties, 
+                                state_name == "Colorado"))
+plot(co_sb['n'])
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-30-1.png" width="432" /&gt;
+]
+---
+
+.pull-left[
+
+```r
+or_sb = point_in_polygon(starbucks, 
+                         filter(counties, 
+                                state_name == "Oregon"))
+plot(or_sb['n'])
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-31-1.png" width="432" /&gt;
+]
+
+.pull-right[
+
+```r
+ny_sb = point_in_polygon(starbucks, 
+                         filter(counties, 
+                                state_name == "New York"))
+plot(ny_sb['n'])
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-32-1.png" width="432" /&gt;
+]
+
+---
+
+# Generalizing the `count` variable
+
+- In its current form, `point_in_polygon` only counts on `geoid`
+
+--
+
+- Lets modify that by making the variable name an input
+  - again, we use `get()` to return the *value* of a *named* object 
+  - we call this, variable `id`
+
+--
+
+
+```r
+point_in_polygon2 = function(points, polygon, var){
+  st_join(polygon, points) %&gt;% 
+    count(get(var))
+}
+```
+
+---
+
+# Applying the new function
+
+- Here, we can apply the PIP function over **states** and _count_ by `name`
+
+--
+
+
+```r
+states = get_conus(us_states(), "name") %&gt;% 
+  st_transform(5070)
+
+state_sb = point_in_polygon2(starbucks, states, 'name')
+
+plot(state_sb['n'])
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-34-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Optimizing functions 
+
+- Lets apply our function over the counties and see how long it takes
+
+--
+
+- We can check the time it takes by wrapping our function in `system.time`
+
+--
+
+
+```r
+system.time({
+  us = point_in_polygon(starbucks, counties)
+})
+
+# user    system  elapsed 
+# 3.719   0.354   4.309 
+```
+
+---
+
+# Thats not bad...
+
+
+```r
+# How many seconds per point?
+(point_per_sec = 4.3 / (nrow(counties) * nrow(starbucks)))
+```
+
+```
+[1] 1.036916e-07
+```
+
+--
+
+```r
+# How will this scale to our dams data
+# (assuming the process is linear)
+
+point_per_sec * (nrow(counties) * 91000)
+```
+
+```
+[1] 29.31745
+```
+
+--
+
+- ~ 30 seconds to test ~282,100,000 point/polygon relations is not bad, but could be a bottle neck in analysis
+
+--
+
+- Lets look at a common means for improvement...
+
+---
+
+# To keep geometery or not?
+
+- Remember our geometries are **sticky**, that means they carry through all calculations - whether they are needed or not
+
+--
+
+- We can ease _alot_ of computational overhead by being mindfull of when we retain our geometry data with our attribute data.
+
+--
+
+.pull-left[
+
+```r
+system.time({
+  st_join(counties, starbucks) %&gt;% 
+    count(geoid) 
+})
+
+#user    system  elapsed 
+#3.970   0.421   5.521
+```
+]
+
+.pull-right[
+
+```r
+system.time({
+  st_join(counties, starbucks) %&gt;% 
+    st_drop_geometry() %&gt;% 
+    count(geoid) %&gt;% 
+    left_join(counties, by = 'geoid') %&gt;% 
+    st_as_sf() 
+})
+
+# user    system  elapsed 
+# 0.396   0.017   0.598
+```
+]
+
+---
+
+
+```r
+# How many seconds per point?
+# How many seconds per point?
+(point_per_sec = .598 / (nrow(counties) * nrow(starbucks)))
+```
+
+```
+[1] 1.442037e-08
+```
+
+```r
+# How will this scale to our dams data
+# (assuming the process is linear)
+
+point_per_sec * (nrow(counties) * 91000)
+```
+
+```
+[1] 4.077171
+```
+
+### Awesome! 
+
+Effectivly a 86% decrease in time needed ((29-4) / 29)
+---
+
+### "Function-izing" our improvements
+
+
+```r
+point_in_polygon3 = function(points, polygon, var){
+  st_join(polygon, points) %&gt;% 
+    st_drop_geometry() %&gt;% 
+    count(get(var)) %&gt;% 
+*   setNames(c(var, "n")) %&gt;%
+    left_join(polygon, by = var) %&gt;% 
+    st_as_sf() 
+}
+```
+
+---
+
+# What else can we wrap?
+
+- What about a really nice, clean, informative plot?
+
+--
+
+- ggplots look great but can be time consuming to program...
+
+--
+
+- A function would allow us to take care of the groundwork 
+
+--
+
+
+
+```r
+plot_pip = function(data){
+  ggplot() + 
+    geom_sf(data = data, aes(fill = log(n)), alpha = .9, size = .2) + 
+    scale_fill_gradient(low = "white", high = "darkgreen") + 
+    theme_void() + 
+    theme(legend.position = 'none',
+          plot.title = element_text(face = "bold", color = "darkgreen", hjust = .5, size = 24)) +
+    labs(title = "Starbucks Locations",
+         caption = paste0(sum(data$n), " locations represented")) 
+}
+```
+
+- This is great because we can devote the time to making a nice plot and we will be able to recycle the work over other cases...
+
+---
+
+# Test
+
+.pull-left[
+
+```r
+point_in_polygon3(starbucks, filter(counties, state_name == "California"), "geoid") %&gt;% 
+plot_pip()
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-43-1.png" width="432" /&gt;
+]
+
+.pull-right[
+
+```r
+point_in_polygon3(starbucks, filter(counties, state_name == "New York"), "geoid") %&gt;% 
+plot_pip()
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-44-1.png" width="432" /&gt;
+]
+
+---
+
+.pull-left[
+
+```r
+point_in_polygon3(starbucks, counties, "geoid") %&gt;% 
+  plot_pip()
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-45-1.png" width="432" /&gt;
+]
+
+.pull-right[
+
+```r
+point_in_polygon3(starbucks, states, var = "name") %&gt;% 
+  plot_pip()
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-46-1.png" width="432" /&gt;
+]
+---
+
+# Moving beyond Starbucks?
+
+- [Here](https://www.qgistutorials.com/en/docs/points_in_polygon.html#:~:text=One%20such%20type%20of%20analysis,use%20this%20method%20of%20analysis.) is a nice tutorial of point-in-polygon in QGIS. It is looking at earthquakes by country.
+
+- Just like us they use `naturalearth` data for the polygon areas
+
+- And they are looking at earthquake data maintained by NOAA.
+
+- In R, we can read the NOAA data directly from a URL.
+
+- The data is a tab delimited txt file so we use `readr::read_delim()`
+
+---
+
+
+```r
+sf::sf_use_s2(FALSE)
+countries = st_as_sf(rnaturalearth::countries110)
+
+url = 'http://www.ngdc.noaa.gov/nndc/struts/results?type_0=Exact&amp;query_0=$ID&amp;t=101650&amp;s=13&amp;d=189&amp;dfn=signif.txt'
+
+quakes  = read_delim(url, delim = "\t") %&gt;% 
+  filter(!is.na(LATITUDE), !is.na(LONGITUDE)) %&gt;% 
+  st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4326) %&gt;%     
+  st_transform(st_crs(countries))
+
+nrow(countries)
+```
+
+```
+[1] 177
+```
+
+```r
+nrow(quakes)
+```
+
+```
+[1] 6198
+```
+
+```r
+nrow(st_intersection(quakes, countries))
+```
+
+```
+[1] 4169
+```
+
+---
+
+# PIP --&gt; Plotting Method
+
+- We can use our functions right out of the box for this data 
+
+--
+
+- But... somethings are not quite right..
+
+
+```r
+point_in_polygon3(quakes, countries, var = "admin") %&gt;% plot_pip() 
+```
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-48-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Modify for our analysis ...
+
+
+```r
+point_in_polygon3(quakes, countries, var = "admin") %&gt;% 
+* plot_pip() +
+  labs(title = "Earthquake Locations") + 
+  scale_fill_viridis_c() + 
+  geom_sf(data = quakes, size = .25, alpha = .05, col = 'red')
+```
+
+---
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-50-1.png" width="864" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Improve the anaylsis...
+
+
+```r
+point_in_polygon3(quakes, countries, var = "admin") %&gt;% 
+  plot_pip() + 
+  labs(title = "Earthquake Locations",
+       subtitle = "Most impacted countries") + 
+  theme(plot.subtitle = element_text(hjust = .5),
+        plot.title = element_text(color = "navy")) + 
+  scale_fill_viridis_c() + 
+  geom_sf(data = quakes, size = .3, alpha = .05, col = 'red') +
+  gghighlight::gghighlight(n &gt; (mean(n) + sd(n)))
+```
+
+---
+
+&lt;img src="lecture-14_files/figure-html/unnamed-chunk-52-1.png" width="864" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Lab 3: Set up
+
+### Data
+
+
+```r
+states_u = get_conus(us_states(), "name") %&gt;% 
+  st_union() %&gt;% 
+  st_cast("MULTILINESTRING")
+
+states_c = get_conus(us_states(), "name") %&gt;% 
+  st_combine() %&gt;% 
+  st_cast("MULTILINESTRING")
+
+countries = st_as_sf(rnaturalearth::countries110)
+```
+
+### Function
+
+```r
+dist_5070_km = function(g1, g2){
+  g2 = st_transform(g2, crs = st_crs(g1))
+  drop_units(set_units(st_distance(g1,g2),"km")) %&gt;% 
+  as.vector()
+}
+```
+---
+
+# Assignment
+
+- Compute and plot the number of cities in each US (CONUS) county as a PIP plot
+
+ - Use the `uscities.csv` to create your points
+ 
+ - Use `USAboundaries::us_states()` to define your polygons
+ 
+ - Use the PIP function developed here to compute PIP counts
+ 
+ - *MODIFY* the `plot_pip` function to plot your data
+ 
+ - save your plot with `ggsave()`
+
+---
+
+class: center, middle
+
+# Submission
+
+Submit your image to gauchospace
+ 
+ 
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
