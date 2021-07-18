@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 17: Raster Data
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+
+
+- Spatial phenomena can be thought of discrete **objects** with clear boundaries or as **continuous** phenomenon that can be observed everywhere, with _no_ natural boundaries.
+
+--
+
+- We have described these as **objects** and **fields** (Kuhn, 2012)
+
+--
+
+- Objects are usually represented by vector data consisting of:
+  - a geometry (simple features (`sfc`, `sfg`))
+  - some attribute information (`data.frame`)
+
+--
+
+- In R these are unified as a `sf` object
+
+--
+****
+
+- Field data is typically represented by raster data
+
+--
+
+- For this, we will begin our discussions using the `raster` package
+
+--
+
+- Like `sf`, raster is an implementation of [standard raster data model](https://gistbok.ucgis.org/bok-topics/raster-data-model)
+
+--
+
+- The model is used by all GIS platforms
+
+--
+
+- Represented continuous data either as continuous or categorical values
+
+--
+
+- Regular set of cells in a grid (matrix)
+
+--
+
+- cells have: resolution, cell coordinate is the center of the cell, the coordinate and value apply to the entire cell area
+
+
+---
+
+# Recap: R data structures
+
+- Vector:
+  - A vector can have dimensions
+    - A 1D vector in a collection of values
+    - A 2D vector is a matrix
+    - A 3D vector is an array
+
+--
+
+- List: a collection of objects
+
+--
+
+- data.frame: a list with requirement of equal length column (vectors)
+
+--
+
+- data.frames and lists (sfc) defined our vector model
+
+--
+
+- Arrays will define our raster model
+
+---
+
+# Spatial Extent
+
+One last topic with respect to vector data (that will carry us into raster) is the idea of an extent:
+
+--
+
+
+```r
+(mx = filter(us_states(), name == "New York") %&gt;% 
+   st_transform(5070) %&gt;% 
+   dplyr::select(name))
+```
+
+```
+Simple feature collection with 1 feature and 1 field
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 1324221 ymin: 2151298 xmax: 1991064 ymax: 2658558
+Projected CRS: NAD83 / Conus Albers
+      name                       geometry
+1 New York MULTIPOLYGON (((1972243 227...
+```
+
+--
+
+In geometry, the minimum bounding box for a point set (stored as `POINT`, `POLYLINE`, `POLYGON`) in N dimensions is "...the box with the smallest measure within which all the points lie." 
+
+---
+### We can extract bounding box coordinates with `st_bbox`
+
+- returns: an object of class `bbox` of length 4.
+
+
+```r
+(bb = st_bbox(mx))
+```
+
+```
+   xmin    ymin    xmax    ymax 
+1324221 2151298 1991064 2658558 
+```
+
+```r
+class(bb)
+```
+
+```
+[1] "bbox"
+```
+
+```r
+typeof(bb)
+```
+
+```
+[1] "double"
+```
+
+---
+
+### There is a method for creating an sfc form a `bbox` object
+
+
+```r
+(bb = st_as_sfc(bb) )
+```
+
+```
+Geometry set for 1 feature 
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: 1324221 ymin: 2151298 xmax: 1991064 ymax: 2658558
+Projected CRS: NAD83 / Conus Albers
+```
+
+```r
+class(bb)
+```
+
+```
+[1] "sfc_POLYGON" "sfc"        
+```
+
+```r
+typeof(bb)
+```
+
+```
+[1] "list"
+```
+
+---
+# Result: 
+
+
+```r
+plot(bb, border = rgb(0,0,1))
+plot(mx, add = TRUE, col = rgb(1,0,0, .5))
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-6-1.png" width="432" /&gt;
+---
+
+# Extents can be discritized in a number of ways:
+
+.pull-left[
+
+```r
+grid = st_make_grid(bb)
+plot(mx$geometry)
+plot(grid, add = TRUE)
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-7-1.png" width="432" /&gt;
+]
+
+.pull-right[
+
+```r
+grid1km = st_make_grid(bb, cellsize = 10000)
+plot(mx$geometry)
+plot(grid1km, add = TRUE)
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-8-1.png" width="432" /&gt;
+]
+
+---
+  
+
+```r
+length(grid1km) # how many grid tiles
+```
+
+```
+[1] 3417
+```
+
+
+```r
+mapview::npts(grid1km) # how many points?
+```
+
+```
+[1] 17085
+```
+
+
+```r
+mapview::npts(grid1km) * 2 # how many X and Y?
+```
+
+```
+[1] 34170
+```
+
+
+```r
+mapview::npts(grid1km) / length(grid) # how many points per tile?
+```
+
+```
+[1] 170.85
+```
+
+
+```r
+sqrt(st_area(grid1km)[1]) # length of each tile?
+```
+
+```
+10000 [m]
+```
+
+
+```r
+st_bbox(grid1km) # extent of grid
+```
+
+```
+   xmin    ymin    xmax    ymax 
+1324221 2151298 1994221 2661298 
+```
+
+---
+
+
+```r
+cent = st_centroid(grid1km)
+
+plot(mx$geometry)
+plot(cent, add = TRUE, pch = 16, cex = .25)
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-15-1.png" width="432" /&gt;
+---
+# Equal area from centroid
+
+We can use our voroni diagram the show that the area closest to a cell centroid is the cell itself.
+
+
+```r
+vor = st_union(cent) %&gt;% 
+  st_voronoi() %&gt;% 
+  st_cast() %&gt;% 
+  st_intersection(bb)
+```
+
+--
+
+
+```r
+plot(mx$geometry); plot(vor, add = TRUE)
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-17-1.png" width="432" /&gt;
+
+---
+
+The raster model is one of the earliest and most widely used data models within geographic information systems (Tomlin, 1990; Goodchild, 1992, Maguire, 1992). 
+
+--
+
+Typically used to record, analyze and visualize data with a continuous nature such as elevation, temperature ("GIS"), or reflected or emitted electromagnetic radiation ("Remote Sensing")
+
+* Quotes are used because you'll find from a data perspective these differences are artificial and a product of the ESRI/ENVI/ERDAS divide
+
+--
+***
+
+The term `raster` originated from the German word for screen, implying a series of orthogonality oriented parallel lines.  
+
+--
+
+- Digital raster objects most often take the form of a _regularly spaced_, _grid-like_ pattern of rows and columns
+
+- Each element referred to as a cell, pixel, or grid point.
+
+--
+
+- The entire raster is sometimes referred to as an "image", "array", "surface", "matrix", or "lattice" (Wise, 2000).  
+
+- The all mean the same thing...
+--
+
+Cells of the raster are most often square, but may be rectangular (with differing resolutions in x and y directions) or other shapes that can be tessellated such as triangles and hexagons (Figure below from Peuquet, 1984).
+
+&lt;img src="lec-img/17-raster-tess.png" width="341" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Photos and Computers ...
+
+&lt;img src="lec-img/17-pixel-resolution.png" width="491" style="display: block; margin: auto;" /&gt;
+
+
+&lt;img src="lec-img/17-what-is-a-pixel.jpg" width="224" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Aerial Imagery (really just a photo 😄)
+
+&lt;img src="lec-img/17-boat-res1.jpg" width="284" style="display: block; margin: auto;" /&gt;
+
+
+&lt;img src="lec-img/17-boat-res2.jpg" width="284" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# What is stored in these cells?
+
+---
+
+.pull-left[
+### Categorical Values (integer/factor)
+&lt;img src="lec-img/17-lc-pixels.png" width="327" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+### Continuous Values (numeric)
+&lt;img src="lec-img/17-raster-elev.png" width="467" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+
+### Spectral Values 
+
+ - Either Color, or sensor
+ 
+&lt;img src="lec-img/17-rgb.png" width="340" style="display: block; margin: auto;" /&gt;
+
+---
+### Any digital image contains an RBG channel for color:
+
+- Red, green, and blue are the three additive colors (primary colors of light)
+
+--
+
+- In R, colors can be defined using the RBG channels
+
+-- 
+
+```r
+(rgb(1,0,0)) # red
+```
+
+```
+[1] "#FF0000"
+```
+
+```r
+(rgb(0,.54,.96)) # UCSB navy
+```
+
+```
+[1] "#008AF5"
+```
+
+```r
+(rgb(254,188,17, maxColorValue = 255)) # UCSB navy
+```
+
+```
+[1] "#FEBC11"
+```
+---
+
+
+```r
+par(mfrow = c(1,3), mar = c(0,0,0,0))
+plot(mx$geometry, col = rgb(1,0,0)) # red
+plot(mx$geometry, col = rgb(0,1,0)) # green
+plot(mx$geometry, col = rgb(0,0,1)) # blue
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-27-1.png" width="432" /&gt;
+
+---
+
+# RGB and bytes/bits
+
+- The **red**, **green** and **blue** use 8 bits each (1 byte), which each have integer values from 0 to 255. 
+
+--
+
+- This makes 256^3 = 16,777,216 possible colors.
+
+--
+
+- See more [here](https://www.rapidtables.com/web/color/RGB_Color.html)
+
+--
+***
+- How does this relate to the selection of 256x256 pixel tiles in web maps?
+
+---
+
+The secondary colors in an RGB color wheel are cyan, magenta, and yellow because these are the three subtractive colors
+
+Think of your printer and the CMYK ink cartridges! Where black, is the absence of color (0,0,0)
+
+
+```r
+par(mfrow = c(1,4), mar = c(0,0,0,0))
+plot(mx$geometry, col = rgb(0,1,1))  # cyan
+plot(mx$geometry, col = rgb(1,0,1)) # Magenta
+plot(mx$geometry, col = rgb(1,1,0)) # Yellow
+plot(mx$geometry, col = rgb(0,0,0)) # Key (black)
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-28-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle, inverse
+# Why do we care?
+
+---
+
+# Pixels are the base unit of raster data
+
+---
+
+# Pixels have resolution
+
+This is the X and the Y dimension of each cell in the units of the CRS
+
+&lt;img src="lec-img/17-raster.png" width="433" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Resolution drives image clarity (granulairty)
+
+- Higher resolution (smaller cells) = more detail, but bigger data!
+
+&lt;img src="lec-img/17-raster-res.png" width="500" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="lec-img/17-raster-res.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Raster images seek to discritize the real world into cell-based values
+
+- Again either integer (categorical), continuous, or signal
+
+&lt;img src="lec-img/17-rasterize-world.png" width="356" style="display: block; margin: auto;" /&gt;
+
+---
+
+# All rasters have an extent!
+
+- This is the same extent as a bounding box
+- Can be described as 4 values (xmin,ymin,xmax,ymax)
+
+&lt;img src="lec-img/17-raster-extent.png" width="474" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+- Unlike vector data, the raster data model stores the coordinate of the grid cells indirectly
+
+--
+
+- Coordinates are derived from the reference (Xmin,Ymin) the resolution, and the cell index (e.g. [100,150])
+
+--
+
+- For example: If we want the coordinates of a value in the 3rd row and the 40th column of a raster matrix, we have to move from the origin (Xmin, Ymin) (3 x Xres) in x-direction and (40 x Yres) in y-direction 
+
+&lt;img src="lec-img/17-raster-extent.png" width="474" style="display: block; margin: auto;" /&gt;
+
+---
+- So, and image (png, tif, gif) can be read as a raster
+
+The raster is defined by the extent and resolution of the cells
+To be spatial, the extent (thus coordinates) must be grounded in an CRS
+
+.pull-left[
+
+```r
+img = brick('lec-img/17-raster-extent.png')
+img
+```
+
+```
+class      : RasterBrick 
+dimensions : 788, 1067, 840796, 4  (nrow, ncol, ncell, nlayers)
+resolution : 1, 1  (x, y)
+extent     : 0, 1067, 0, 788  (xmin, xmax, ymin, ymax)
+crs        : NA 
+source     : 17-raster-extent.png 
+names      : X17.raster.extent.1, X17.raster.extent.2, X17.raster.extent.3, X17.raster.extent.4 
+min values :                   0,                   0,                   0,                   0 
+max values :                 255,                 255,                 255,                 255 
+```
+]
+
+.pull-right[
+
+
+```r
+plotRGB(img, r = 1, g = 2, b = 3)
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-36-1.png" width="432" /&gt;
+
+]
+---
+
+# Raster Data in R
+
+A `RasterLayer` represents single-layer (variable) raster data. 
+
+--
+
+A `RasterLayer` always stores the fundamental parameters that describe it. 
+  - The number of columns and rows, 
+  - The spatial extent
+  - The Coordinate Reference System. 
+
+--
+
+In addition, a `RasterLayer` can store information about the file where raster values are stored (if there is such a file). 
+
+Here we construct an empty raster:
+
+
+```r
+r &lt;- raster(ncol=20, nrow=20, xmx=-80, xmn=-120, ymn=20, ymx=60)
+r
+```
+
+```
+class      : RasterLayer 
+dimensions : 20, 20, 400  (nrow, ncol, ncell)
+resolution : 2, 2  (x, y)
+extent     : -120, -80, 20, 60  (xmin, xmax, ymin, ymax)
+crs        : +proj=longlat +datum=WGS84 +no_defs 
+```
+---
+# Raster Values
+
+
+```r
+getValues(r)
+```
+
+```
+  [1] NA NA NA NA NA NA NA NA NA NA NA NA NA
+ [14] NA NA NA NA NA NA NA NA NA NA NA NA NA
+ [27] NA NA NA NA NA NA NA NA NA NA NA NA NA
+ [40] NA NA NA NA NA NA NA NA NA NA NA NA NA
+ [53] NA NA NA NA NA NA NA NA NA NA NA NA NA
+ [66] NA NA NA NA NA NA NA NA NA NA NA NA NA
+ [79] NA NA NA NA NA NA NA NA NA NA NA NA NA
+ [92] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[105] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[118] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[131] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[144] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[157] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[170] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[183] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[196] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[209] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[222] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[235] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[248] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[261] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[274] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[287] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[300] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[313] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[326] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[339] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[352] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[365] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[378] NA NA NA NA NA NA NA NA NA NA NA NA NA
+[391] NA NA NA NA NA NA NA NA NA NA
+```
+
+---
+
+# Assigning a values as a vector
+
+```r
+values(r) &lt;- 1:ncell(r)
+r
+```
+
+```
+class      : RasterLayer 
+dimensions : 20, 20, 400  (nrow, ncol, ncell)
+resolution : 2, 2  (x, y)
+extent     : -120, -80, 20, 60  (xmin, xmax, ymin, ymax)
+crs        : +proj=longlat +datum=WGS84 +no_defs 
+source     : memory
+names      : layer 
+values     : 1, 400  (min, max)
+```
+
+```r
+getValues(r)
+```
+
+```
+  [1]   1   2   3   4   5   6   7   8   9  10
+ [11]  11  12  13  14  15  16  17  18  19  20
+ [21]  21  22  23  24  25  26  27  28  29  30
+ [31]  31  32  33  34  35  36  37  38  39  40
+ [41]  41  42  43  44  45  46  47  48  49  50
+ [51]  51  52  53  54  55  56  57  58  59  60
+ [61]  61  62  63  64  65  66  67  68  69  70
+ [71]  71  72  73  74  75  76  77  78  79  80
+ [81]  81  82  83  84  85  86  87  88  89  90
+ [91]  91  92  93  94  95  96  97  98  99 100
+[101] 101 102 103 104 105 106 107 108 109 110
+[111] 111 112 113 114 115 116 117 118 119 120
+[121] 121 122 123 124 125 126 127 128 129 130
+[131] 131 132 133 134 135 136 137 138 139 140
+[141] 141 142 143 144 145 146 147 148 149 150
+[151] 151 152 153 154 155 156 157 158 159 160
+[161] 161 162 163 164 165 166 167 168 169 170
+[171] 171 172 173 174 175 176 177 178 179 180
+[181] 181 182 183 184 185 186 187 188 189 190
+[191] 191 192 193 194 195 196 197 198 199 200
+[201] 201 202 203 204 205 206 207 208 209 210
+[211] 211 212 213 214 215 216 217 218 219 220
+[221] 221 222 223 224 225 226 227 228 229 230
+[231] 231 232 233 234 235 236 237 238 239 240
+[241] 241 242 243 244 245 246 247 248 249 250
+[251] 251 252 253 254 255 256 257 258 259 260
+[261] 261 262 263 264 265 266 267 268 269 270
+[271] 271 272 273 274 275 276 277 278 279 280
+[281] 281 282 283 284 285 286 287 288 289 290
+[291] 291 292 293 294 295 296 297 298 299 300
+[301] 301 302 303 304 305 306 307 308 309 310
+[311] 311 312 313 314 315 316 317 318 319 320
+[321] 321 322 323 324 325 326 327 328 329 330
+[331] 331 332 333 334 335 336 337 338 339 340
+[341] 341 342 343 344 345 346 347 348 349 350
+[351] 351 352 353 354 355 356 357 358 359 360
+[361] 361 362 363 364 365 366 367 368 369 370
+[371] 371 372 373 374 375 376 377 378 379 380
+[381] 381 382 383 384 385 386 387 388 389 390
+[391] 391 392 393 394 395 396 397 398 399 400
+```
+
+---
+
+
+
+```r
+plot(r)
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-40-1.png" width="432" /&gt;
+
+
+---
+
+## Raster is S4
+
+- Compared to S3, the S4 object system is much stricter, and much closer to other OO systems. 
+- What does this mean for us? 
+- Data is structured with a "representation" - which is a list of slot (or attributes), giving their names and classes, accessed with @ 
+
+
+```r
+str(r, max.level = 2)
+```
+
+```
+Formal class 'RasterLayer' [package "raster"] with 12 slots
+  ..@ file    :Formal class '.RasterFile' [package "raster"] with 13 slots
+  ..@ data    :Formal class '.SingleLayerData' [package "raster"] with 13 slots
+  ..@ legend  :Formal class '.RasterLegend' [package "raster"] with 5 slots
+  ..@ title   : chr(0) 
+  ..@ extent  :Formal class 'Extent' [package "raster"] with 4 slots
+  ..@ rotated : logi FALSE
+  ..@ rotation:Formal class '.Rotation' [package "raster"] with 2 slots
+  ..@ ncols   : int 20
+  ..@ nrows   : int 20
+  ..@ crs     :Formal class 'CRS' [package "sp"] with 1 slot
+  ..@ history : list()
+  ..@ z       : list()
+```
+
+---
+
+# Access via Function
+
+.pull-left[
+
+```r
+r@extent
+```
+
+```
+class      : Extent 
+xmin       : -120 
+xmax       : -80 
+ymin       : 20 
+ymax       : 60 
+```
+
+```r
+r@crs
+```
+
+```
+CRS arguments: +proj=longlat +datum=WGS84 +no_defs 
+```
+
+```r
+r@ncols
+```
+
+```
+[1] 20
+```
+
+```r
+r@ncols
+```
+
+```
+[1] 20
+```
+
+```r
+r@data
+```
+
+```
+An object of class ".SingleLayerData"
+Slot "values":
+  [1]   1   2   3   4   5   6   7   8   9  10
+ [11]  11  12  13  14  15  16  17  18  19  20
+ [21]  21  22  23  24  25  26  27  28  29  30
+ [31]  31  32  33  34  35  36  37  38  39  40
+ [41]  41  42  43  44  45  46  47  48  49  50
+ [51]  51  52  53  54  55  56  57  58  59  60
+ [61]  61  62  63  64  65  66  67  68  69  70
+ [71]  71  72  73  74  75  76  77  78  79  80
+ [81]  81  82  83  84  85  86  87  88  89  90
+ [91]  91  92  93  94  95  96  97  98  99 100
+[101] 101 102 103 104 105 106 107 108 109 110
+[111] 111 112 113 114 115 116 117 118 119 120
+[121] 121 122 123 124 125 126 127 128 129 130
+[131] 131 132 133 134 135 136 137 138 139 140
+[141] 141 142 143 144 145 146 147 148 149 150
+[151] 151 152 153 154 155 156 157 158 159 160
+[161] 161 162 163 164 165 166 167 168 169 170
+[171] 171 172 173 174 175 176 177 178 179 180
+[181] 181 182 183 184 185 186 187 188 189 190
+[191] 191 192 193 194 195 196 197 198 199 200
+[201] 201 202 203 204 205 206 207 208 209 210
+[211] 211 212 213 214 215 216 217 218 219 220
+[221] 221 222 223 224 225 226 227 228 229 230
+[231] 231 232 233 234 235 236 237 238 239 240
+[241] 241 242 243 244 245 246 247 248 249 250
+[251] 251 252 253 254 255 256 257 258 259 260
+[261] 261 262 263 264 265 266 267 268 269 270
+[271] 271 272 273 274 275 276 277 278 279 280
+[281] 281 282 283 284 285 286 287 288 289 290
+[291] 291 292 293 294 295 296 297 298 299 300
+[301] 301 302 303 304 305 306 307 308 309 310
+[311] 311 312 313 314 315 316 317 318 319 320
+[321] 321 322 323 324 325 326 327 328 329 330
+[331] 331 332 333 334 335 336 337 338 339 340
+[341] 341 342 343 344 345 346 347 348 349 350
+[351] 351 352 353 354 355 356 357 358 359 360
+[361] 361 362 363 364 365 366 367 368 369 370
+[371] 371 372 373 374 375 376 377 378 379 380
+[381] 381 382 383 384 385 386 387 388 389 390
+[391] 391 392 393 394 395 396 397 398 399 400
+
+Slot "offset":
+[1] 0
+
+Slot "gain":
+[1] 1
+
+Slot "inmemory":
+[1] TRUE
+
+Slot "fromdisk":
+[1] FALSE
+
+Slot "isfactor":
+[1] FALSE
+
+Slot "attributes":
+list()
+
+Slot "haveminmax":
+[1] TRUE
+
+Slot "min":
+[1] 1
+
+Slot "max":
+[1] 400
+
+Slot "band":
+[1] 1
+
+Slot "unit":
+[1] ""
+
+Slot "names":
+[1] ""
+```
+]
+
+.pull-right[
+
+```r
+extent(r)
+```
+
+```
+class      : Extent 
+xmin       : -120 
+xmax       : -80 
+ymin       : 20 
+ymax       : 60 
+```
+
+```r
+crs(r)
+```
+
+```
+CRS arguments: +proj=longlat +datum=WGS84 +no_defs 
+```
+
+```r
+nrow(r)
+```
+
+```
+[1] 20
+```
+
+```r
+ncol(r)
+```
+
+```
+[1] 20
+```
+
+```r
+values(r)
+```
+
+```
+  [1]   1   2   3   4   5   6   7   8   9  10
+ [11]  11  12  13  14  15  16  17  18  19  20
+ [21]  21  22  23  24  25  26  27  28  29  30
+ [31]  31  32  33  34  35  36  37  38  39  40
+ [41]  41  42  43  44  45  46  47  48  49  50
+ [51]  51  52  53  54  55  56  57  58  59  60
+ [61]  61  62  63  64  65  66  67  68  69  70
+ [71]  71  72  73  74  75  76  77  78  79  80
+ [81]  81  82  83  84  85  86  87  88  89  90
+ [91]  91  92  93  94  95  96  97  98  99 100
+[101] 101 102 103 104 105 106 107 108 109 110
+[111] 111 112 113 114 115 116 117 118 119 120
+[121] 121 122 123 124 125 126 127 128 129 130
+[131] 131 132 133 134 135 136 137 138 139 140
+[141] 141 142 143 144 145 146 147 148 149 150
+[151] 151 152 153 154 155 156 157 158 159 160
+[161] 161 162 163 164 165 166 167 168 169 170
+[171] 171 172 173 174 175 176 177 178 179 180
+[181] 181 182 183 184 185 186 187 188 189 190
+[191] 191 192 193 194 195 196 197 198 199 200
+[201] 201 202 203 204 205 206 207 208 209 210
+[211] 211 212 213 214 215 216 217 218 219 220
+[221] 221 222 223 224 225 226 227 228 229 230
+[231] 231 232 233 234 235 236 237 238 239 240
+[241] 241 242 243 244 245 246 247 248 249 250
+[251] 251 252 253 254 255 256 257 258 259 260
+[261] 261 262 263 264 265 266 267 268 269 270
+[271] 271 272 273 274 275 276 277 278 279 280
+[281] 281 282 283 284 285 286 287 288 289 290
+[291] 291 292 293 294 295 296 297 298 299 300
+[301] 301 302 303 304 305 306 307 308 309 310
+[311] 311 312 313 314 315 316 317 318 319 320
+[321] 321 322 323 324 325 326 327 328 329 330
+[331] 331 332 333 334 335 336 337 338 339 340
+[341] 341 342 343 344 345 346 347 348 349 350
+[351] 351 352 353 354 355 356 357 358 359 360
+[361] 361 362 363 364 365 366 367 368 369 370
+[371] 371 372 373 374 375 376 377 378 379 380
+[381] 381 382 383 384 385 386 387 388 389 390
+[391] 391 392 393 394 395 396 397 398 399 400
+```
+]
+
+---
+
+# Multi-layers
+
+&lt;img src="lec-img/17_multi-band.png" width="440" style="display: block; margin: auto;" /&gt;
+
+---
+
+In many cases multi-variable raster data sets are used. Variables can related to time or measurements
+
+--
+
+The raster package has two classes for multi-layer data:
+  - `RasterBrick` can only be linked to a single (multi-layer) file. 
+  - `RasterStack` can be formed from separate files and/or from a few layers (‘bands’) from a single file.
+  
+--
+
+A `RasterStack` is a collection of  objects with the same spatial `extent` and `resolution.` 
+
+In essence it is a list of  objects, or a 3D array. 
+
+--
+
+A `RasterBrick` is truly a multi-layered object
+
+Processing a `RasterBrick` can be more efficient than processing a `RasterStack` representing the same data. However, it can only refer to a single file. 
+
+--
+
+The main difference is that a `RasterStack` is loose collection of `RasterLayer` objects that can refer to different files (but must all have the same extent and resolution), whereas a `RasterBrick` can only point to a single file.
+
+---
+
+# Remeber our Array data?
+
+
+```r
+(v = 1:27)
+```
+
+```
+ [1]  1  2  3  4  5  6  7  8  9 10 11 12 13
+[14] 14 15 16 17 18 19 20 21 22 23 24 25 26
+[27] 27
+```
+
+```r
+(arr = array(v, dim = c(3,3,3)))
+```
+
+```
+, , 1
+
+     [,1] [,2] [,3]
+[1,]    1    4    7
+[2,]    2    5    8
+[3,]    3    6    9
+
+, , 2
+
+     [,1] [,2] [,3]
+[1,]   10   13   16
+[2,]   11   14   17
+[3,]   12   15   18
+
+, , 3
+
+     [,1] [,2] [,3]
+[1,]   19   22   25
+[2,]   20   23   26
+[3,]   21   24   27
+```
+---
+
+# An array is a single file so it can be "bricked"
+
+```r
+b = brick(arr)
+plot(b)
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-46-1.png" width="432" /&gt;
+
+
+---
+
+# Real Data example:
+
+- WorldClim is a set of global climate layers (gridded climate data in GeoTiff format) that can be used for mapping and spatial modeling.
+
+- `raster::getData` provides access to WorldClim Data
+
+
+```r
+# 10 degree resolution, bio variables
+(climate &lt;- getData('worldclim', var='bio', res=10))
+```
+
+```
+class      : RasterStack 
+dimensions : 900, 2160, 1944000, 19  (nrow, ncol, ncell, nlayers)
+resolution : 0.1666667, 0.1666667  (x, y)
+extent     : -180, 180, -60, 90  (xmin, xmax, ymin, ymax)
+crs        : +proj=longlat +datum=WGS84 +no_defs 
+names      :  bio1,  bio2,  bio3,  bio4,  bio5,  bio6,  bio7,  bio8,  bio9, bio10, bio11, bio12, bio13, bio14, bio15, ... 
+min values :  -269,     9,     8,    72,   -59,  -547,    53,  -251,  -450,   -97,  -488,     0,     0,     0,     0, ... 
+max values :   314,   211,    95, 22673,   489,   258,   725,   375,   364,   380,   289,  9916,  2088,   652,   261, ... 
+```
+
+What are the properties of the data?
+
+---
+# Visual of the stack?
+&lt;img src="lec-img/17-bioclim.png" width="340" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Define a Region to explore: US West
+
+
+```r
+west = us_states() %&gt;% 
+  filter(stusps %in% c("CA", "AZ", "UT", "OR", "WA", "NV", "ID")) %&gt;% 
+  st_union() %&gt;% 
+  st_transform(crs(climate)) %&gt;% 
+  as_Spatial()
+
+plot(west)
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-49-1.png" width="432" /&gt;
+
+---
+# Crop (clip!) global RasterStack to the West
+  
+
+```r
+west_tmp = crop(climate$bio5, west)
+
+plot(west_tmp, main="Max Temperature of Warmest Month")
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-50-1.png" width="432" /&gt;
+
+---
+
+# 200+ degree?
+
+
+```r
+summary(west_tmp)
+```
+
+```
+        bio5
+Min.     144
+1st Qu.  260
+Median   291
+3rd Qu.  327
+Max.     448
+NA's    1309
+```
+
+The data for temperature is stored as `\(C = bio5 / 10\)`
+
+Why?
+
+---
+
+```r
+(raw = format(object.size(west_tmp), units = "auto"))
+```
+
+```
+[1] "52 Kb"
+```
+
+```r
+(formed = format(object.size(west_tmp /10), units = "auto"))
+```
+
+```
+[1] "90.9 Kb"
+```
+
+```r
+90.2 / 51.2
+```
+
+```
+[1] 1.761719
+```
+
+
+---
+# Data Volume!
+
+- With raster data the scale of the stored data is important not only for use but for data creation
+- Often this factor is called the data scale or the scaling factor
+
+--
+
+- Basic operators work directly on the data vector/slot of raster objects
+
+
+```r
+west_tmp_c = west_tmp / 10
+summary(west_tmp_c)
+```
+
+```
+          bio5
+Min.      14.4
+1st Qu.   26.0
+Median    29.1
+3rd Qu.   32.7
+Max.      44.8
+NA's    1309.0
+```
+
+```r
+west_tmp_f = (west_tmp_c * 9/5) + 32
+summary(west_tmp_f)
+```
+
+```
+           bio5
+Min.      57.92
+1st Qu.   78.80
+Median    84.38
+3rd Qu.   90.86
+Max.     112.64
+NA's    1309.00
+```
+
+---
+
+# Our subsetting techniques also work across RasterStack objects
+
+
+```r
+west_tmp = crop(climate[[1:4]], west)
+
+plot(west_tmp, nrow = 1)
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-54-1.png" width="432" /&gt;
+
+---
+
+# Wrap up... raster vs. vector
+
+- Lab 04 is about making object tessellations of the CONUS
+
+--
+
+- We needed an object view to perform PIP counts of dams
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-55-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+
+```r
+r = raster(count_pts, res = 10000)
+fr = fasterize::fasterize(count_pts, r, field = "n")
+
+format(object.size(count_pts), units = "auto")
+```
+
+```
+[1] "3.9 Mb"
+```
+
+```r
+format(object.size(fr), units = "auto")
+```
+
+```
+[1] "1 Mb"
+```
+
+--
+
+
+```r
+plot(fr, axes = FALSE)
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-57-1.png" width="432" /&gt;
+---
+
+# Where are we going?
+
+
+```
+class      : RasterBrick 
+dimensions : 340, 346, 117640, 7  (nrow, ncol, ncell, nlayers)
+resolution : 30, 30  (x, y)
+extent     : 594075, 604455, 4652535, 4662735  (xmin, xmax, ymin, ymax)
+crs        : +proj=utm +zone=15 +datum=WGS84 +units=m +no_defs 
+source     : memory
+names      : coast,  blue, green,   red,   NIR, SWIR1, SWIR2 
+min values :  8566,  7721,  6670,  6057,  5141,  4966,  5041 
+max values : 18482, 19079, 19592, 21965, 24772, 23896, 20687 
+```
+
+
+---
+
+&lt;img src="lec-img/17-rgb-stack.jpg" width="600" style="display: block; margin: auto;" /&gt;
+---
+
+
+```r
+par(mfrow = c(1,3))
+plotRGB(r, r = 4, g = 3, b = 2, stretch = "lin") 
+plotRGB(r, r = 5, g = 4, b = 3, stretch = "lin")
+plotRGB(r, r = 5, g = 6, b = 4, stretch = "lin")
+```
+
+&lt;img src="lecture-17_files/figure-html/unnamed-chunk-60-1.png" width="864" /&gt;
+---
+
+# Daily Assignment
+
+In an Rmd:
+
+- install `elevatr` from Github **NOT** CRAN (`remotes::install_github("jhollist/elevatr")`)
+  - Recent improvements (using GDAL) have been added
+  
+- Read your `uscities.csv` data into R, make it a `sf` object, and filter to Goleta
+
+- Transform to `CRS:5070` and create a 5 km buffer (`st_buffer(5000)`)
+
+- Get the bounding box of that buffer (`st_bbox`) and make the `bbox` object a `sfc` and then `sf` object
+
+- Pass that bounding box sf object to `elevatr::get_elev_raster`
+
+- In addition to the bbox you will need to define a Z. This is the same zoom as in webmaps!
+
+- Crop the returned elevation object to the bounding box (`raster::crop`)
+
+- Plot the raster and describe its properties.
+
+---
+
+## Hints to get started ...
+
+
+
+---
+
+# Submission:
+
+Submit your knit HTML file to Gauchospace.
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
