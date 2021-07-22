@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 15: Coverages/Tesselations
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+# Yesterdays Data...
+
+
+```r
+cities = read_csv("data/uscities.csv") %&gt;%
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) %&gt;% 
+  get_conus("state_name") %&gt;% 
+  select(city)
+```
+
+--
+
+
+```r
+polygon = get_conus(us_states()) %&gt;% 
+  select(name)
+```
+
+---
+
+### Building a PIP Analysis: Join Data
+
+
+```r
+cj = st_join(polygon, cities)
+```
+
+```
+Simple feature collection with 6 features and 2 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -71.08392 ymin: 43.05982 xmax: -66.9499 ymax: 47.45716
+Geodetic CRS:  WGS 84
+     name           city                       geometry
+1   Maine        Sanford MULTIPOLYGON (((-68.92401 4...
+1.1 Maine      Westbrook MULTIPOLYGON (((-68.92401 4...
+1.2 Maine Cousins Island MULTIPOLYGON (((-68.92401 4...
+1.3 Maine   Lisbon Falls MULTIPOLYGON (((-68.92401 4...
+1.4 Maine       Gardiner MULTIPOLYGON (((-68.92401 4...
+1.5 Maine    Steep Falls MULTIPOLYGON (((-68.92401 4...
+```
+
+---
+### Building a PIP Analysis: Getting a table
+
+
+```r
+cj = st_join(polygon, cities) %&gt;% 
+    st_drop_geometry()
+```
+
+
+```
+     name           city
+1   Maine        Sanford
+1.1 Maine      Westbrook
+1.2 Maine Cousins Island
+1.3 Maine   Lisbon Falls
+1.4 Maine       Gardiner
+1.5 Maine    Steep Falls
+```
+---
+
+### Building a PIP Analysis: Counting over a group
+
+
+```r
+cj = st_join(polygon, cities) %&gt;% 
+    st_drop_geometry() %&gt;% 
+    count(name)
+```
+
+
+```
+         name    n
+1     Alabama  583
+2     Arizona  447
+3    Arkansas  537
+4  California 1501
+5    Colorado  455
+6 Connecticut  109
+```
+
+---
+### Building a PIP Analysis: Re-join the geometries
+
+
+```r
+cj = st_join(polygon, cities) %&gt;% 
+    st_drop_geometry() %&gt;% 
+    count(name) %&gt;% 
+    left_join(polygon, by = 'name')
+```
+
+
+```
+         name    n                       geometry
+1     Alabama  583 MULTIPOLYGON (((-88.46866 3...
+2     Arizona  447 MULTIPOLYGON (((-114.7997 3...
+3    Arkansas  537 MULTIPOLYGON (((-94.61792 3...
+4  California 1501 MULTIPOLYGON (((-118.594 33...
+5    Colorado  455 MULTIPOLYGON (((-109.06 38....
+6 Connecticut  109 MULTIPOLYGON (((-73.69594 4...
+```
+
+---
+
+### Building a PIP Analysis: create `sf` object
+
+
+```r
+cj = st_join(polygon, cities) %&gt;% 
+    st_drop_geometry() %&gt;% 
+    count(name) %&gt;% 
+    left_join(polygon, by = 'name') %&gt;% 
+    st_as_sf()
+```
+
+
+```
+Simple feature collection with 6 features and 2 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -124.4096 ymin: 30.22831 xmax: -71.78936 ymax: 42.04964
+Geodetic CRS:  WGS 84
+         name    n                       geometry
+1     Alabama  583 MULTIPOLYGON (((-88.46866 3...
+2     Arizona  447 MULTIPOLYGON (((-114.7997 3...
+3    Arkansas  537 MULTIPOLYGON (((-94.61792 3...
+4  California 1501 MULTIPOLYGON (((-118.594 33...
+5    Colorado  455 MULTIPOLYGON (((-109.06 38....
+6 Connecticut  109 MULTIPOLYGON (((-73.69594 4...
+```
+
+---
+# A note on yesterday...
+
+
+```r
+point_in_polygon3 = function(points, polygon, group){
+      st_join(polygon, points) %&gt;%
+        st_drop_geometry() %&gt;%
+*       count(get(group)) %&gt;%
+        setNames(c(group, "n")) %&gt;%
+        left_join(polygon, by = group) %&gt;%
+        st_as_sf()
+    }
+```
+
+---
+
+# id()
+
+(thanks to Justin for identifying the source)
+
+
+```r
+dplyr::id()
+```
+
+```
+Error: `id()` was deprecated in dplyr 0.5.0 and is now defunct.
+Please use `vctrs::vec_group_id()` instead.
+```
+
+---
+
+# Applying our function:
+
+**Goal**: Count cities in each US county
+
+--
+
+
+```r
+counties = get_conus(us_counties(), "state_name") %&gt;% 
+  st_transform(st_crs(cities))
+
+city_pip = point_in_polygon3(cities, counties, "geoid")
+```
+
+--
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-18-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Summary
+
+- So far we have spent the last two weeks looking at simple feature objects
+
+--
+
+- Where a feature as a geometry define by a set of structured POINT(s) 
+
+--
+
+- These points have precision and define location ({X Y CRS})
+
+--
+
+- The geometry defines a bounds: either 0D, 1D or 2D 
+
+--
+
+- Each object is therefore bounded to those geometries implying a level of exactness.
+
+---
+
+## Core Concepts of Spatial Data: ([Kuhn 2012](https://www.tandfonline.com/doi/full/10.1080/13658816.2012.722637))
+
+&lt;img src="lec-img/15-cc.png" width="582" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Core Concepts of Spatial Data: ([Kuhn 2012](https://www.tandfonline.com/doi/full/10.1080/13658816.2012.722637))
+
+- **One Base Concept**: Location
+
+- **Four Content Concepts**: Field, Object, Network, Event
+
+- **Two Quality Concepts**: Granularity, Accuracy
+
+---
+
+## Core Concepts of Spatial Data: ([Kuhn 2012](https://www.tandfonline.com/doi/full/10.1080/13658816.2012.722637))
+
+- **One Base Concept**: Location (*coordinates*)
+
+- **Four Content Concepts**: Field (*raster*), Object (*simple feature*), &lt;del&gt;Network&lt;/del&gt;, &lt;del&gt;Event&lt;/del&gt;
+
+- **Two Quality Concepts**: Granularity (*simplification*), Accuracy (*taken for granted*)
+
+---
+
+# Object View
+
+- Objects describe *individuals* that have an identity (id) as well as spatial, temporal, and thematic properties. 
+
+--
+
+- Answers questions about _properties_ and _relations_ of objects. 
+
+--
+
+- Results from fixing theme, controlling time, and measuring space. 
+
+--
+
+- Features, such as surfaces, depend on objects (but are also objects)
+
+---
+
+# Object View
+
+- Object implies boundedness
+
+    - boundaries may not be known or even knowable, but have limits. 
+
+--
+
+- Crude examples of such limits are the minimal bounding boxes used for indexing and querying objects in databases. 
+
+--
+
+- Many objects (particularly natural ones) do not have crisp boundaries (watersheds) 
+
+--
+
+- Differences between spatial information from multiple sources are often caused by more or less arbitrary delineations through context-dependent boundaries. 
+
+--
+
+- Many questions about objects and features can be answered without boundaries, using simple point representations (centroids) with thematic _attributes_.
+
+---
+
+# Field View
+
+Fields describe phenomena that have a scalar or vector attribute everywhere in a space of interest 
+
+  - for example, air temperatures, rainfall, elevation, land cover 
+  
+--
+  
+Field information answers the question **what is here?**, where here can be anywhere in the space considered. 
+
+--
+
+Field-based spatial information can also represent attributes that are computed rather than measured, such as probabilities or densities.
+
+&lt;img src="lec-img/15-prob-snow-christmas.jpg" width="216" style="display: block; margin: auto;" /&gt;
+
+
+
+--
+
+Together, fields and objects are  the two fundamental ways of structuring spatial information. 
+
+---
+
+# Objects can provide coverage:
+
+- Both objects and fields can cover space continuously - the primary difference is that objects prescribe bounds.
+
+--
+
+  - Counties are one form of object that covers the USA seamlessly
+
+--
+
+  - State objects are another ...
+
+---
+class: center, middle, inverse
+# Object Coverages
+---
+
+# LANDSAT Path Row
+
+- Serves tiles based on a path/row index
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-21-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# MODIS Sinisoial Grid
+
+- Serves tiles based on a path/row index
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-22-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+# [Uber Hex Addressing](https://eng.uber.com/h3/)
+
+- Breaks the world into Hexagons...
+
+&lt;img src="lec-img/15-uber-h3.jpeg" width="104" /&gt;&lt;img src="lec-img/15-uber-h3-zoom.jpeg" width="96" /&gt;
+---
+
+# [what3word](https://what3words.com/switched.mandates.apple)
+
+- Breaks the world into 3m grids encoded with unique 3 word strings
+
+&lt;img src="lec-img/15-what3words.png" width="763" style="display: block; margin: auto;" /&gt;
+---
+
+# [Map Tiles / slippy maps / Pyramids](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)
+
+- Use XYZ where Z is a zoom level ...
+&lt;img src="lec-img/15-pyramid.jpg" width="341" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Our Data for today ...
+
+### Classifier
+
+
+```r
+regions = data.frame(region = state.region, state_name = state.name)
+```
+
+--
+
+### Southern Counties
+
+```r
+south_counties = left_join(us_counties(), regions) %&gt;% 
+  filter(region == "South") %&gt;% 
+  st_transform(st_crs(cities))
+```
+
+--
+
+### Unioned to States using dplyr
+
+```r
+south_states = south_counties %&gt;% 
+  group_by(state_name) %&gt;% summarise()
+```
+
+--
+
+### South County Centroids
+
+```r
+south_cent = st_centroid(south_counties)
+```
+
+---
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-30-1.png" width="720" /&gt;
+
+---
+
+## Tesselation plotting function
+
+
+```r
+plot_tess = function(data, title){
+  ggplot() + 
+    geom_sf(data = data, fill = "white", col = "navy", size = .2) +   
+    theme_void() +
+    labs(title = title, caption = paste("This tesselation has:", nrow(data), "tiles" )) +
+    theme(plot.title = element_text(hjust = .5, color =  "navy", face = "bold"))
+}
+```
+
+---
+
+
+```r
+plot_tess(south_counties, "Counties")
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-32-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Regular Tiles
+
+- One way to tile a surface is into regions of equal area
+
+--
+
+- Tiles can be either _square_ (rectilinear) or _hexagonal_
+
+--
+
+- `st_make_grid` generates a square or hexagonal grid covering the geometry of an `sf` or `sfc` object
+
+--
+
+- The return object of `st_make_grid` is a new `sfc` object 
+
+--
+
+- Grids can be specified by _cellsize_ or number of grid cells (*n*) in the X and Y direction
+
+--
+
+
+```r
+# Create a grid over the south with 70 rows and 50 columns
+sq_grid = st_make_grid(south_counties, n = c(70, 50)) %&gt;% 
+  st_as_sf() %&gt;% 
+  mutate(id = 1:n())
+```
+
+---
+
+
+```r
+plot_tess(sq_grid, "Square Coverage")
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-34-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Hexagonal Grid
+
+- Hexagonal tessellations (honey combs) offer an alternative to square grids
+
+- They are created in the same way but by setting `square = FALSE`
+
+
+```r
+hex_grid = st_make_grid(south_counties, n = c(70, 50), square = FALSE) %&gt;% 
+  st_as_sf() %&gt;% 
+  mutate(id = 1:n())
+```
+
+---
+
+
+```r
+plot_tess(hex_grid, "Hexegonal Coverage")
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-36-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Advantages Square Grids
+
+ - Simple definition and data storage
+    - Only need the origin (lower left), cell size (XY) and grid dimensions
+    
+ - Easy to aggregate and dissaggregate (resample)
+ 
+ - Analogous to raster data
+ 
+ - Relationship between cells is given 
+ 
+ - Combining layers is easy with traditional matrix algebra
+
+---
+
+# Advantages Square Grids 
+
+ - Reduced Edge Effects
+    - Lower perimeter to area ratio
+    - minimizes the amount line length needed to create a lattice of cells with a given area
+    
+ - All neighbors are identical
+    - No rook vs queen neighbors
+    
+ - Better fit to curve surfaces (e.g. the earth)
+
+---
+class: center, middle
+
+&lt;img src="lec-img/15-hex-vs-others.png" width="500" style="display: block; margin: auto;" /&gt;
+---
+
+# Triangulations
+
+- An alternative to creating equal area tiles is to create triangulations from known **anchor points**
+
+--
+
+- Triangulation requires a set of input points and seeks to partition the interior into a partition of triangles.
+
+--
+
+- In GIS contexts you'll hear:
+  - Thiessen Polygon 
+  - Voronoi Regions
+  - Delunay Triangulation
+  - TIN (Triangular irregular networks)
+  - etc,..
+
+---
+
+# Voronoi Polygons
+
+- Voronoi/Thiessen polygon boundaries define the area closest to each anchor point relative to all others
+
+--
+
+- They are defined by the _perpendicular_ bisectors of the lines between all points.
+
+--
+
+&lt;img src="lec-img/15-voronoi-animation.gif" style="display: block; margin: auto;" /&gt;
+
+---
+# Voronoi Polygons
+
+&lt;img src="lec-img/15-Voronoi_growth_euclidean.gif" style="display: block; margin: auto;" /&gt;
+
+---
+# Voronoi Polygons
+
+- [Usefull for tasks](https://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK4/NO) such as: 
+  - nearest neighbor search, 
+  - facility location (optimization), 
+  - largest empty areas, 
+  - path planning...
+
+- Also useful for simple interpolation of values such as rain gauges,
+
+.pull-left[
+&lt;img src="lec-img/15-gage-rainfall.png" width="597" /&gt;
+]
+.pull-right[
+&lt;img src="lec-img/15-triangle-rainfall.png" width="597" /&gt;
+]
+---
+# Often used in numerical models and simulations
+
+&lt;img src="lec-img/15-ocean-eddy.png" width="591" /&gt;&lt;img src="lec-img/15-jetstream.png" width="374" /&gt;
+---
+
+# `st_voronoi`
+
+- st_voronoi creates voronoi tesselation in `sf`
+
+--
+
+- It works over a `MULTIPOINT` collection
+
+--
+
+- Should always be simplified after creation (st_cast())
+
+--
+
+- If to be treated as an object for analysis, should be id'd
+
+--
+
+
+```r
+south_cent_u = st_union(south_cent)
+
+v_grid = st_voronoi(south_cent_u) %&gt;% 
+  st_cast() %&gt;% 
+  st_as_sf() %&gt;% 
+  mutate(id = 1:n())
+```
+
+---
+
+
+```r
+plot_tess(v_grid, "Voronoi Coverage")
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-44-1.png" width="1152" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+v_grid = st_intersection(v_grid, st_union(south_states))
+plot_tess(v_grid, "Voroni Coverage") + 
+  geom_sf(data = south_cent, col = "darkred", size = .2)
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-45-1.png" width="1152" style="display: block; margin: auto;" /&gt;
+---
+
+# Delaunay triangulation
+
+- A Delaunay triangulation for a given set of points (P) in a plane, is a triangulation DT(P), where no point is inside the circumcircle of any triangle in DT(P). 
+
+&lt;img src="lec-img/15-Delaunay_triangles.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Delaunay triangulation
+
+- The Delaunay triangulation of a discrete POINT set corresponds to the dual graph of the Voronoi diagram. 
+
+- The circumcenters (center of circles) of Delaunay triangles are the vertices of the Voronoi diagram. 
+
+&lt;img src="lec-img/15-vor-delun.png" width="260" style="display: block; margin: auto;" /&gt;
+
+---
+class: middle, center
+
+### Used in landscape evaluation and terrian modeling
+
+&lt;img src="lec-img/15-flood-plain-mapping.jpg" width="255" /&gt;
+
+&lt;img src="lec-img/15-tin-terrain.jpg" width="293" /&gt;
+
+
+---
+
+# `st_triangulate`
+
+- `st_triangulate` creates Delaunay triangulation in `sf`
+
+--
+
+- It works over a `MULTIPOINT` collection
+
+--
+
+- Should always be simplified after creation (st_cast())
+
+--
+
+- If to be treated as an object for analysis, should be id'd
+
+--
+
+
+```r
+t_grid = st_triangulate(south_cent_u) %&gt;% 
+  st_cast() %&gt;% 
+  st_as_sf() %&gt;% 
+  mutate(id = 1:n())
+```
+
+---
+
+
+```r
+plot_tess(t_grid, "Square Coverage")
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-51-1.png" width="720" style="display: block; margin: auto;" /&gt;
+---
+
+
+```r
+t_grid = st_intersection(t_grid, st_union(south_states))
+plot_tess(t_grid, "Voroni Coverage") + 
+  geom_sf(data = south_cent, col = "darkred", size = .3)
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-52-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Difference in object coverages:
+
+&lt;table class="table table-striped" style="font-size: 14px; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Tesselation Characteristics&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Type &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Elements &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Mean Area (km2) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Standard Deviation Area (km2) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Coverage Area &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; triangulation &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2,828 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 813 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 525 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2,298,198 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; voroni &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1,421 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1,643 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 986 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2,334,538 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; counties &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1,421 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1,643 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1,136 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2,334,538 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; grid &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3,500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1,513 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5,294,950 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Hexagon &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3,003 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1,832 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5,502,608 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+---
+
+# Modifiable areal unit problem (MAUP)
+
+- The modifiable areal unit problem (MAUP) is a source of statistical bias that can significantly impact the results of statistical hypothesis tests. 
+
+--
+
+- MAUP affects results when point-based measures are aggregated into districts. 
+
+--
+
+- The resulting summary values (e.g., totals or proportions) are influenced by both the shape and scale of the aggregation unit.
+
+&lt;img src="lec-img/15-maup.png" width="378" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Our MAUP
+
+
+```r
+cities = st_transform(cities, st_crs(south_counties))
+county_pip = point_in_polygon3(cities, south_counties, "geoid")
+plot(county_pip['n'], border = NA)
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-55-1.png" width="432" /&gt;
+
+---
+
+.pull-left[
+
+```r
+sq_pip = point_in_polygon3(cities, sq_grid, "id")
+plot(sq_pip['n'], border = NA, key.pos = 4)
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-56-1.png" width="432" /&gt;
+]
+
+.pull-right[
+
+```r
+hex_pip = point_in_polygon3(cities, hex_grid, "id")
+plot(hex_pip['n'], border = NA,  key.pos = 4)
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-57-1.png" width="432" /&gt;
+]
+
+---
+
+.pull-left[
+
+```r
+v_pip = point_in_polygon3(cities, v_grid, "id")
+plot(v_pip['n'], border = NA, key.pos = 4)
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-58-1.png" width="432" /&gt;
+]
+
+.pull-right[
+
+```r
+t_pip = point_in_polygon3(cities, t_grid, "id")
+plot(t_pip['n'], border = NA, key.pos = 4)
+```
+
+&lt;img src="lecture-15_files/figure-html/unnamed-chunk-59-1.png" width="432" /&gt;
+]
+
+---
+
+# Summary
+
+- The power of GIS is the ability to integrate different layers and types of information
+
+--
+
+- The scale of information can impact the analysis as can the grouping and zoning schemes chosen
+
+--
+
+- The Modifiable Areal Unit Problem (MAUP) is an important issue for those who conduct spatial analysis using units of analysis at aggregations higher than incident level. 
+
+--
+
+- The MAUP occurs when the aggregate units of analysis are arbitrarily produced or not directly related to the underlying phenomena. A classic example of this problem is Gerrymandering.
+
+--
+
+- Gerrymandering involves shaping and re-shaping voting districts based on the political affiliations of the resident citizenry. 
+
+---
+
+# [Examples](https://thefulcrum.us/worst-gerrymandering-districts-example)
+&lt;img src="lec-img/15-gm-maup.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Lab 04:
+
+- **Q1**: Making tessellations of CONUS using county centroids as anchors
+
+--
+
+- **Q2**: Summarizing the traits of each tessellation
+
+--
+
+- **Q3**: Map PIP counts over each tessellation of dams in the USA
+
+--
+
+- **Q4**: Map PIP counts of different dams by their purpose over a chosen tessellation to visualize use distribution
+
+---
+
+class: middle, center
+
+# Daily Assignment
+
+Complete Question 1 of lab 4
+Submit your Rmd to Gauchospace
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
