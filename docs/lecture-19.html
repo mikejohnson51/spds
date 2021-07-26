@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+    <script src="libs/jquery-1.12.4/jquery.min.js"></script>
+    <link href="libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet-1.3.1/leaflet.js"></script>
+    <link href="libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+    <script src="libs/proj4-2.6.2/proj4.min.js"></script>
+    <script src="libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+    <link href="libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet-binding-2.0.4.1/leaflet.js"></script>
+    <script src="libs/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js"></script>
+    <script src="libs/leaflet-providers-plugin-2.0.4.1/leaflet-providers-plugin.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 19: Map Algebra
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+### The end is in sight:
+
+- **Today**: Map Algebra and raster/object interaction
+
+- **Tomorrow**: Kmeans clustering 
+
+--
+****
+- **Monday**: Holiday!
+
+- **Tuesday**: Terrain Analysis (last Daily Assignment)
+
+- **Wednesday**: Google Earth Engine Guest Lecture ([Jim Coll](https://jimcoll.github.io/))
+
+- **Thursday**: Wrap up
+
+--
+***
+- **Lab 05**: Flood Detection (due 09-07 @ midnight)
+
+  - In class we will do question 1 through ~3
+  
+- **Lab 06**: Will be short (1/2 of current) (assigned 09-07, due 09-14 @ midnight)
+
+  - This is the "practical" final, limited help will be offered
+  
+  - Lab next week will be a "crash-course" in ArcMap (Ryan Erikson)
+  
+- **Final**: due 09-14 at midnight this is your complete personal web page
+
+---
+class: center, middle
+
+**No** work will be accepted after  **09-14 at midnight**
+
+Grades due on the 17th
+
+
+---
+
+# Recap
+
+&lt;img src="lec-img/18-raster.png" width="474" style="display: block; margin: auto;" /&gt;
+
+---
+# Yesterdays Assignment
+
+### Read in the saved raster file
+
+
+```r
+(r = raster("data/goleta-elev.tif"))
+```
+
+```
+class      : RasterLayer 
+dimensions : 318, 318, 101124  (nrow, ncol, ncell)
+resolution : 31.45065, 31.45065  (x, y)
+extent     : -2157752, -2147751, 1530395, 1540396  (xmin, xmax, ymin, ymax)
+crs        : +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs 
+source     : goleta-elev.tif 
+names      : goleta.elev 
+values     : -70, 501  (min, max)
+```
+---
+
+### Create a conditional (threshold) mask
+
+
+```r
+threshold = function(x) {ifelse(x &lt;= 0 , NA, 1)}
+```
+
+--
+
+
+```r
+threshold(100)
+```
+
+```
+[1] 1
+```
+
+```r
+threshold(-100)
+```
+
+```
+[1] NA
+```
+
+--
+
+
+```r
+(m = calc(r, threshold))
+```
+
+```
+class      : RasterLayer 
+dimensions : 318, 318, 101124  (nrow, ncol, ncell)
+resolution : 31.45065, 31.45065  (x, y)
+extent     : -2157752, -2147751, 1530395, 1540396  (xmin, xmax, ymin, ymax)
+crs        : +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs 
+source     : memory
+names      : layer 
+values     : 1, 1  (min, max)
+```
+
+---
+
+.pull-left[
+
+```r
+plot(r)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-8-1.png" width="432" /&gt;
+]
+
+.pull-left[
+
+```r
+plot(m, col = "black")
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-9-1.png" width="432" /&gt;
+]
+
+---
+
+## Multiply cell-wise
+
+- algebraic, logical, and functional operations act on a raster cell-wise
+
+
+```r
+ocean_cut = m * r
+plot(ocean_cut, col = viridis::viridis(256))
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-10-1.png" width="432" style="display: block; margin: auto;" /&gt;
+---
+
+# Reclassify
+
+
+```r
+(rcl = data.frame(min = seq(0,500,100),max =  seq(100,600, 100), lab = c(0:5)))
+```
+
+```
+  min max lab
+1   0 100   0
+2 100 200   1
+3 200 300   2
+4 300 400   3
+5 400 500   4
+6 500 600   5
+```
+
+
+```r
+(rc = reclassify(ocean_cut, rcl, lowerTRUE = TRUE))
+```
+
+```
+class      : RasterLayer 
+dimensions : 318, 318, 101124  (nrow, ncol, ncell)
+resolution : 31.45065, 31.45065  (x, y)
+extent     : -2157752, -2147751, 1530395, 1540396  (xmin, xmax, ymin, ymax)
+crs        : +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs 
+source     : memory
+names      : layer 
+values     : 0, 5  (min, max)
+```
+
+---
+
+
+```r
+(s = stack(r, m, ocean_cut, rc) %&gt;% 
+  setNames(c("elevation", "land-mask", "terrain", "topography")))
+```
+
+```
+class      : RasterStack 
+dimensions : 318, 318, 101124, 4  (nrow, ncol, ncell, nlayers)
+resolution : 31.45065, 31.45065  (x, y)
+extent     : -2157752, -2147751, 1530395, 1540396  (xmin, xmax, ymin, ymax)
+crs        : +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs 
+names      : elevation, land.mask, terrain, topography 
+min values :       -70,         1,       1,          0 
+max values :       501,         1,     501,          5 
+```
+
+---
+
+
+```r
+plot(s, col = viridis::viridis(256))
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-14-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Object/Raster Interaction
+
+- Objects can be used to extract values from a raster!
+
+--
+
+- Lets get some objects from OpenStreetMap
+
+--
+
+- OSM provides the largest, most up to date digital representation of the earths features
+
+--
+
+- Learning to identify and extract OSM data will provide you with more data to anwser questions then you weill ever need!
+
+--
+
+- Lets say we want the river channels in the Goleta Area...
+
+---
+
+# OpenStreetMap (OSM) tags
+
+- A OSM tag consists of two items:
+  
+  - a "key" and a "value." 
+
+--
+
+  - Tags describe _specific_ features of map elements (*nodes*, _ways_, or _relations_). 
+
+--
+
+  - Tags are presented "for humans" as key=value: separated by an equals sign. 
+
+--
+
+- The **key** is used to describe a topic, category, or type of feature (e.g., highway or name). 
+
+--
+
+- Keys can be qualified with prefixes, infixes, or suffixes (usually, separated with a colon, :), forming super- or sub-categories 
+
+--
+
+- The _value_ provides detail about a _key-specified_ feature. Commonly, values are: 
+  - free form text: name="Hollistor Road"
+  - one of a set of distinct values: highway=motorway, 
+  - multiple values (separated by a semicolon) (e.g. motorcycle:rental=yes)
+ 
+--
+
+- So for a *river*, if we [google OSM river](https://www.google.com/search?q=osm+rivers) ...
+  
+---
+  
+&lt;img src="lec-img/19-osm.png" width="1137" style="display: block; margin: auto;" /&gt;
+---
+
+# Lets get the waterway data in R!
+
+- OSM has global coverage, we need to limit the results to Goleta
+
+--
+
+- Goltea is our 'AOI', and can be defined by its bbox or extent.
+
+--
+
+- Since OSM is global, all data is in the WGS84 Geographic CRS (`EPSG:4326`)
+
+--
+
+
+```r
+(bb  = st_bbox(s) %&gt;% st_as_sfc() %&gt;% st_transform(4326))
+```
+
+```
+Geometry set for 1 feature 
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: -119.9263 ymin: 34.38165 xmax: -119.7928 ymax: 34.49051
+Geodetic CRS:  WGS 84
+```
+
+---
+
+With a bounding box, we can use the `osmdata` library to format OSM (overpass API) queries:
+
+
+```r
+(osm = osmdata::opq(bb))
+```
+
+```
+$bbox
+[1] "34.3816492088834,-119.926331041619,34.490509206584,-119.792833373424"
+
+$prefix
+[1] "[out:xml][timeout:25];\n(\n"
+
+$suffix
+[1] ");\n(._;&gt;;);\nout body;"
+
+$features
+NULL
+
+attr(,"class")
+[1] "list"           "overpass_query"
+attr(,"nodes_only")
+[1] FALSE
+```
+
+---
+### But... we want features!
+
+--
+
+Specifically features that match the tag `waterway=stream`
+
+--
+
+
+```r
+(osm = osmdata::opq(bb) %&gt;% 
+  add_osm_feature(key = 'waterway', value = "stream") )
+```
+
+```
+$bbox
+[1] "34.3816492088834,-119.926331041619,34.490509206584,-119.792833373424"
+
+$prefix
+[1] "[out:xml][timeout:25];\n(\n"
+
+$suffix
+[1] ");\n(._;&gt;;);\nout body;"
+
+$features
+[1] " [\"waterway\"=\"stream\"]"
+
+attr(,"class")
+[1] "list"           "overpass_query"
+attr(,"nodes_only")
+[1] FALSE
+```
+---
+
+With a formatted query, we can extract the web-based data as `sf` objects
+
+--
+
+
+```r
+(osm = osmdata::opq(bb) %&gt;% 
+  add_osm_feature(key = 'waterway', value = "stream") %&gt;% 
+  osmdata_sf())
+
+print(osm)
+```
+  
+---
+
+### So what did we get?
+
+
+```r
+(river = osm$osm_lines %&gt;% 
+   dplyr::select(osm_id, name, waterway))
+```
+
+```
+Simple feature collection with 254 features and 3 fields
+Geometry type: LINESTRING
+Dimension:     XY
+Bounding box:  xmin: -119.931 ymin: 34.41211 xmax: -119.7606 ymax: 34.50882
+Geodetic CRS:  WGS 84
+First 10 features:
+           osm_id                name
+23144196 23144196                &lt;NA&gt;
+23144200 23144200                &lt;NA&gt;
+23144203 23144203 Maria Ygnacio Creek
+23144204 23144204                &lt;NA&gt;
+23144206 23144206     Las Vegas Creek
+23144210 23144210                &lt;NA&gt;
+23144219 23144219           Dry Creek
+23144220 23144220      Devereux Creek
+23144223 23144223                &lt;NA&gt;
+23144236 23144236     San Pedro Creek
+         waterway
+23144196   stream
+23144200   stream
+23144203   stream
+23144204   stream
+23144206   stream
+23144210   stream
+23144219   stream
+23144220   stream
+23144223   stream
+23144236   stream
+                               geometry
+23144196 LINESTRING (-119.8703 34.42...
+23144200 LINESTRING (-119.8424 34.42...
+23144203 LINESTRING (-119.7945 34.45...
+23144204 LINESTRING (-119.8815 34.48...
+23144206 LINESTRING (-119.8331 34.45...
+23144210 LINESTRING (-119.7994 34.46...
+23144219 LINESTRING (-119.8664 34.48...
+23144220 LINESTRING (-119.8901 34.42...
+23144223 LINESTRING (-119.8699 34.45...
+23144236 LINESTRING (-119.8311 34.49...
+```
+---
+
+## Lets find the longest river segment *IN* our extent
+
+
+```r
+river = river %&gt;% 
+  st_transform(crs(s)) %&gt;% 
+  st_intersection(st_as_sfc(st_bbox(r))) %&gt;% 
+  mutate(length = st_length(.)) %&gt;% 
+  slice_max(length, n = 1)
+```
+
+--
+
+
+```r
+plot(r)
+plot(river, add = TRUE, col = "blue", lwd = 2)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-22-1.png" width="432" /&gt;
+
+---
+
+# Value Extraction
+
+- Often, we want to know the profile and sinousity of a river
+
+- To do this, we need to know the inlet and outlet as well as the straight line connector
+
+
+```r
+inlet  = head(st_cast(river, "POINT"), 1)
+outlet = tail(st_cast(river, "POINT"), 1) 
+pts = bind_rows(inlet, outlet) 
+
+line = st_cast(st_union(pts), "LINESTRING")
+```
+
+---
+
+
+```r
+plot(r)
+plot(river, add = TRUE, col = "blue", lwd = 2)
+plot(line, add = TRUE, col = "black", lwd = 2)
+plot(outlet$geometry, add = TRUE, pch = 16, col = "red")
+plot(inlet$geometry, add = TRUE, pch = 16, col = "green")
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-24-1.png" width="432" /&gt;
+---
+## Sinuosity
+
+Channel **sinuosity** is calculated by dividing the length of the stream channel by the straight line distance between the end points of the selected channel reach.
+
+
+```r
+(sin = st_length(river) / st_length(line))
+```
+
+```
+1.247054 [1]
+```
+
+&lt;img src="lec-img/19-sinuosity.png" width="942" style="display: block; margin: auto;" /&gt;
+---
+
+## River Slope:
+
+The change in elevation between the inlet/outlet divided by the length (rise/run) give us the slope of the river:
+
+--
+
+To calculate this, we must extract elevation values at the inlet and outlet:
+
+--
+
+
+```r
+(elev = raster::extract(r, pts))
+```
+
+```
+[1] 95 22
+```
+
+--
+
+
+```r
+100 * (elev[1] - elev[2]) / units::drop_units(st_length(river))
+```
+
+```
+[1] 1.744715
+```
+
+---
+
+## River profile
+
+What does the elevation profile of the river look like?
+
+
+```r
+profile = raster::extract(r, river)[[1]]
+```
+
+--
+
+
+```r
+plot(profile, type = "l")
+lines(zoo::rollmean(profile,k = 6), col = "darkred", lwd = 3)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-30-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle, inverse
+# Map Algebra
+---
+
+# Map Algebra
+
+- Dana Tomlin (Tomlin 1990) defined a framework for the analyizing field data stored as grided values.
+
+--
+
+- He called this framework map algebra. 
+
+--
+
+- Map algebra operations and functions are broken down into four types: 
+
+--
+
+  - local
+
+--
+
+  - focal
+
+--
+
+  - zonal 
+
+--
+
+  - global
+
+---
+
+# Yesterdays Rainfall data:
+
+
+```r
+library(climateR)
+AOI = USAboundaries::us_counties() %&gt;% filter(state_name == "California")
+
+system.time({ 
+  ca = climateR::getTerraClim(AOI, "prcp", startDate = "2000-01-01", endDate = '2000-12-31') 
+})
+```
+
+```
+Spherical geometry (s2) switched off
+Spherical geometry (s2) switched on
+```
+
+```
+   user  system elapsed 
+  0.225   0.100   1.052 
+```
+
+```r
+(prcp = ca[[1]])
+```
+
+```
+class      : RasterStack 
+dimensions : 229, 247, 56563, 12  (nrow, ncol, ncell, nlayers)
+resolution : 0.04166667, 0.04166667  (x, y)
+extent     : -124.4167, -114.125, 32.5, 42.04167  (xmin, xmax, ymin, ymax)
+crs        : +proj=longlat +datum=WGS84 +no_defs 
+names      : X2000.01, X2000.02, X2000.03, X2000.04, X2000.05, X2000.06, X2000.07, X2000.08, X2000.09, X2000.10, X2000.11, X2000.12 
+min values :      0.0,      0.2,      1.6,      3.5,      0.0,      0.0,      0.0,      0.0,      0.0,      0.0,      2.6,      0.0 
+max values :    154.8,    605.2,    597.6,    165.5,    291.1,    124.0,     59.2,     65.7,     99.0,     59.6,    235.2,    151.4 
+```
+
+---
+
+# Local
+
+- Local operations and functions are applied to **each** individual cell and only involve those cells sharing the same location.
+
+--
+
+- More than one raster can be involved in a local operation. 
+
+--
+
+- For example, rasters can be **summed** ( each overlapping pixels is added) 
+
+--
+
+- Local operations also include **reclassification** of values. 
+
+---
+
+
+```r
+s = stack(mean(prcp), calc(prcp, sd), min(prcp), max(prcp)) %&gt;% 
+  setNames(c("Mean", "StDev", "Min", "Max"))
+
+rasterVis::levelplot(s)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-32-1.png" width="432" /&gt;
+
+---
+
+# Focal
+
+- Also referred to as "neighborhood" operations.
+
+--
+
+- Assigns summary values to the output cells based on the neighboring cells in the input raster. 
+
+--
+
+- For example, a cell output value can be the average of 9 neighboring input cells (including the center cell) - this acts as a smoothing function.
+
+---
+
+# Focal
+
+- Focal operations require a window (also known as a kernel) to work over
+
+--
+
+- Additionally a kernel also defines the weight each neighboring cell contributes to the summary statistic. 
+
+--
+
+- For example, all cells in a 3x3 neighbor could each contribute 1/9th of their value to the summarized value (i.e. equal weight). 
+
+- The weight can take on a more complex form defined by a function; such weights are defined by a kernel function. 
+
+- One popular function is a Gaussian weighted function which assigns greater weight to nearby cells than those further away ([Toblers first law](https://en.wikipedia.org/wiki/Tobler%27s_first_law_of_geography))
+
+---
+
+# Example: Focal
+
+Lets apply a smoothing kernel to our UCSB elevation data over an 11x11 window, using the mean operator
+  
+
+```r
+goleta = AOI::aoi_get("Goleta") %&gt;% st_transform(crs(r))
+goleta_elev = crop(r, goleta)
+f1 &lt;- focal(goleta_elev, w= matrix(1,nrow=11,ncol=11), fun=mean)
+```
+---
+
+# Results 
+.pull-left[
+
+```r
+plot(goleta_elev)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-34-1.png" width="432" /&gt;
+]
+
+.pull-right[
+
+```r
+plot(f1)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-35-1.png" width="432" /&gt;
+]
+
+---
+
+## What did we do?
+
+.pull-left[
+
+```r
+matrix(1,nrow=11,ncol=11)
+```
+
+```
+      [,1] [,2] [,3] [,4] [,5] [,6] [,7]
+ [1,]    1    1    1    1    1    1    1
+ [2,]    1    1    1    1    1    1    1
+ [3,]    1    1    1    1    1    1    1
+ [4,]    1    1    1    1    1    1    1
+ [5,]    1    1    1    1    1    1    1
+ [6,]    1    1    1    1    1    1    1
+ [7,]    1    1    1    1    1    1    1
+ [8,]    1    1    1    1    1    1    1
+ [9,]    1    1    1    1    1    1    1
+[10,]    1    1    1    1    1    1    1
+[11,]    1    1    1    1    1    1    1
+      [,8] [,9] [,10] [,11]
+ [1,]    1    1     1     1
+ [2,]    1    1     1     1
+ [3,]    1    1     1     1
+ [4,]    1    1     1     1
+ [5,]    1    1     1     1
+ [6,]    1    1     1     1
+ [7,]    1    1     1     1
+ [8,]    1    1     1     1
+ [9,]    1    1     1     1
+[10,]    1    1     1     1
+[11,]    1    1     1     1
+```
+]
+
+.pull-right[
+
+```r
+mean(goleta_elev[1:11, 1:11])
+```
+
+```
+[1] 100.6116
+```
+
+```r
+na.omit(values(f1))[1]
+```
+
+```
+[1] 100.6116
+```
+]
+---
+
+# Zonal 
+
+- Zonal operations compute a summary values (such as the mean) from cells aggregated to some zonal unit. 
+
+--
+
+- Like focal operations, a zone and a mediating function must be defined
+
+--
+
+- The most basis example of a zonal function is aggregation!
+
+--
+
+
+```r
+aggregate(goleta_elev, 10) %&gt;% plot()
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-38-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Zonal Statisics (More advanced)
+
+- For more complicated object zones, [exactextractr](https://github.com/isciences/exactextractr) is a fast and effiecient R utility that binds the C++ `exactextract` tool. 
+
+--
+
+- What is the county level mean January rainfall in California?
+
+--
+
+
+```r
+AOI$janPTT = exactextractr::exact_extract(prcp$X2000.01, AOI, "mean", progress = FALSE)
+plot(AOI['janPTT'])
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-39-1.png" width="432" /&gt;
+
+---
+
+# What about the US?
+
+
+```r
+counties =  filter(us_counties(), !usps %in% c("AK", "HI", "PR"))
+  
+jan = getTerraClim(counties, "prcp", startDate = "2000-01-01") 
+  
+counties$janPTT = exact_extract(jan$prcp, counties, "mean", progress = FALSE)
+```
+
+
+
+
+```r
+plot(counties['janPTT'], border = NA, key.pos = 4)
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-42-1.png" width="432" style="display: block; margin: auto;" /&gt;
+---
+
+# Global
+
+- Global operations make use of _some_ or _all_ input cells when computing an output cell value. 
+
+- They are a special case of zonal operations with the _entire_ raster represents a single zone. 
+
+- Examples include generating descriptive statistics for the entire raster dataset
+
+---
+
+### Mean Monthly Rainfall for California
+
+
+```r
+v = cellStats(prcp, mean)
+plot(x = 1:12, y = v, type  = "l", main = "Rainfall Monthly Mean")
+```
+
+&lt;img src="lecture-19_files/figure-html/unnamed-chunk-43-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+### One potential limit to the raster package in R is speed
+
+- If dealing with bigger data, the raster package is a bit antiquated
+
+--
+
+- rasterize polygons: `fasterize`
+
+- Extract cell values by feature: `velox`
+
+- Zonal Statistics: `exactextractr`
+
+- Proxy objects: `stars`
+
+--
+
+- If you really want to work with _BIG_ data (e.g. Terabytes or Petabytes) your limit is both hardware and software...
+
+--
+
+- Cloud platforms like Google Earth Engine are valuable
+
+- GEE is a javascript library with some python bindings build by Google, but as with most great spatial libraries it has an R [wrapper](https://github.com/r-spatial/rgee):
+
+
+---
+class: center, middle
+
+All said, there are many valid reason to **not** use R, but speed is not one of them even though is is commonly the most cited...
+
+---
+
+# Extra! Animating Rasters...
+
+Install and load the `gifski` package
+
+- **save_gif**: combines many individual plots
+
+- A **for loop** build the plots
+
+- The **plot** is what we have been doing all along (if you want a ggplot you must print the object!)
+
+- **gif_file**: the path to save the image
+
+- **width/height**: the image dimensions
+
+- **delay**: the pause between frames
+
+- **loop**: should the gif play over and over?
+
+
+```r
+library(gifski)
+
+save_gif(
+  {for(i in 1:nlayers(prcp)) {
+      plot(prcp[[i]], col = blues9, legend = FALSE, main = month.name[i])}
+  }, 
+  gif_file = "lectures/lec-img/ppt.gif", 
+  width = 800, height = 600, delay = .33, loop = TRUE)
+```
+
+---
+# Result
+
+![](lec-img/ppt.gif) 
+---
+
+# Daily Assignment:
+
+Keep working in your elevation Rmd...
+
+- install `osmdata` from CRAN
+
+- For the Goleta area, extract all OSM point data for restaurants. See [here](https://wiki.openstreetmap.org/wiki/Tag:amenity%3Drestaurant) for the OSM tag.
+
+- Keep only those that have a name in the name attribute (remove NAs)
+
+- `extract` the elevation of these restaurants from your elevation raster
+  - add this information as a new column to the OSM points 
+
+- Create a leaflet map to show these locations as `Markers`.
+  - The `label` should be the name
+  - The `popup` should be the elevation cast to a character.
+
+---
+
+<div id="htmlwidget-d0e4e17a28a5aa770d70" style="width:432px;height:504px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d0e4e17a28a5aa770d70">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addProviderTiles","args":["CartoDB",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addMarkers","args":[[34.4430236,34.4303938,34.4311699,34.4311362,34.4118967,34.4305277,34.4304664,34.4304556,34.436135,34.4129577],[-119.8801197,-119.882268,-119.8739299,-119.8738376,-119.8548208,-119.8723609,-119.8724644,-119.8722312,-119.8158627,-119.857464],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},["Elev:  46","Elev:  17","Elev:  16","Elev:  16","Elev:  15","Elev:  15","Elev:  14","Elev:  14","Elev:  14","Elev:  14"],null,null,null,["Frog Bar and Grill","Cal Taco","Jeannine's","Sharky's Woodfired Mexican Grill","PokiRito","Choppa Poke","Pieology Pizzeria","Kyle's Kitchen","Breakfast Café","A View of the World from Isla Vista"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[34.4118967,34.4430236],"lng":[-119.882268,-119.8158627]}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+# Submission
+
+Submit your knit HTML file to Guachospace
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
