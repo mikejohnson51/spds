@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Geography 13</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Johnson" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link rel="stylesheet" href="ucsb.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Geography 13
+## Lecture 21: Terrain Analysis
+### Mike Johnson
+
+---
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 2; font-size: 80%}
+&lt;/style&gt;
+
+
+
+
+# Raster Data is Big
+
+Landsat/Sentinel scenes (uncropped) can be ~1GB per scene, and 359,977,746 cells
+
+We can reduce some of this by cropping to AOIs but in general we need to be very intentional about the data (time/space) that we want to evaluate, but 
+
+Many Raster Utilities like GDAL operate on raster files on disk rather then in memory. This means they take path names as arguments.
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="lec-img/21-gee-logo.png" alt="caption" width="49%" height="20%" /&gt;&lt;img src="lec-img/21-sentinal-hub.png" alt="caption" width="49%" height="20%" /&gt;
+&lt;p class="caption"&gt;caption&lt;/p&gt;
+&lt;/div&gt;
+
+---
+
+
+
+```bash
+gdalinfo data/LC80250312016270LGN00_B4.TIF 
+```
+
+```
+Driver: GTiff/GeoTIFF
+Files: data/LC80250312016270LGN00_B4.TIF
+Size is 7681, 7811
+Coordinate System is:
+PROJCRS["WGS 84 / UTM zone 15N",
+    BASEGEOGCRS["WGS 84",
+        DATUM["World Geodetic System 1984",
+            ELLIPSOID["WGS 84",6378137,298.257223563,
+                LENGTHUNIT["metre",1]]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["degree",0.0174532925199433]],
+        ID["EPSG",4326]],
+    CONVERSION["UTM zone 15N",
+        METHOD["Transverse Mercator",
+            ID["EPSG",9807]],
+        PARAMETER["Latitude of natural origin",0,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8801]],
+        PARAMETER["Longitude of natural origin",-93,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8802]],
+        PARAMETER["Scale factor at natural origin",0.9996,
+            SCALEUNIT["unity",1],
+            ID["EPSG",8805]],
+        PARAMETER["False easting",500000,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8806]],
+        PARAMETER["False northing",0,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8807]]],
+    CS[Cartesian,2],
+        AXIS["(E)",east,
+            ORDER[1],
+            LENGTHUNIT["metre",1]],
+        AXIS["(N)",north,
+            ORDER[2],
+            LENGTHUNIT["metre",1]],
+    USAGE[
+        SCOPE["Engineering survey, topographic mapping."],
+        AREA["Between 96°W and 90°W, northern hemisphere between equator and 84°N, onshore and offshore. Canada - Manitoba; Nunavut; Ontario. Ecuador -Galapagos. Guatemala. Mexico. United States (USA)."],
+        BBOX[0,-96,84,-90]],
+    ID["EPSG",32615]]
+Data axis to CRS axis mapping: 1,2
+Origin = (518085.000000000000000,4740915.000000000000000)
+Pixel Size = (30.000000000000000,-30.000000000000000)
+Metadata:
+  AREA_OR_POINT=Point
+Image Structure Metadata:
+  COMPRESSION=DEFLATE
+  INTERLEAVE=BAND
+Corner Coordinates:
+Upper Left  (  518085.000, 4740915.000) ( 92d46'43.55"W, 42d49'14.10"N)
+Lower Left  (  518085.000, 4506585.000) ( 92d47' 9.23"W, 40d42'35.93"N)
+Upper Right (  748515.000, 4740915.000) ( 89d57'43.04"W, 42d46'49.73"N)
+Lower Right (  748515.000, 4506585.000) ( 90d 3'35.11"W, 40d40'21.80"N)
+Center      (  633300.000, 4623750.000) ( 91d23'47.81"W, 41d45'15.83"N)
+Band 1 Block=512x512 Type=UInt16, ColorInterp=Gray
+```
+
+---
+
+# CLI Projection
+
+
+```bash
+gdalwarp -t_srs "EPSG:4326" data/LC80250312016270LGN00_B4.TIF  data/wgsLC84.tif
+
+gdalinfo data/wgsLC84.tif
+```
+
+```
+Processing data/LC80250312016270LGN00_B4.TIF [1/1] : 0...10...20...30...40...50...60...70...80...90...100 - done.
+Driver: GTiff/GeoTIFF
+Files: data/wgsLC84.tif
+Size is 8928, 6791
+Coordinate System is:
+GEOGCRS["WGS 84",
+    DATUM["World Geodetic System 1984",
+        ELLIPSOID["WGS 84",6378137,298.257223563,
+            LENGTHUNIT["metre",1]]],
+    PRIMEM["Greenwich",0,
+        ANGLEUNIT["degree",0.0174532925199433]],
+    CS[ellipsoidal,2],
+        AXIS["geodetic latitude (Lat)",north,
+            ORDER[1],
+            ANGLEUNIT["degree",0.0174532925199433]],
+        AXIS["geodetic longitude (Lon)",east,
+            ORDER[2],
+            ANGLEUNIT["degree",0.0174532925199433]],
+    ID["EPSG",4326]]
+Data axis to CRS axis mapping: 2,1
+Origin = (-92.785898091653451,42.820583996472585)
+Pixel Size = (0.000316298634937,-0.000316298634937)
+Metadata:
+  AREA_OR_POINT=Point
+Image Structure Metadata:
+  INTERLEAVE=BAND
+Corner Coordinates:
+Upper Left  ( -92.7858981,  42.8205840) ( 92d47' 9.23"W, 42d49'14.10"N)
+Lower Left  ( -92.7858981,  40.6726000) ( 92d47' 9.23"W, 40d40'21.36"N)
+Upper Right ( -89.9619839,  42.8205840) ( 89d57'43.14"W, 42d49'14.10"N)
+Lower Right ( -89.9619839,  40.6726000) ( 89d57'43.14"W, 40d40'21.36"N)
+Center      ( -91.3739410,  41.7465920) ( 91d22'26.19"W, 41d44'47.73"N)
+Band 1 Block=8928x1 Type=UInt16, ColorInterp=Gray
+```
+
+
+
+---
+
+# Compute Times
+
+
+```r
+system.time({
+  r = raster('data/LC80250312016270LGN00_B4.TIF') 
+  r2 =projectRaster(r, crs = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs')
+  writeRaster(r2, 'data/wgsLC84.tif', overwrite = TRUE)
+})
+# user  system elapsed 
+# 99.161  31.844 146.286 
+```
+
+
+```r
+system.time({
+  system('gdalwarp -t_srs "EPSG:4326" data/LC80250312016270LGN00_B4.TIF data/wgsLC84.tif')
+})
+# user  system elapsed 
+# 2.270   0.821   3.730 
+
+system.time({
+  sf::gdal_utils(util = "warp",
+                "data/LC80250312016270LGN00_B4.TIF", 'data/wgsLC84.tif',
+                 options = c("-t_srs", '4326'))
+})
+# user  system elapsed 
+# 7.348   1.133   9.059  
+```
+
+---
+
+
+```r
+knitr::include_graphics("lec-img/21-focal-image.png")
+```
+
+&lt;img src="lec-img/21-focal-image.png" width="629" style="display: block; margin: auto;" /&gt;
+---
+
+
+```r
+knitr::include_graphics("lec-img/21-moving-window.png")
+```
+
+&lt;img src="lec-img/21-moving-window.png" width="436" style="display: block; margin: auto;" /&gt;
+---
+
+```r
+knitr::include_graphics("lec-img/21-focal-examples.png")
+```
+
+&lt;img src="lec-img/21-focal-examples.png" width="446" style="display: block; margin: auto;" /&gt;
+---
+# Terrain Analysis
+---
+
+
+```r
+url  = "https://labs.waterdata.usgs.gov/api/nldi/linked-data/nwissite/USGS-11120000/basin/"
+basin = read_sf(url)
+write_sf(basin, dsn = "data/USGS-11120000.gpkg")
+
+elev  = elevatr::get_elev_raster(basin, z = 13) %&gt;% 
+  crop(basin)
+
+writeRaster(elev, "data/goleta-area-elev.tif", overwrite = TRUE)
+```
+
+---
+&lt;img src="lecture-21_files/figure-html/unnamed-chunk-12-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+library(rayshader)
+
+pmat &lt;- matrix(extract(r,extent(r),buffer=300), nrow=ncol(r),ncol=nrow(r))
+
+sphere_shade(pmat) %&gt;%
+  plot_map()
+```
+
+```
+
+Calculating Surface Normal [] ETA:  0s
+Calculating Surface Normal [] ETA:  1s
+Calculating Surface Normal [] ETA:  0s
+                                      
+```
+
+&lt;img src="lecture-21_files/figure-html/unnamed-chunk-13-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Slope and Aspect
+
+- Used for: hydrology, engineering, conservation, site planning, other infrastructure 	development, transportation development,
+
+--
+
+- Watershed deliniation, flowpaths and direction, erosion modeling, and viewshed determination all use slope and/or aspect	data as input.
+
+--
+
+- Slope is defined as the change is elevation (a rise) with a change in horizontal position (a run).
+
+--
+
+- Slope is often reported in degrees (0° is flat, 90° is vertical)
+
+---
+
+# Slope
+
+&lt;img src="lec-img/21-general-slope.png" width="623" style="display: block; margin: auto;" /&gt;
+
+---
+# Calculating Slope
+
+- Elevation is denoted by Z
+- Uses a 3x3 (or 5x5) neighborhood
+- Each cell is assigned a subscript 
+
+The most common formula: 
+
+&lt;img src="lec-img/21-slope-formula.png" width="540" style="display: block; margin: auto;" /&gt;
+---
+
+- Slope calculation base on cells adjacent to the center cell
+
+- The distance is from cell center to cell center (res*2)
+
+&lt;img src="lec-img/21-basic-slope-calc.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="lec-img/21-3d-finite.gif" style="display: block; margin: auto;" /&gt;
+
+`$$\frac{dz}{dx} = \frac{(c + 2f + i) - (a + 2d + g)}{8 * x_{res}}$$`
+`$$\frac{dz}{dy} = \frac{(g + 2h + i) - (a + 2b + c)}{8 * y_{res}}$$`
+
+`$$\frac{rise}{run} = \sqrt(\frac{dz}{dx})^2 + (\frac{dz}{dy})^2$$`
+---
+
+&lt;img src="lec-img/21-example-slope.gif" style="display: block; margin: auto;" /&gt;
+`$$\frac{dz}{dx} = \frac{(c + 2f + i) - (a + 2d + g)}{8 * x_{res}}$$`
+`$$\frac{dz}{dx} = \frac{(50 + 60 + 10) - (50 + 60 + 8)}{40} = .05$$`
+
+`$$\frac{dz}{dy} = \frac{(g + 2h + i) - (a + 2b + c)}{8 * y_{res}}$$`
+
+`$$\frac{dz}{dy} = \frac{(8 + 20 + 10) - (50 + 90 + 50)}{40} = -3.8$$`
+
+`$$\frac{rise}{run} = \sqrt(\frac{dz}{dx})^2 + (\frac{dz}{dy})^2 = \sqrt 0.05^2 + -3.8^2 = 3.80032$$`
+`$$\frac{rise}{run} = arctan(3.80032)* \frac{180}{\pi} = 75.25$$`
+
+---
+
+# Using Whitebox
+
+`WhiteboxTools` is an open source geospatial platform created by Prof. John Lindsay 
+
+Project Highlights
+
+- Contains more than 440 tools for processing various types of geospatial data.
+- Many tools operate in parallel, taking full advantage of your multi-core processor.
+- Written in the cross-platform programming language `Rust` and compiled to highly efficient native code.
+- Small stand-alone application with no external dependencies
+
+---
+
+# Slope 
+
+- Units of output raster; options include 'degrees', 'radians', 'percent'
+
+--
+
+- Requires 2 inputs: 
+
+  - (1) **path** to local DEM ("data/goleta-area-elev.tif")
+  - (2) **path** to write DEM (""data/goleta-area-slope.tif")
+  
+
+```r
+wbt_slope("data/goleta-area-elev.tif", "data/goleta-area-slope.tif")
+```
+---
+
+# Results
+
+&lt;img src="lecture-21_files/figure-html/unnamed-chunk-20-1.png" width="432" style="display: block; margin: auto;" /&gt;
+---
+
+# Aspect
+
+- Aspect identifies the _downslope_ direction of the maximum rate of change in value from each cell to its neighbors. It can be thought of as the slope direction.
+
+--
+
+- The values of each cell indicate the compass direction the surface faces at that location.
+
+&lt;img src="lec-img/21-aspect.png" width="30%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Aspect 
+
+- Calculates an aspect raster from an input DEM.
+
+--
+
+- Requires 2 inputs: 
+
+  - (1) **path** to local DEM ("data/goleta-area-elev.tif")
+  - (2) **path** to write DEM (""data/goleta-area-slope.tif")
+
+
+```r
+wbt_aspect("data/goleta-area-elev.tif", "data/goleta-area-aspect.tif")
+```
+
+---
+
+# Aspect View
+
+.pull-left[
+
+```r
+r = raster("data/goleta-area-aspect.tif")
+plot(r,  box = FALSE, axes = FALSE)
+```
+
+&lt;img src="lecture-21_files/figure-html/unnamed-chunk-23-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+```r
+r = raster("data/goleta-area-aspect.tif")
+plot(r,  box = FALSE, axes = FALSE, col = rainbow(8))
+```
+
+&lt;img src="lecture-21_files/figure-html/unnamed-chunk-24-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Hillshade
+
+- Hillshading is a technique used to visualize terrain as shaded relief, illuminating it with a hypothetical light source. 
+
+--
+
+
+- The illumination value for each raster cell is determined by its orientation to the light source, which is based on slope and aspect. 
+
+--
+
+- The lighting source is controlled by defining an _azimuth_ and _altitude_ of the hypothetical sun
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="lec-img/21-hillshade-azimuth.gif" alt="caption" width="49%" height="20%" /&gt;&lt;img src="lec-img/21-hillshade-altitude.gif" alt="caption" width="49%" height="20%" /&gt;
+&lt;p class="caption"&gt;caption&lt;/p&gt;
+&lt;/div&gt;
+
+---
+
+# Whitebox
+
+Calculates a hillshade raster from an input DEM.
+
+- **azimuth** = 315
+- **altitude** = 30
+- **zfactor** = 1
+
+
+```r
+wbt_hillshade("data/goleta-area-elev.tif", "data/goleta-area-hillshade.tif")
+```
+
+```
+[1] "hillshade - Elapsed Time (excluding I/O): 0.61s"
+```
+---
+# Reults 
+
+.pull-left[
+### No alpha
+
+```r
+r = raster("data/goleta-area-hillshade.tif")
+plot(r,  box = FALSE, axes = FALSE, col = gray.colors(256))
+```
+
+&lt;img src="lecture-21_files/figure-html/unnamed-chunk-27-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+### alpha layer
+
+```r
+plot(r,  box = FALSE, axes = FALSE, col = gray.colors(256, alpha = .5))
+```
+
+&lt;img src="lecture-21_files/figure-html/unnamed-chunk-28-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+
+## Contours
+- A contour - or isoline - is a curve along which a continuous field has a constant value.[
+
+- Isolines show connections between two places that share a common value.
+
+- The most common example in cartography is a contour line, which are used in topographic maps to join places that have the same height value
+
+
+```r
+wbt_contours_from_raster("data/goleta-area-elev.tif", "data/goleta-area-contour.shp", interval = 100)
+```
+
+---
+
+# Results
+
+
+```r
+plot(read_sf("data/goleta-area-contour.shp"))
+```
+
+&lt;img src="lecture-21_files/figure-html/unnamed-chunk-30-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Overlay
+
+```r
+r = raster("data/goleta-area-hillshade.tif")
+cont = read_sf("data/goleta-area-contour.shp")
+plot(r,  box = FALSE, axes = FALSE, col = gray.colors(256, alpha = .5))
+plot(cont['HEIGHT'], add = TRUE)
+```
+
+&lt;img src="lecture-21_files/figure-html/unnamed-chunk-31-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+
+# HAND
+
+Height Above Nearest Drainage is a hydrologically normalized DEM in which each cell represents the height above the nearest cell designated as a river. Therefore, to create a HAND product we need a representation of the DEM, and the river network on the same raster grid.
+
+&lt;img src="lec-img/21-HAND.png" width="522" style="display: block; margin: auto;" /&gt;
+
+---
+
+If we think of the basin as a bathtub, then the height of the water in the channel will spread evenly across the landscape submerging any cell with a HAND value less then the height of the water in the channel. That is, if the height of the water (stage) in a river is 4 feet, any cell with a HAND value less then 4 will be flooded. This idea is illustrated below:
+
+&lt;img src="lec-img/flood.gif" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Summary
+ - Terrain operator are critical for a range of ecologic/environmental studies
+
+ - Terrain operators are focal operations based on the neighborhood of a cell
+
+ - Terrain operators are complex and take time to execute
+
+ - We can dramatically increase the processing speed by leaving data on disk
+
+ - We use whitebox tools as an interface to do this
+
+ - Today we saw `slope`, `aspect`, `hillshade`, and `contour` and talked about `HAND`
+
+ - Again whitebox tools provide 100s of operations for working with elevation data
+
+---
+
+# Daily Exercise
+In an Rmd file ...
+
+We are going to evaluate the terrain near [Mount Saint Helens](https://en.wikipedia.org/wiki/Mount_St._Helens)
+
+- Get a representation of Mount Saint Helens using AOI::aoi_get()
+- Buffer the returned polygon by a 1/2 mile
+
+
+```r
+mo = AOI::aoi_get("Mount Saint Helens") %&gt;% 
+  AOI::aoi_buffer(.5)
+```
+
+#### In a chunk with `eval = FALSE`:
+
+- Get elevation for this AOI using elevatr and a zoom of 12
+- Write the raster as a tif to your data folder
+- Create a `hillshade`, `slope`, and `aspect` raster using `whitebox` be intentional with you path names!
+
+---
+
+#### In a chunck with `eval = TRUE`:
+
+- Read each image back in a plot with the following palettes:
+
+*Elevation*: `viridis::viridis(256)`
+
+*Slope*: `terrain.colors(256)`
+
+*Aspect*: `rainbow(8)`
+
+*Hillshade*: `gray.colors(256, alpha = .8)`
+
+- Be sure to set the axes, and box to FALSE, and label the plot with a title using main
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
